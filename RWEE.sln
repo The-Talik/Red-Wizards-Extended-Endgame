@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36603.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RWEE.Plugin", "RWEE.Plugin\RWEE.Plugin.csproj", "{C01ADF17-772F-4029-9B8F-75E8196DE4CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RWEE.Patcher", "RWEE.Patcher\RWEE.Patcher.csproj", "{B17FE2B6-41B2-4A63-A19B-CF9E4C40DE09}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C01ADF17-772F-4029-9B8F-75E8196DE4CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C01ADF17-772F-4029-9B8F-75E8196DE4CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C01ADF17-772F-4029-9B8F-75E8196DE4CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C01ADF17-772F-4029-9B8F-75E8196DE4CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B17FE2B6-41B2-4A63-A19B-CF9E4C40DE09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B17FE2B6-41B2-4A63-A19B-CF9E4C40DE09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B17FE2B6-41B2-4A63-A19B-CF9E4C40DE09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B17FE2B6-41B2-4A63-A19B-CF9E4C40DE09}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FAFA302A-1352-49B7-97D1-540157A3BCAA}
+	EndGlobalSection
+EndGlobal

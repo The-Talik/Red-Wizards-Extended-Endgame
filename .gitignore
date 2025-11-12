@@ -1,0 +1,16 @@
+# VS / build
+.vs/
+**/bin/
+**/obj/
+*.user
+*.suo
+
+# local outputs
+_releases/*
+releases/*
+releases/**/plugin/RedWizardsExtendedEndgame.plugin/*
+releases/**/patcher/*
+!releases/.keep   # if you want to keep the folder in git
+
+# packages, zips (if you create them)
+*.zip
