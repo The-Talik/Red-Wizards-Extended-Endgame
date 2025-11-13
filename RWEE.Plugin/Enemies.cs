@@ -25,10 +25,10 @@ namespace RWEE
 			{
 				if (aiChar.level > 50)
 				{
-					//Main.log($"Applying AI bonus. lev: {aiChar.level} hp: {___baseHP} shield: {___baseShield} energy: {___baseEnergy} regen: {___hpRegen} regen shield-recharge: {___shieldRecharge} dam bonus: {___ss.dmgBonus}");
+					Main.log($"Applying AI bonus. lev: {aiChar.level} hp: {___baseHP} shield: {___baseShield} energy: {___baseEnergy} regen: {___hpRegen} regen shield-recharge: {___shieldRecharge} dam bonus: {___ss.dmgBonus}");
 					//float mod = aiChar.level / 50;  //1x at L50, 2x at L100, 3x at L150, etc
 
-					float mod = levelToMod(aiChar.level * (aiChar.AIType==4 || aiChar.AIType==3 ? 1.2f : 0f)); //bosses are harder, but give better loot.
+					float mod = levelToMod(aiChar.level * (aiChar.AIType==4 || aiChar.AIType==3 ? 1.2f : 1f)); //bosses are harder, but give better loot.
 					if (mod <= 0)
 						mod = 0;
 					___baseHP *= (1 + mod);
@@ -41,7 +41,7 @@ namespace RWEE
 					___acceleration *= (1 + mod / 10);
 
 					___ss.dmgBonus += mod;
-					//Main.log($"applied {(1+mod)}x. lev: {aiChar.level} hp: {___baseHP} shield: {___baseShield} energy: {___baseEnergy} regen: {___hpRegen} regen shield-recharge: {___shieldRecharge} dam bonus: {___ss.dmgBonus}");
+					Main.log($"applied {(1+mod)}x. lev: {aiChar.level} hp: {___baseHP} shield: {___baseShield} energy: {___baseEnergy} regen: {___hpRegen} regen shield-recharge: {___shieldRecharge} dam bonus: {___ss.dmgBonus}");
 					//this.baseHP;
 					//this.ss.armor;
 					//this.ss.armorMod
@@ -52,6 +52,7 @@ namespace RWEE
 		static public float levelToMod(float level)
 		{
 			float mod = (float)(Math.Pow(level - 49, 1.5) - 1) / 100;
+			//Main.log($"level: {level} mod: {mod}");
 			return Mathf.Max(mod, 0);
 		}
 		/**

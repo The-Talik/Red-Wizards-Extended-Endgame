@@ -61,9 +61,14 @@ Changes from base game:
  - Ancient artifacts are purple, instead of blue
 
 Current Version: 1.0.3
-Download: https://www.nexusmods.com/starvalor/mods/55
+Download:
+https://www.nexusmods.com/starvalor/mods/55
+https://github.com/The-Talik/Red-Wizards-Extended-Endgame/releases
 
 Changelog:
+1.0.4
+ - Adjusts item drop for high level enemies to give a more even spread of equipment types, and ensure good weapons are always returned even if the item level is too high.
+ - fix a bug with enemy stat scaling from the last build.
 1.0.3
  - Fixed a bug stopping tech from leveling past 50
  - Sector level up can now cause nearby, lower level sectors to level up.

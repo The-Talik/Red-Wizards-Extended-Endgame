@@ -9,16 +9,19 @@ namespace RWEE
 {
 	internal class DataDumps
 	{
-		/**
-* Dump items
-*/
-		//[HarmonyPatch(typeof(ItemDB), "LoadDatabase")]
-		static class ItemDB_LoadDatabase
+		const bool show = true;
+		// =========================
+		// Item dump
+		// =========================
+		[HarmonyPatch(typeof(ItemDB), "LoadDatabase")]
+		static class ItemDB_LoadDatabase_dump
 		{
 			// lowest so other LoadDatabase patches finish first
 			[HarmonyPriority(Priority.Last)]
 			static void Postfix(List<Item> ___items)
 			{
+				if (!show)
+					return;
 				try
 				{
 					var items = ___items;
@@ -94,15 +97,21 @@ namespace RWEE
 					$"prodMats=[{prodMats}]";
 			}
 		}
-		/**
-		 * Equipment list dump
-		 */
-		//[HarmonyPatch(typeof(EquipmentDB), "LoadDatabase")]
-		static class EquipmentDB_LoadDatabase_Dump_Patch
+
+
+
+
+		// =========================
+		// Equipment dump
+		// =========================
+		[HarmonyPatch(typeof(EquipmentDB), "LoadDatabase")]
+		public static class EquipmentDB_LoadDatabase_Dump_Patch
 		{
 			[HarmonyPriority(Priority.Last)]
 			static void Postfix()
 			{
+				if (!show)
+					return;
 				try
 				{
 					var list = GetEquipmentList();
@@ -127,7 +136,7 @@ namespace RWEE
 				}
 			}
 
-			static List<Equipment> GetEquipmentList()
+			public static List<Equipment> GetEquipmentList()
 			{
 				// Try common field names on EquipmentDB
 				var fi =
@@ -168,7 +177,7 @@ namespace RWEE
 
 				return
 					$"[#{e.id}] {name}  " +
-					$"type={e.type} class>={e.minShipClass} " +
+					$"type={e.type} {e.effects[0].type} class>={e.minShipClass} " +
 					$"lvl={e.itemLevel} (tech={e.techLevel},sort={e.sortPower}) " +
 					$"space={e.space:0.##} massFlat={e.massFlat:0.##} massMod={e.massChange:0.##} " +
 					$"energy={e.energyCost:0.##}{(e.energyCostPerShipClass ? "*2^(class-1)" : "")} " +
@@ -187,6 +196,111 @@ namespace RWEE
 				if (e.spawnInArena) bits.Add("Arena");
 				if (!e.enableChangeKey) bits.Add("NoRebind");
 				return bits.Count > 0 ? string.Join("|", bits) : "-";
+			}
+		}
+		// =========================
+		// Weapons dump (after predefs)
+		// =========================
+		[HarmonyPatch(typeof(GameData), "GetPredefinedData")]
+		static class GameData_GetPredefinedData_DumpWeapons
+		{
+			[HarmonyPriority(Priority.Last)]
+			static void Postfix()
+			{
+				if (!show) return;
+				try
+				{
+					var (list, src) = ResolveWeapons();
+					if (list == null || list.Count == 0)
+					{
+						Main.log("[Weapons] List is null/empty.");
+						return;
+					}
+
+					Main.log($"[Weapons] Dumping {list.Count} weapons (source='{src}')…");
+					for (int i = 0; i < list.Count; i++)
+					{
+						var w = list[i];
+						if (w == null) continue;
+						Main.log(FormatWeapon(w));
+					}
+					Main.log("[Weapons] Done.");
+				}
+				catch (Exception ex)
+				{
+					Main.error("[Weapons] Dump failed: " + ex);
+				}
+			}
+
+			static (List<TWeapon> list, string source) ResolveWeapons()
+			{
+				var gi = GameData.data;
+				if (gi == null) return (null, "GameData.data=null");
+
+				// Try common names first
+				var f =
+					AccessTools.Field(gi.GetType(), "weapons") ??
+					AccessTools.Field(gi.GetType(), "weaponList") ??
+					AccessTools.Field(gi.GetType(), "allWeapons");
+
+				if (f != null)
+				{
+					var l = AsList(f.GetValue(gi));
+					if (l != null) return (l, f.Name);
+				}
+
+				// Fallback: find first field that looks like List<TWeapon> / TWeapon[]
+				foreach (var fld in gi.GetType().GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic))
+				{
+					var trial = AsList(fld.GetValue(gi));
+					if (trial != null && trial.Count > 0) return (trial, fld.Name);
+				}
+
+				return (new List<TWeapon>(), "notfound");
+			}
+
+			static List<TWeapon> AsList(object obj)
+			{
+				if (obj is List<TWeapon> l) return l;
+				if (obj is TWeapon[] arr) return arr.ToList();
+				if (obj is System.Collections.IEnumerable en)
+				{
+					var outList = new List<TWeapon>();
+					foreach (var o in en)
+					{
+						if (o is TWeapon w) outList.Add(w);
+						else return null; // mixed → bail
+					}
+					return outList;
+				}
+				return null;
+			}
+
+			static string FormatWeapon(TWeapon w)
+			{
+				// name fallback
+				string name = string.IsNullOrEmpty(w.name) ? $"Weapon#{w.index}" : w.name;
+
+				// energy/heat per-shot (raw; no player skills)
+				float energyShot = w.energyCost; // property: energyCostMod * (damage * 0.12f)
+				float heatShotRaw = w.heatGenMod * (w.damage * 0.75f + 1f);
+
+				// per-second considering burst mechanics
+				float rof = Math.Max(w.rateOfFire, 0.0001f);
+				float burstDenom = Math.Max(w.rateOfFire + w.shortCooldown * w.burst, 0.0001f);
+				float energyPerSec = (w.burst == 0) ? (energyShot / rof) : (energyShot * (w.burst + 1) / burstDenom);
+				float heatPerSec = (w.burst == 0) ? (heatShotRaw / rof) : (heatShotRaw * (w.burst + 1) / burstDenom);
+
+				return
+					$"[#{w.index}] {name}  " +
+					$"type={w.type}/{w.compType} dmgType={w.damageType} " +
+					$"space={w.space:0.##} dmg={w.damage:0.#} ROF={w.rateOfFire:0.##} burst={w.burst} " +
+					$"range={w.range} speed={w.speed} aoe={w.aoe:0.#} prox={w.proximityDmgMod:0.###} " +
+					$"fluxMod={w.fluxDamageMod:0.###} heatDmgMod={w.heatDamageMod:0.###} " +
+					$"tech={w.techLevel} drop={w.dropLevel} ilvl={w.itemLevel} " +
+					$"E/shot={energyShot:0.##} E/s={energyPerSec:0.##} Heat/shot={heatShotRaw:0.#} Heat/s={heatPerSec:0.#} " +
+					$"power={w.power():0.#} " +
+					$"flags=[{(w.tradable ? "Trade" : "NoTrade")}{(w.massKiller ? "|MassKiller" : "")}{(w.autoTargeting ? "|AutoTarget" : "")}]";
 			}
 		}
 	}

@@ -11,6 +11,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Experimental.Playables;
 
 namespace RWEE
 {
@@ -26,7 +27,8 @@ namespace RWEE
 	internal class Items
 	{
 		public static bool debugUpgrades = false;  //always upgrade items from high level bosses.  Always return mythic relics when scrapping.
-		//List<Item> relics;
+																							 //List<Item> relics;
+		static int[][] typeMap;
 		/**
 		 * Adds Mystic Relics
 		 */
@@ -78,7 +80,7 @@ namespace RWEE
 				it.rarity = tier;
 				it.levelPlus = template.levelPlus;
 				it.weight = template.weight;
-				it.basePrice = Mathf.Max(template.basePrice * 1.6f*(tier-4), 100000f);
+				it.basePrice = Mathf.Max(template.basePrice * 1.6f * (tier - 4), 100000f);
 				it.priceVariation = template.priceVariation;
 				it.tradeChance = template.tradeChance != null ? (int[])template.tradeChance.Clone() : new int[7];
 				it.tradeQuantity = template.tradeQuantity;
@@ -205,7 +207,7 @@ namespace RWEE
 										SoundSys.PlaySound(16, true);
 										break;
 								}
-								
+
 							}
 							break;
 					}
@@ -348,7 +350,7 @@ namespace RWEE
 				if (__result > 0)
 					return;
 				string type = eqType.ToString();//read value
-				//Main.log($"getting upgrade item for tier {desiredTier}");
+																				//Main.log($"getting upgrade item for tier {desiredTier}");
 				CargoSystem cs = PlayerControl.inst.GetCargoSystem;
 				for (int i = 0; i < cs.cargo.Count; i++)
 				{
@@ -419,7 +421,7 @@ namespace RWEE
 		}
 
 
-		[HarmonyPatch(typeof(ItemDB), "GetRarityColor", new System.Type[] { typeof(int), typeof(bool)})]
+		[HarmonyPatch(typeof(ItemDB), "GetRarityColor", new System.Type[] { typeof(int), typeof(bool) })]
 		static class ItemDB_GetRarityColor
 		{
 			static bool Prefix(int rarity, bool allowColorblindMode, ref string __result)
@@ -444,5 +446,174 @@ namespace RWEE
 				return false;
 			}
 		}
+		[HarmonyPatch(typeof(GameDataInfo), "GetRandomWeapon")]
+		static class GameDataInfo_GetRandomWeapon
+		{
+			static void Postfix(GameDataInfo __instance,
+				float maxSpace, int minPower, int maxPower, WeaponType ignoreType, DropLevel maxDropLevel, int faction, int factionExtraChance, System.Random rand,
+				ref TWeapon __result)
+			{
+				//Main.log($"found {__result.name}");
+				if (__result.index != 0)
+					return;
+				if (__result.index == 0 && __result.itemLevel >= minPower)
+					return;
+				Main.log($"GetRandomWeapon fixing Light Laser {minPower} {maxPower}");
+				minPower -= 10;
+				__result = GameData.data.GetRandomWeapon(maxSpace, minPower, maxPower, ignoreType, maxDropLevel, faction, factionExtraChance, rand);
+			}
+		}
+		[HarmonyPatch(typeof(EquipmentDB), "GetRandomEquipment")]
+		static class EquipmentDB_GetRandomEquipment
+		{
+			static bool Prefix(
+				float minSpace, float maxSpace, int minPower, int maxPower, ref
+				int effectType, ShipClassLevel maxShipClass, int faction,
+				bool enableNoRarity, DropLevel maxDropLevel, int factionExtraChance, System.Random rand)
+			{
+				/*Main.log(
+					$"GetRandomEquipment(" +
+					$"minSpace={minSpace:0.##}, maxSpace={maxSpace:0.##}, " +
+					$"minPower={minPower}, maxPower={maxPower}, " +
+					$"effectType={effectType}, maxShipClass={maxShipClass}({(int)maxShipClass}), " +
+					$"faction={faction}, enableNoRarity={enableNoRarity}, " +
+					$"maxDropLevel={maxDropLevel}({(int)maxDropLevel}), factionExtraChance={factionExtraChance}, " +
+					$"rand={(rand == null ? "null" : rand.GetHashCode().ToString())}" +
+					$")");*/
+				if (effectType >= 0)
+					return true;
+				//EquipmentDB.ValidateDatabase();
+				bool flag = GameData.data.gameMode == 1;
+				int num = 0;
+				if (minPower >= maxPower)
+				{
+					minPower = maxPower - 1;
+				}
+				if (maxSpace < 1f)
+				{
+					maxSpace = 1f;
+				}
+				List<Equipment> list = new List<Equipment>();
+				var fi = AccessTools.Field(typeof(EquipmentDB), "equipments");
+				var equipments = fi?.GetValue(null) as List<Equipment>;
+				int type = rand.Next(0, EquipmentType.GetNames(typeof(EquipmentType)).Count());
+				//Main.error($"Looking for type {type}");
+				while (list.Count < 5)
+				{
+					for (int i = 0; i < equipments.Count; i++)
+					{
+						Equipment equipment = equipments[i];
+						if (equipment.space >= minSpace
+							&& equipment.space <= maxSpace
+							&& equipment.itemLevel >= minPower
+							&& equipment.itemLevel <= maxPower
+							&& rand.Next(1, 101) <= equipment.lootChance
+							&& equipment.dropLevel <= maxDropLevel
+							&& (equipment.rarityMod > 0f || enableNoRarity)
+							&& (int)equipment.type == type
+							&& (!flag || equipment.spawnInArena)
+							&& equipment.minShipClass <= maxShipClass
+							&& (equipment.repReq.factionIndex == 0 || equipment.repReq.factionIndex == faction))
+						{
+							list.Add(equipment);
+							if (factionExtraChance > 0 && equipment.repReq.factionIndex > 0)
+							{
+								for (int j = 0; j < factionExtraChance; j++)
+								{
+									list.Add(equipment);
+								}
+							}
+						}
+					}
+					num++;
+					if (list.Count < 5)
+					{
+						minPower--;
+						maxPower = (int)(maxPower + (1 + (int)maxDropLevel * (int)DropLevel.Boss));
+						minSpace -= 1f;
+						maxSpace += 1f;
+						if (num > 5 && maxShipClass < ShipClassLevel.Kraken)
+						{
+							maxShipClass++;
+							num = 0;
+						}
+						list.Clear();
+					}
+				}
+				return list[rand.Next(0, list.Count)];
+				
+			}
+		}
+		/*
+		internal static class UniformEffectPicker
+		{
+			static bool _built;
+			static int[][] _effectBuckets;          // index = (int)EquipmentType -> int[] of effectType ids
+			static EquipmentType[] _nonEmptyTypes;  // only types that have at least one effect
+
+			public static void BuildOnce()
+			{
+				if (_built) return;
+
+				var fi =
+					AccessTools.Field(typeof(EquipmentDB), "equipments") ??
+					AccessTools.Field(typeof(EquipmentDB), "equipment") ??
+					AccessTools.Field(typeof(EquipmentDB), "list") ??
+					AccessTools.Field(typeof(EquipmentDB), "items");
+
+				var list = fi?.GetValue(null) as List<Equipment>;
+				if (list == null) { _built = true; return; }
+
+				int typeCount = Enum.GetValues(typeof(EquipmentType)).Length;
+				var tmp = new List<int>[typeCount];
+				for (int i = 0; i < typeCount; i++) tmp[i] = new List<int>(8);
+
+				foreach (var eq in list)
+				{
+					if (eq?.effects == null || eq.effects.Count == 0) continue;
+					int t = (int)eq.type;
+					var bucket = tmp[t];
+					for (int i = 0; i < eq.effects.Count; i++)
+					{
+						int eff = eq.effects[i].type;
+						// de-dupe without HashSet; lists are small so Contains() is fine
+						if (!bucket.Contains(eff)) bucket.Add(eff);
+					}
+				}
+
+				var typeList = new List<EquipmentType>();
+				_effectBuckets = new int[typeCount][];
+				for (int i = 0; i < typeCount; i++)
+				{
+					if (tmp[i].Count > 0)
+					{
+						_effectBuckets[i] = tmp[i].ToArray();
+						typeList.Add((EquipmentType)i);
+					}
+					else
+					{
+						_effectBuckets[i] = Array.Empty<int>();
+					}
+				}
+				_nonEmptyTypes = typeList.ToArray();
+				_built = true;
+			}
+
+			public static bool TryPick(System.Random rand, out int effectType)
+			{
+				effectType = -1;
+				if (!_built || _nonEmptyTypes == null || _nonEmptyTypes.Length == 0) return false;
+
+				int tIdx = (rand != null) ? rand.Next(_nonEmptyTypes.Length) : UnityEngine.Random.Range(0, _nonEmptyTypes.Length);
+				int typeIndex = (int)_nonEmptyTypes[tIdx];
+				var bucket = _effectBuckets[typeIndex];
+				if (bucket == null || bucket.Length == 0) return false;
+
+				int eIdx = (rand != null) ? rand.Next(bucket.Length) : UnityEngine.Random.Range(0, bucket.Length);
+				effectType = bucket[eIdx];
+				return true;
+			}
+		}*/
 	}
 }
+
