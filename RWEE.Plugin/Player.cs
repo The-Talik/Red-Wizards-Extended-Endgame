@@ -53,8 +53,10 @@ namespace RWEE
 		{
 			static bool Prefix()
 			{
+				Main.error("TechLevelUp");
 				if (PChar.Char.fighterPilot >= Main.NEW_SECT_CAP)
 					return false;
+				Main.error("true");
 				return true;
 			}
 		}
@@ -108,13 +110,14 @@ namespace RWEE
 				return true;
 			}
 		}
-		/*
+		
 		[HarmonyPatch(typeof(PChar), "GetRelevantLevelRank")]
 		static class PChar_GetRelevantLevelRank
 		{
-			static bool Prefix(int statLevel, int compareLevel, int flatBonus, float finalMod, ref int __result)
+			static void Prefix(int statLevel, int compareLevel, int flatBonus, float finalMod, ref int __result)
 			{
-				int num = 0;
+
+/*				int num = 0;
 				if (statLevel >= PChar.maxLevel)
 				{
 					__result = 0;
@@ -176,9 +179,9 @@ namespace RWEE
 					}
 				}
 				__result=  Mathf.RoundToInt((float)(num + flatBonus) * (1f + finalMod));
-				return false;
+				return false;*/
 			}
 		}
-		*/
+		
 	}
 }

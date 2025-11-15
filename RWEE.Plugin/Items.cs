@@ -29,11 +29,33 @@ namespace RWEE
 		public static bool debugUpgrades = false;  //always upgrade items from high level bosses.  Always return mythic relics when scrapping.
 																							 //List<Item> relics;
 		static int[][] typeMap;
-		/**
-		 * Adds Mystic Relics
-		 */
-		[HarmonyPatch(typeof(ItemDB), "LoadDatabase")]
-		static class ItemDB_LoadDatabase_makeRelic
+
+
+
+		[HarmonyPatch(typeof(EquipmentDB), "LoadDatabase")]
+		static class EquipmentDB_LoadDatabase_addItems
+		{
+			// do adds late so other mods finish first
+			[HarmonyPriority(Priority.VeryLow)]
+			static void Postfix(ref List<Equipment> ___equipments) // if it's an array in your build, use: ref Item[] ___items
+			{
+				// find Pirate Heavy Booster as template
+				var pCB = ___equipments.FirstOrDefault(i => i != null && i.id == 151);
+				pCB.minShipClass = ShipClassLevel.Dreadnought;
+				pCB.techLevel = 58;
+				pCB.space = 6;
+				pCB.rarityMod = 1;
+				pCB.energyCost = 32;
+				pCB.effects[0].value = 92;
+				___equipments.Add(pCB);
+			}
+		}
+
+				/**
+				 * Adds Mystic Relics
+				 */
+				[HarmonyPatch(typeof(ItemDB), "LoadDatabase")]
+		static class ItemDB_LoadDatabase_addItems
 		{
 			// do adds late so other mods finish first
 			[HarmonyPriority(Priority.VeryLow)]
@@ -41,11 +63,12 @@ namespace RWEE
 			{
 				if (___items == null) return;
 
+
 				// find Ancient Relic (id 24) as template
 				var ancient = ___items.FirstOrDefault(i => i != null && i.id == 24);
 				//ancient.canUpgradeToTier += 2;  //for testing
 				ancient.rarity = 4; //purple
-				if (ancient == null) { Main.log("[MysticRelic] Ancient Relic not found"); return; }
+				if (ancient == null) { Main.log("[LegendaryCatalyst] Ancient Relic not found"); return; }
 
 				int nextId = ___items.Max(i => i?.id ?? -1) + 1;
 
@@ -55,23 +78,28 @@ namespace RWEE
 					// if (et == EquipmentType.Generator || et == EquipmentType.Battery) continue;
 
 					string label = et.ToString();                       // e.g., "Armor"
-					string refName = "mystic_relic_" + label.ToLowerInvariant();
-					string imageName = "mythic_relic.png";
-					var it = MakeRelicVariant(ancient, nextId++, 5, $"Mystic {label} Relic", refName, label, imageName, $"The relic pulses with mysterious power.");
-					___items.Add(it);
-					Main.log($"[MysticRelic] Added #{it.id} {it.itemName} {it.refName}");
+					
 
-					refName = "arcane_orb_" + label.ToLowerInvariant();
-					imageName = "arcane_orb.png";
-					it = MakeRelicVariant(ancient, nextId++, 6, $"Arcane {label} Orb", refName, label, imageName, $"Peering into the orb, you feel the presence of the entire universe peering back.");
+					//Tier 5
+					var it = MakeRelicVariant(ancient, nextId++, 5,
+						$"Legendary {label} Catalyst",
+						"mystic_relic_" + label.ToLowerInvariant(),
+						label, "legendary_catalyst.png",
+						$"A low, steady hum radiates from within. As you hold it, old scars seem lighter and familiar tools feel newly made, as if the Catalyst is reminding matter what it was always capable of becoming.");
 					___items.Add(it);
-					Main.log($"[ArcaneOrb] Added #{it.id} {it.itemName} {it.refName}");
+
+					//Tier 6
+					it = MakeRelicVariant(ancient, nextId++, 6,
+						$"Mythic {label} Relic",
+						"arcane_orb_" + label.ToLowerInvariant(),
+						label, "mythic_relic.png",
+						$"The Relic does not shine so much as it refuses darkness. Touching it is like reading a memory written in thunder — names you’ve never learned settle on your tongue as if they were yours.");
+					___items.Add(it);
 				}
 
 				RebuildItemIdDictFromList(___items);
 
 			}
-
 			static Item MakeRelicVariant(Item template, int newId, int tier, string itemName, string refName, string targetTag, string imageName, string description)
 			{
 				var it = ScriptableObject.CreateInstance<Item>();
@@ -89,7 +117,7 @@ namespace RWEE
 				it.canBeStashed = template.canBeStashed;
 				it.canBeTraded = false;
 				it.randomDrop = false;
-				//it.canUpgradeToTier = template.canUpgradeToTier+1;  //don't use standard upgarding since we require type matching as well
+				//it.canUpgradeToTier = template.canUpgradeToTier+1;  //Can't use standard upgarding since we require type matching as well, which the item search method does not know
 				it.geologyRequired = -1;
 				it.craftable = false;
 				it.craftingLevelAffectsYield = false;
@@ -121,6 +149,7 @@ namespace RWEE
 					it.sprite = template.sprite;
 					Main.log($"[Icons] Missing icon PNG: {png}");
 				}
+				Main.log($"[Relics] Added #{it.id} {it.itemName} {it.refName}");
 				return it;
 			}
 
@@ -357,7 +386,7 @@ namespace RWEE
 					CargoItem cargoItem = cs.cargo[i];
 					if (cargoItem.itemType == 3 && ((inStation && (cargoItem.stockStationID == stationID || cargoItem.stockStationID <= -2)) || cargoItem.stockStationID == -1))
 					{
-						switch (cargoItem.rarity)
+						switch (desiredTier)
 						{
 							case 5:
 								if (ItemDB.GetItem(cargoItem.itemID).refName == "mystic_relic_" + type.ToLowerInvariant())
@@ -378,7 +407,7 @@ namespace RWEE
 						}
 					}
 				}
-				Main.log($"Did not find item.");
+				//Main.log($"Did not find item.");
 			}
 		}
 
@@ -419,9 +448,17 @@ namespace RWEE
 				return true;
 			}
 		}
+		[HarmonyPatch(typeof(TWeapon), "Dmg")]
+		static class TWeapon_Dmg
+		{
+			static void Postfix(int rarity, ref float __result)
+			{
+				if (rarity >= 5)
+					__result *= 1.5f;
+			}
+		}
 
-
-		[HarmonyPatch(typeof(ItemDB), "GetRarityColor", new System.Type[] { typeof(int), typeof(bool) })]
+				[HarmonyPatch(typeof(ItemDB), "GetRarityColor", new System.Type[] { typeof(int), typeof(bool) })]
 		static class ItemDB_GetRarityColor
 		{
 			static bool Prefix(int rarity, bool allowColorblindMode, ref string __result)
@@ -453,12 +490,13 @@ namespace RWEE
 				float maxSpace, int minPower, int maxPower, WeaponType ignoreType, DropLevel maxDropLevel, int faction, int factionExtraChance, System.Random rand,
 				ref TWeapon __result)
 			{
+				int origMinPower = minPower;
 				//Main.log($"found {__result.name}");
 				if (__result.index != 0)
 					return;
 				if (__result.index == 0 && __result.itemLevel >= minPower)
 					return;
-				Main.log($"GetRandomWeapon fixing Light Laser {minPower} {maxPower}");
+				Main.log($"↪ Fixing ERROR. Increasing power range to {origMinPower}->{minPower} {maxPower} and searching again.");
 				minPower -= 10;
 				__result = GameData.data.GetRandomWeapon(maxSpace, minPower, maxPower, ignoreType, maxDropLevel, faction, factionExtraChance, rand);
 			}
@@ -469,7 +507,7 @@ namespace RWEE
 			static bool Prefix(
 				float minSpace, float maxSpace, int minPower, int maxPower, ref
 				int effectType, ShipClassLevel maxShipClass, int faction,
-				bool enableNoRarity, DropLevel maxDropLevel, int factionExtraChance, System.Random rand)
+				bool enableNoRarity, DropLevel maxDropLevel, int factionExtraChance, System.Random rand, ref Equipment __result)
 			{
 				/*Main.log(
 					$"GetRandomEquipment(" +
@@ -497,7 +535,7 @@ namespace RWEE
 				var fi = AccessTools.Field(typeof(EquipmentDB), "equipments");
 				var equipments = fi?.GetValue(null) as List<Equipment>;
 				int type = rand.Next(0, EquipmentType.GetNames(typeof(EquipmentType)).Count());
-				//Main.error($"Looking for type {type}");
+				//Main.log($"Looking for type {(EquipmentType)type}");
 				while (list.Count < 5)
 				{
 					for (int i = 0; i < equipments.Count; i++)
@@ -540,8 +578,12 @@ namespace RWEE
 						list.Clear();
 					}
 				}
-				return list[rand.Next(0, list.Count)];
-				
+				__result = list[rand.Next(0, list.Count)];
+				return false;
+			}
+			static void Postfix(ref Equipment __result)
+			{
+				//Main.log($"Found {__result.name}");
 			}
 		}
 		/*

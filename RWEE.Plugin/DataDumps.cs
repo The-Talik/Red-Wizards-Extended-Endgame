@@ -176,14 +176,14 @@ namespace RWEE
 				float price = e.Price(1);
 
 				return
-					$"[#{e.id}] {name}  " +
+					$"[#{e.id}] {name} " +
+					$"[{e.refName}] " +
 					$"type={e.type} {e.effects[0].type} class>={e.minShipClass} " +
 					$"lvl={e.itemLevel} (tech={e.techLevel},sort={e.sortPower}) " +
 					$"space={e.space:0.##} massFlat={e.massFlat:0.##} massMod={e.massChange:0.##} " +
 					$"energy={e.energyCost:0.##}{(e.energyCostPerShipClass ? "*2^(class-1)" : "")} " +
 					$"rarityMod={e.rarityMod:0.##} drop={e.dropLevel} loot%={e.lootChance} sell%={e.sellChance} " +
 					$"flags=[{FlagStr(e)}] reqItem={(e.requiredItemID >= 0 ? $"{e.requiredItemID}x{e.requiredQnt}" : "-")} " +
-					$"price~={price:0} " +
 					$"effects=[{effects}]";
 			}
 

@@ -18,9 +18,8 @@ namespace RWEE
 			RweeData.Init(true);
 			String saveVersion = RweeData.GetString("RWEESaveVersion");
 			Main.log($"Save version: {saveVersion} Local Version: {Main.pluginVersion}");
-
 			//if (VersionControl.IsNewer(Main.pluginVersion, saveVersion))
-			if(saveVersion == null)
+			if (saveVersion == null)
 			{
 				Main.log("Updating Universe.");
 				int sectorsUpdated = 0;

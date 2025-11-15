@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using RWEE;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,15 +12,21 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+
 namespace RWEE
 {
-	[BepInPlugin(pluginGuid, pluginName, pluginVersion)]
+
+
+	[BepInPlugin(pluginGuid, pluginName,pluginVersion)] 
 	public class Main : BaseUnityPlugin
 	{
 		public const string pluginGuid = "mc.starvalor.extendedendgame";
 		public const string pluginName = "RWEE";//"Red Wizard's Extended Endgame";
-		public const string pluginVersion = "1.0.3"; //"1.0.3";
+		public const string pluginVersion = "1.0.5";
 
+		//public System.Reflection.Assembly asm = typeof(Main).Assembly;
+		//public const string pluginVersion = asm.GetName().Version?.ToString()
+		//?? "0.0.0";
 
 		public const int OLD_PCHAR_MAXLEVEL = 50;
 		public const int NEW_PCHAR_MAXLEVEL = 100;

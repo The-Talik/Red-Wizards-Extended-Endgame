@@ -1,5 +1,5 @@
 What is it?
- Red Wizards Extended Endgame is an attempt at extending the gameplay in a way that feels balanced, rewarding, and challenging all at the same time. Increase player level cap to 100, sector level cap to 200, adds endgame upgrades, and a bunch of other tweaks.
+ Red Wizards Extended Endgame is an endgame overhaul that attempts to extend the gameplay in a way that feels balanced, rewarding, and challenging all at the same time. Increase player level cap to 100, sector level cap to 200, adds endgame upgrades, and a bunch of other changes.
 
 Highlights:
  - Player levels are capped at 100.
@@ -12,6 +12,10 @@ Installation Instructions:
  2. Place the RedWizardsExtendedEndgame.plugin folder in BepInEx\plugins
  3. Place the RedWizardsExtendedEndgame.Patcher.dll file in PebInEx\patchers
  4. Profit!
+
+Current Version: 1.0.5
+Download: https://www.nexusmods.com/starvalor/mods/55
+Alternate: https://github.com/The-Talik/Red-Wizards-Extended-Endgame/releases
 
 Adding/Removing this mod:
  It can now be fully safely added to a game.  Your first load will update existing sectors to increase their limit.
@@ -40,9 +44,11 @@ Changes from base game:
   - (Reason: This allows skills to be reset more freely (even after hitting max level) but not spammed)
  - Tech and Construction Level cap is increased to 200 to match sector limits.  Rest of the knowledges are still capped at 50 for balance purposes
  Items:
- - Added tier 6 and 7 weapons and equipment, droppable only by very high level enemies (startint at L50 and L100, respectively)
- - Scrapping legendary (Tier 5) or Mythic(Not set on this) (Tier 6) equipment (Not weapons or Tier 7) will occasionally drop an upgrade item for that item type (roughly 10% of the time).
-  - Example: scrapping a legendary battery can drop a Mystic Battery Relic that can upgrade batteries to legendary.  Sorry savescummers, the results are seeded. ;-)
+ - Added tier Mythic (Tier 6) and Ascended (Tier 7) weapons and equipment, droppable only by very high level enemies (starting at L50 and L100, respectively)
+ - Scrapping Legendary or Mythic equipment (Not weapons or Ascended) will occasionally drop an upgrade item for that item type (roughly 10% of the time).
+  - Example: scrapping a legendary battery can drop a Legendary Battery Catalyst that can upgrade batteries to Legendary.  Sorry savescummers, the results are seeded. ;-)
+ - Added Pirate Capital Booster
+ - Legendary and higher weapons are buffed roughly 1.5x to be more competitive with endgame player-made ones.
  Crew:
  - Escape Pod crew always start as level 1
   - Higher level sectors have a chance of spawning higher tier crew, instead of higher level
@@ -60,14 +66,17 @@ Changes from base game:
  - Fleet ships properly use their scanner power when looking for asteroids to mine
  - Ancient artifacts are purple, instead of blue
 
-Current Version: 1.0.3
-Download:
-https://www.nexusmods.com/starvalor/mods/55
-https://github.com/The-Talik/Red-Wizards-Extended-Endgame/releases
-
 Changelog:
+1.0.5
+ - Legendary and higher weapons are buffed roughly 1.5x to be more competitive with endgame player-made ones.
+ - Fixed a bug prevent tech from leveling past 100
+ - Fixed a bug that allowed Mythic Relics to upgrade items past Tier 5.
+ - Renamed relics and tiers from this mod.
+ - Added Pirate Capital Booster.
+1.0.4b
+ - hotfix for version popup message.
 1.0.4
- - Adjusts item drop for high level enemies to give a more even spread of equipment types, and ensure good weapons are always returned even if the item level is too high.
+ - Adjusts item drop for high level enemies to give a more even spread of equipment types, and ensure reasonable weapons are always returned even if the item level is too high. for the default formula.
  - fix a bug with enemy stat scaling from the last build.
 1.0.3
  - Fixed a bug stopping tech from leveling past 50
@@ -80,12 +89,12 @@ Changelog:
 1.0.1
  - Fixed a bug with Mythic Relics.
 
-Roadmap/next up:
+Roadmap:
  - Higher mk levels of QOL items, scanners, warp, collector beams, etc.
   - Higher level sensors with more features (detect which stations are in a sector before visiting, etc)
   - Higher level Battle Computer which shows more info about your opponent.
  - Allow Crew to evolve beyond legendary, which will mostly only be possible with crew from escape pods found in high level sectors.
- - Ravager spawning
+ - Ravager re-spawning
  - Disable extra equipment/weapons when owning a fleet or resetting skills, rather than uninstalling it.
  - Get Space Pilot benefit when no fleet members are present (even if you control a fleet).
  - swap/launch
@@ -93,8 +102,11 @@ Roadmap/next up:
   - Swap with a derelict (leaving your ship a derelict, or maybe piloted by your first officer)
   - Launch from inventory.  Pilot a ship from your inventory, leaving your ship as derelict, or piloted by your FO.
  - Require merging mythic relics with ancient relic before it can be used.  (Is this just going to be annoying?)
+ - Make background perks not lock you out of other background perks and remove the part preventing you from allying.
+  - Maybe also make being friendly with a faction add automatic displeasure to their enemy factions so you can't ally everyone at the same time.
 
 Looser down-the-road ideas:
+ _ Tiers 8 (Celestial) and 9(Transcendent)
  - Higher mk levels of other items.  (This requires more balance consideration, so is listed separately from above)
  - new bases spawn in sectors that had a base defeated.  IE, if you help PCM destroy a Pirate base, the sector should spawn a PCM base sometime later.
  - base spawning for factions with low base-counts.
@@ -116,7 +128,9 @@ Looser down-the-road ideas:
   - Equipment that ads extra crew seats.  Maybe the equipment can only be used if the ship does not already have a crew seat for that type making it useless on big ships.
  - Some form of endgame state that requires you to piss off all factions but one, in order to gain some super reward.
  - Maybe a separate higher-level version of Space Pilot and Fleet Commander that only starts when the base skills are maxed out.  This would allow the game to keep the standard L55-60 skills as hard to get, but introduce a new set of skill upgrades.
+ - allow very high level enemies to drop ship blueprints
  - UI improvements:
   - Controls active with map open.
   - Map UI updates (Maybe a separate mod?)
   - Crafting UI updates (maybe a separate mod?)
+  - allow very high level enemies to drop ship blueprints

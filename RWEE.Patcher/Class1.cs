@@ -8,6 +8,7 @@ using Mono.Cecil.Cil;
 public static class RWEEPatcher
 {
 	public const int NEW_PCHAR_MAXLEVEL = 100;
+	public const int NEW_SECT_CAP = 200;
 	private static ManualLogSource _log;
 	// Your loader likes the PROPERTY form.
 	public static IEnumerable<string> TargetDLLs { get; } = new[] { "Assembly-CSharp.dll" };
@@ -36,10 +37,10 @@ public static class RWEEPatcher
 		total += ReplaceFieldReadsWithConst(mod, "PChar", "EarnXP", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_PCHAR_MAXLEVEL));
 		total += ReplaceFieldReadsWithConst(mod, "PChar", "LevelUp", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_PCHAR_MAXLEVEL));
 		total += ReplaceFieldReadsWithConst(mod, "PChar", "UpdateChar", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_PCHAR_MAXLEVEL));
-		total += ReplaceFieldReadsWithConst(mod, "PChar", "GetRelevantLevelRank", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_PCHAR_MAXLEVEL));
-		total += ReplaceFieldReadsWithConst(mod, "BaseCharacter", "GetKnowledgeProgress", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_PCHAR_MAXLEVEL));
-		total += ReplaceFieldReadsWithConst(mod, "BaseCharacter", "GetKnowledgeProgressWithPoints", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_PCHAR_MAXLEVEL));
-		total += ReplaceFieldReadsWithConst(mod, "BaseCharacter", "KnowledgeUp", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_PCHAR_MAXLEVEL));
+		total += ReplaceFieldReadsWithConst(mod, "PChar", "GetRelevantLevelRank", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_SECT_CAP));
+		total += ReplaceFieldReadsWithConst(mod, "BaseCharacter", "GetKnowledgeProgress", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_SECT_CAP));
+		total += ReplaceFieldReadsWithConst(mod, "BaseCharacter", "GetKnowledgeProgressWithPoints", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_SECT_CAP));
+		total += ReplaceFieldReadsWithConst(mod, "BaseCharacter", "KnowledgeUp", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_SECT_CAP));
 		total += EnsureOptionalStringField(mod, "GameDataInfo", "rweeJson");
 		total += ReplaceConstFloatInMethod(mod, "AIMarauder", "SetActions", 500f, 2000f);
 		total += ReplaceConstFloatInMethod(mod, "AIMercenary", "SetActions", 250f, 500f);
