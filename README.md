@@ -13,7 +13,7 @@ Installation Instructions:
  3. Place the RedWizardsExtendedEndgame.Patcher.dll file in PebInEx\patchers
  4. Profit!
 
-Current Version: 1.0.5
+Current Version: 1.1.0
 Download: https://www.nexusmods.com/starvalor/mods/55
 Alternate: https://github.com/The-Talik/Red-Wizards-Extended-Endgame/releases
 
@@ -67,6 +67,12 @@ Changes from base game:
  - Ancient artifacts are purple, instead of blue
 
 Changelog:
+1.1.0
+ - Item ID inconsistency (Internal change)
+ - ID fix for Pirate Capital Booster
+ - Minor balance tweaks
+1.0.5b
+ - Fix for techLevel capping at 100
 1.0.5
  - Legendary and higher weapons are buffed roughly 1.5x to be more competitive with endgame player-made ones.
  - Fixed a bug prevent tech from leveling past 100
@@ -104,33 +110,33 @@ Roadmap:
  - Require merging mythic relics with ancient relic before it can be used.  (Is this just going to be annoying?)
  - Make background perks not lock you out of other background perks and remove the part preventing you from allying.
   - Maybe also make being friendly with a faction add automatic displeasure to their enemy factions so you can't ally everyone at the same time.
+ - Boost Turret stats in high level sectors (like we did for ships)
 
 Looser down-the-road ideas:
- _ Tiers 8 (Celestial) and 9(Transcendent)
  - Higher mk levels of other items.  (This requires more balance consideration, so is listed separately from above)
+  - More faction specific items.  Especially new chains that don't have faction specific versions, like Gyroscopes, etc.
+  - Item that increases turret rotation speed.
  - new bases spawn in sectors that had a base defeated.  IE, if you help PCM destroy a Pirate base, the sector should spawn a PCM base sometime later.
  - base spawning for factions with low base-counts.
  - Add some high level perks to challenge people.  ie, defeat a L200 hunter crew, ravager, etc.
- - Button to hide a recipe from the crafting list.
  - Attacking a fleet member should make the whole fleet hostile.
  - Attacking/destroying a turret should make the whole sector hostile.
  - Faction launches hunter fleet if you threaten a station.
- - Items that add Bounty (You will more often be attacked by blah blah blah...)
- - Double Star Enemies.
-  - High level hunter quests.
-  - High Level Ravagers.
-  - (Reason: In late game, hunter quests and ravagers feel really week, compared to hunter fleets)
+ - Equipment that adds Bounty (You will more often be attacked by...)
  - Auto updater. (Maybe a separate mod-manager mod?)
- - tweak pirate speed boosters
-  - Probably add a space 6 Pirate Capital Booster. (Maybe)
+ - Equipment that converts equipment/cargo/hanger/crew/etc between each other.
  - Way to make smaller ships more competitive late-game.
-  - Maybe big ships are vulnerable from behind.  Causing extra damage, and debufs.
-  - Equipment that ads extra crew seats.  Maybe the equipment can only be used if the ship does not already have a crew seat for that type making it useless on big ships.
+  - Maybe big ships are vulnerable from behind?  Causing extra damage, and debufs?
+  - Equipment that ads extra crew seats.  Only installable if the ship does not already have a crew seat for that type.
+ - Way to make ramming builds more viable late-game
  - Some form of endgame state that requires you to piss off all factions but one, in order to gain some super reward.
  - Maybe a separate higher-level version of Space Pilot and Fleet Commander that only starts when the base skills are maxed out.  This would allow the game to keep the standard L55-60 skills as hard to get, but introduce a new set of skill upgrades.
- - allow very high level enemies to drop ship blueprints
+ - Balance for ultra-late-game sectors L150+
+  - Tiers 8 (Celestial) and 9(Transcendent)
+  -  allow very high level enemies to drop ship blueprints
  - UI improvements:
   - Controls active with map open.
   - Map UI updates (Maybe a separate mod?)
   - Crafting UI updates (maybe a separate mod?)
-  - allow very high level enemies to drop ship blueprints
+  - Button to hide a recipe from the crafting list.
+ - Autopilot

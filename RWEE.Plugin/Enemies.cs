@@ -37,7 +37,7 @@ namespace RWEE
 					//Main.log($"Applying AI bonus. lev: {aiChar.level} hp: {___baseHP} shield: {___baseShield} energy: {___baseEnergy} regen: {___hpRegen} regen shield-recharge: {___shieldRecharge} dam bonus: {___ss.dmgBonus}");
 					//float mod = aiChar.level / 50;  //1x at L50, 2x at L100, 3x at L150, etc
 
-					float mod = levelToMod(aiChar.level * (aiChar.AIType==4 || aiChar.AIType==3 ? 1.2f : 1f)); //bosses are harder, but give better loot.
+					float mod = levelToMod(aiChar.level * (aiChar.AIType==4 || aiChar.AIType==3 ? 1.3f : 1f)); //bosses are harder, but give better loot.
 					if (mod <= 0)
 						mod = 0;
 					___baseHP *= (1 + mod);
@@ -50,12 +50,8 @@ namespace RWEE
 					___acceleration *= (1 + mod / 10);
 
 					___ss.dmgBonus += mod;
-					Main.log($"Applied AI Bonus {(1+mod)}x. lev: {aiChar.level} hp: {origBaseHP}→{___baseHP} shield: {origBaseShield}→{___baseShield}" +
+					Main.log($"Boosting AI {aiChar.Name()} {(1+mod)}x. lev: {aiChar.level} hp: {origBaseHP}→{___baseHP} shield: {origBaseShield}→{___baseShield}" +
 						$"energy: {origBaseEnergy}→{___baseEnergy} regen: {origHpRegen}→{___hpRegen} shield-recharge: {origShieldRecharge}→{___shieldRecharge} dam bonus: origDamageBonus→{___ss.dmgBonus}");
-					//this.baseHP;
-					//this.ss.armor;
-					//this.ss.armorMod
-					//this.ss.dmgBonus
 				}
 			}
 		}
@@ -89,53 +85,7 @@ namespace RWEE
 				}
 			}
 		}
-		/**
-		 * High levels drop high tier
-		 */
-
-		[HarmonyPatch(typeof(AIControl), "ConfigureAI")]
-		static class AIControl_ConfigureAI
-		{
-			static void Postfix(AICharacter ___Char, SpaceShip ___ss)
-			{
-				//				Main.log($"Done generating AIControl level:{___Char.level} rank:{___Char.rank}");
-				if (___Char.rank < 1)
-					return;
-				//___ss.loots
-				for (int i = 0; i < ___ss.loots.Count; i++)
-				{
-					if (___ss.loots[i].itemType > 2)
-						continue;
-					int tmpLev = ___Char.level;
-					if (___Char.rank == 1)
-						tmpLev -= 50;
-					int oldRarity = ___ss.loots[i].rarity;
-					string itemLog = "";
-					while (tmpLev > 50)
-					{
-						if (UnityEngine.Random.Range(1, 101) < 10 || Items.debugUpgrades)
-						{
-							___ss.loots[i].rarity++;
-							itemLog += "+";
-						}
-						else
-							itemLog += ".";
-
-						if(___Char.AIType == 4)
-							tmpLev -= 5;
-						else
-							tmpLev -= 10;
-					}
-					if (___ss.loots[i].rarity > Main.MAX_RARITY || Items.debugUpgrades)
-						___ss.loots[i].rarity = Main.MAX_RARITY;
-					if (___Char.level < 100 && !Items.debugUpgrades)
-						if (___ss.loots[i].rarity > 6)
-							___ss.loots[i].rarity = 6;
-
-					Main.log($"Loot: Char  [{___Char.Name()} L{___Char.level}] {___Char.AIType} itemType:{___ss.loots[i].itemType} itemID:{___ss.loots[i].itemID} rarity:{oldRarity}->{itemLog}->{___ss.loots[i].rarity} rarityEnabled:{___ss.loots[i].rarityEnabled}");
-				}
-			}
-		}
+		
 		/**
 		 * Adjust AI to use strafe if they are faster than their target.
 		 */
@@ -234,7 +184,7 @@ namespace RWEE
 		}
 		static float getTurnSpeed(SpaceShip ss)
 		{
-			return ss.stats.turnSpeed * ss.crew.efficiency[1];
+			return ss.stats.turnSpeed;
 		}
 		[HarmonyPatch(typeof(ScanSystem), MethodType.Constructor, new Type[] { typeof(Transform), typeof(AIControl), typeof(int) })]
 		static class ScanSystem_ScanSystem
@@ -258,23 +208,145 @@ namespace RWEE
 				}
 			}
 		}
-		[HarmonyPatch(typeof(AIMarauder), "SearchForEnemies")]
-		static class AIMarauder_SearchForEnemies
-		{
-			static void Postfix(AICharacter ___Char, ref float ___attackDistance, ref float ___returnDistance)
-			{
+		/**
+		 * High levels drop high tier
+		 */
 
+		[HarmonyPatch(typeof(AIControl), "ConfigureAI")]
+		static class AIControl_ConfigureAI
+		{
+			static void Prefix()
+			{
+				Main.log($"AIControl_ConfigureAI");
+			}
+			static void Postfix(AICharacter ___Char, SpaceShip ___ss)
+			{
+								Main.log($"Done generating AIControl level:{___Char.level} rank:{___Char.rank} loot:{___ss.loots.Count}");
+				if (___Char.rank < 1)
+					return;
+				//___ss.loots
+
+				for (int i = 0; i < ___ss.loots.Count; i++)
+				{
+					if (___ss.loots[i].itemType > 2)
+						continue;
+					int tmpLev = ___Char.level;
+					if (___Char.rank == 1)
+						tmpLev -= 50;
+					int oldRarity = ___ss.loots[i].rarity;
+					string itemLog = "";
+					while (tmpLev > 50)
+					{
+						if (UnityEngine.Random.Range(1, 101) < 6 || Items.debugUpgrades)
+						{
+							___ss.loots[i].rarity++;
+							itemLog += "+";
+						}
+						else
+							itemLog += ".";
+
+						if (___Char.AIType == 4)
+							tmpLev -= 3;
+						else
+							tmpLev -= 5;
+					}
+					if (___ss.loots[i].rarity > Main.MAX_RARITY || Items.debugUpgrades)
+						___ss.loots[i].rarity = Main.MAX_RARITY;
+					if (___Char.level < 100 && !Items.debugUpgrades)
+						if (___ss.loots[i].rarity > 6)
+							___ss.loots[i].rarity = 6;
+
+					Main.log($"Loot: Char  [{___Char.Name()} L{___Char.level}] {___Char.AIType} itemType:{___ss.loots[i].itemType} itemID:{___ss.loots[i].itemID} rarity:{oldRarity}->{itemLog}->{___ss.loots[i].rarity} rarityEnabled:{___ss.loots[i].rarityEnabled}");
+				}
 			}
 		}
-		/*		[HarmonyPatch(typeof(AIMercenary), "SearchForEnemies")]
-				static class AIMercenary_SearchForEnemies
+		[HarmonyPatch(typeof(EquipmentDB), "GetRandomEquipment")]
+		static class EquipmentDB_GetRandomEquipment
+		{
+			static bool Prefix(
+				float minSpace, float maxSpace, int minPower, int maxPower, ref
+				int effectType, ShipClassLevel maxShipClass, int faction,
+				bool enableNoRarity, DropLevel maxDropLevel, int factionExtraChance, System.Random rand, ref Equipment __result)
+			{
+				/*Main.log(
+					$"GetRandomEquipment(" +
+					$"minSpace={minSpace:0.##}, maxSpace={maxSpace:0.##}, " +
+					$"minPower={minPower}, maxPower={maxPower}, " +
+					$"effectType={effectType}, maxShipClass={maxShipClass}({(int)maxShipClass}), " +
+					$"faction={faction}, enableNoRarity={enableNoRarity}, " +
+					$"maxDropLevel={maxDropLevel}({(int)maxDropLevel}), factionExtraChance={factionExtraChance}, " +
+					$"rand={(rand == null ? "null" : rand.GetHashCode().ToString())}" +
+					$")");*/
+				if (effectType >= 0)
+					return true;
+				//EquipmentDB.ValidateDatabase();
+				bool flag = GameData.data.gameMode == 1;
+				int num = 0;
+				if (minPower >= maxPower)
 				{
-					static void Postfix(AICharacter ___Char, ref float ___attackDistance, ref float ___returnDistance)
+					minPower = maxPower - 1;
+				}
+				if (maxSpace < 1f)
+				{
+					maxSpace = 1f;
+				}
+				List<Equipment> list = new List<Equipment>();
+				var fi = AccessTools.Field(typeof(EquipmentDB), "equipments");
+				var equipments = fi?.GetValue(null) as List<Equipment>;
+				int type = rand.Next(0, EquipmentType.GetNames(typeof(EquipmentType)).Count());
+				Main.log($"Looking for type {(EquipmentType)type}");
+				while (list.Count < 5)
+				{
+					Main.log($"loop {num} Power: {minPower}-{maxPower} Space: {minSpace}-{maxSpace}");
+					for (int i = 0; i < equipments.Count; i++)
 					{
-						Main.error($"AIMercenary_SearchForEnemies {___Char.Name()} {___attackDistance} {___returnDistance}");
-						___attackDistance = 250f * (1 + levelToMod(___Char.level));
-						___returnDistance = 350f * (1 + levelToMod(___Char.level));
+						Equipment equipment = equipments[i];
+						if (equipment.space >= minSpace
+							&& equipment.space <= maxSpace
+							&& equipment.itemLevel >= minPower
+							&& equipment.itemLevel <= maxPower
+							&& rand.Next(1, 101) <= equipment.lootChance
+							&& equipment.dropLevel <= maxDropLevel
+							&& (equipment.rarityMod > 0f || enableNoRarity)
+							&& (int)equipment.type == type
+							&& (!flag || equipment.spawnInArena)
+							&& equipment.minShipClass <= maxShipClass
+							&& (equipment.repReq.factionIndex == 0 || equipment.repReq.factionIndex == faction))
+						{
+							Main.log($"Adding loot contender: {equipment.equipName}");
+							list.Add(equipment);
+							if (factionExtraChance > 0 && equipment.repReq.factionIndex > 0)
+							{
+								for (int j = 0; j < factionExtraChance; j++)
+								{
+									list.Add(equipment);
+								}
+							}
+						}
 					}
-				}*/
+					num++;
+					if (list.Count < 5)
+					{
+						minPower--;
+						maxPower = (int)(maxPower + (1 + (int)maxDropLevel * (int)DropLevel.Boss));
+						minSpace -= 1f;
+						maxSpace += 1f;
+						if (num > 5 && maxShipClass < ShipClassLevel.Kraken)
+						{
+							maxShipClass++;
+							num = 0;
+						}
+						list.Clear();
+					}
+				}
+				Main.log($"Contenders: {list.Count}");	
+				__result = list[rand.Next(0, list.Count)];
+				return false;
+			}
+			static void Postfix(ref Equipment __result)
+			{
+				//Main.log($"Found {__result.name}");
+			}
+		}
 	}
 }

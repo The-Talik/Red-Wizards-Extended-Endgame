@@ -36,12 +36,13 @@ public static class RWEEPatcher
 		//total += ForceField(mod, "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, 100));
 		total += ReplaceFieldReadsWithConst(mod, "PChar", "EarnXP", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_PCHAR_MAXLEVEL));
 		total += ReplaceFieldReadsWithConst(mod, "PChar", "LevelUp", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_PCHAR_MAXLEVEL));
-		total += ReplaceFieldReadsWithConst(mod, "PChar", "UpdateChar", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_PCHAR_MAXLEVEL));
 		total += ReplaceFieldReadsWithConst(mod, "PChar", "GetRelevantLevelRank", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_SECT_CAP));
+		total += ReplaceFieldReadsWithConst(mod, "PChar", "UpdateChar", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_SECT_CAP));
 		total += ReplaceFieldReadsWithConst(mod, "BaseCharacter", "GetKnowledgeProgress", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_SECT_CAP));
 		total += ReplaceFieldReadsWithConst(mod, "BaseCharacter", "GetKnowledgeProgressWithPoints", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_SECT_CAP));
 		total += ReplaceFieldReadsWithConst(mod, "BaseCharacter", "KnowledgeUp", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_SECT_CAP));
 		total += EnsureOptionalStringField(mod, "GameDataInfo", "rweeJson");
+		total += EnsureOptionalStringField(mod, "GameDataInfo", "rweeItemMapJson");
 		total += ReplaceConstFloatInMethod(mod, "AIMarauder", "SetActions", 500f, 2000f);
 		total += ReplaceConstFloatInMethod(mod, "AIMercenary", "SetActions", 250f, 500f);
 

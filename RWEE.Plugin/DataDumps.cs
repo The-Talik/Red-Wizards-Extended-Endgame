@@ -84,7 +84,7 @@ namespace RWEE
 
 				// line
 				return
-					$"[#{it.id}] {name}  " +
+					$"[#{it.id}] {name} [{it.refName}]  " +
 					$"type={it.type} rare={it.rarity} " +
 					$"lvl={it.itemLevel} (lvlPlus={it.levelPlus}) " +
 					$"price={it.basePrice:0}±{it.priceVariation:0.##} " +

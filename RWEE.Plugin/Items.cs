@@ -13,6 +13,11 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Experimental.Playables;
 
+/**
+ * Item Types:
+ * 1 = weapons, 2 = equipment, 3 = item (goods), 4 == ship, 5 == crew member
+ * 
+ */
 namespace RWEE
 {
 	static class UpgradeCtx
@@ -35,26 +40,52 @@ namespace RWEE
 		[HarmonyPatch(typeof(EquipmentDB), "LoadDatabase")]
 		static class EquipmentDB_LoadDatabase_addItems
 		{
-			// do adds late so other mods finish first
 			[HarmonyPriority(Priority.VeryLow)]
-			static void Postfix(ref List<Equipment> ___equipments) // if it's an array in your build, use: ref Item[] ___items
+			static void Postfix(ref List<Equipment> ___equipments)
 			{
-				// find Pirate Heavy Booster as template
-				var pCB = ___equipments.FirstOrDefault(i => i != null && i.id == 151);
-				pCB.minShipClass = ShipClassLevel.Dreadnought;
-				pCB.techLevel = 58;
-				pCB.space = 6;
-				pCB.rarityMod = 1;
-				pCB.energyCost = 32;
-				pCB.effects[0].value = 92;
-				___equipments.Add(pCB);
+				var template = ___equipments.FirstOrDefault(i => i != null && i.id == 151);
+				if (template == null) { Main.warn("Template id 151 not found"); return; }
+
+				int nextId = ___equipments.Max(i => i?.id ?? -1) + 1;
+
+				// Runtime-safe deep-ish clone for ScriptableObjects
+				var clone = UnityEngine.Object.Instantiate(template);
+
+				// (Optional) ensure no shared mutable lists
+				if (template.effects != null)
+				{
+					clone.effects = new List<Effect>(template.effects.Count);
+					for (int i = 0; i < template.effects.Count; i++)
+					{
+						var e = template.effects[i];
+						clone.effects.Add(new Effect { type = e.type, value = e.value, mod = e.mod });
+					}
+				}
+
+				clone.id = nextId;
+				clone.equipName = "Pirate Capital Booster";
+				clone.refName = "pirate_capital_booster";  // keep refName unique/stable
+				clone.minShipClass = ShipClassLevel.Dreadnought;
+				clone.techLevel = 58;
+				clone.space = 6f;
+				clone.rarityMod = 1f;
+				clone.energyCost = 32f;
+				if (clone.effects != null && clone.effects.Count > 0)
+					clone.effects[0].value = 92f;
+
+				___equipments.Add(clone);
+
+
+				(AccessTools.Method(typeof(EquipmentDB), "RebuildDictionaries")
+				 ?? AccessTools.Method(typeof(EquipmentDB), "BuildDictionaries")
+				 ?? AccessTools.Method(typeof(EquipmentDB), "Refresh"))?.Invoke(null, null);
 			}
 		}
 
-				/**
-				 * Adds Mystic Relics
-				 */
-				[HarmonyPatch(typeof(ItemDB), "LoadDatabase")]
+		/**
+		 * Adds Mystic Relics
+		 */
+		[HarmonyPatch(typeof(ItemDB), "LoadDatabase")]
 		static class ItemDB_LoadDatabase_addItems
 		{
 			// do adds late so other mods finish first
@@ -71,7 +102,7 @@ namespace RWEE
 				if (ancient == null) { Main.log("[LegendaryCatalyst] Ancient Relic not found"); return; }
 
 				int nextId = ___items.Max(i => i?.id ?? -1) + 1;
-
+				//nextId += 1000;
 				foreach (EquipmentType et in Enum.GetValues(typeof(EquipmentType)))
 				{
 					// optional skips:
@@ -496,96 +527,13 @@ namespace RWEE
 					return;
 				if (__result.index == 0 && __result.itemLevel >= minPower)
 					return;
-				Main.log($"↪ Fixing ERROR. Increasing power range to {origMinPower}->{minPower} {maxPower} and searching again.");
 				minPower -= 10;
+				Main.log($"↪ Fixing ERROR. Increasing power range to {origMinPower}->{minPower} to {maxPower} and searching again.");
+				
 				__result = GameData.data.GetRandomWeapon(maxSpace, minPower, maxPower, ignoreType, maxDropLevel, faction, factionExtraChance, rand);
 			}
 		}
-		[HarmonyPatch(typeof(EquipmentDB), "GetRandomEquipment")]
-		static class EquipmentDB_GetRandomEquipment
-		{
-			static bool Prefix(
-				float minSpace, float maxSpace, int minPower, int maxPower, ref
-				int effectType, ShipClassLevel maxShipClass, int faction,
-				bool enableNoRarity, DropLevel maxDropLevel, int factionExtraChance, System.Random rand, ref Equipment __result)
-			{
-				/*Main.log(
-					$"GetRandomEquipment(" +
-					$"minSpace={minSpace:0.##}, maxSpace={maxSpace:0.##}, " +
-					$"minPower={minPower}, maxPower={maxPower}, " +
-					$"effectType={effectType}, maxShipClass={maxShipClass}({(int)maxShipClass}), " +
-					$"faction={faction}, enableNoRarity={enableNoRarity}, " +
-					$"maxDropLevel={maxDropLevel}({(int)maxDropLevel}), factionExtraChance={factionExtraChance}, " +
-					$"rand={(rand == null ? "null" : rand.GetHashCode().ToString())}" +
-					$")");*/
-				if (effectType >= 0)
-					return true;
-				//EquipmentDB.ValidateDatabase();
-				bool flag = GameData.data.gameMode == 1;
-				int num = 0;
-				if (minPower >= maxPower)
-				{
-					minPower = maxPower - 1;
-				}
-				if (maxSpace < 1f)
-				{
-					maxSpace = 1f;
-				}
-				List<Equipment> list = new List<Equipment>();
-				var fi = AccessTools.Field(typeof(EquipmentDB), "equipments");
-				var equipments = fi?.GetValue(null) as List<Equipment>;
-				int type = rand.Next(0, EquipmentType.GetNames(typeof(EquipmentType)).Count());
-				//Main.log($"Looking for type {(EquipmentType)type}");
-				while (list.Count < 5)
-				{
-					for (int i = 0; i < equipments.Count; i++)
-					{
-						Equipment equipment = equipments[i];
-						if (equipment.space >= minSpace
-							&& equipment.space <= maxSpace
-							&& equipment.itemLevel >= minPower
-							&& equipment.itemLevel <= maxPower
-							&& rand.Next(1, 101) <= equipment.lootChance
-							&& equipment.dropLevel <= maxDropLevel
-							&& (equipment.rarityMod > 0f || enableNoRarity)
-							&& (int)equipment.type == type
-							&& (!flag || equipment.spawnInArena)
-							&& equipment.minShipClass <= maxShipClass
-							&& (equipment.repReq.factionIndex == 0 || equipment.repReq.factionIndex == faction))
-						{
-							list.Add(equipment);
-							if (factionExtraChance > 0 && equipment.repReq.factionIndex > 0)
-							{
-								for (int j = 0; j < factionExtraChance; j++)
-								{
-									list.Add(equipment);
-								}
-							}
-						}
-					}
-					num++;
-					if (list.Count < 5)
-					{
-						minPower--;
-						maxPower = (int)(maxPower + (1 + (int)maxDropLevel * (int)DropLevel.Boss));
-						minSpace -= 1f;
-						maxSpace += 1f;
-						if (num > 5 && maxShipClass < ShipClassLevel.Kraken)
-						{
-							maxShipClass++;
-							num = 0;
-						}
-						list.Clear();
-					}
-				}
-				__result = list[rand.Next(0, list.Count)];
-				return false;
-			}
-			static void Postfix(ref Equipment __result)
-			{
-				//Main.log($"Found {__result.name}");
-			}
-		}
+
 		/*
 		internal static class UniformEffectPicker
 		{
@@ -656,6 +604,15 @@ namespace RWEE
 				return true;
 			}
 		}*/
+	}
+
+	[HarmonyPatch(typeof(CargoItem), MethodType.Constructor, new Type[] { typeof(int), typeof(int), typeof(int), typeof(int), typeof(int) })]
+	static class CargoItem_CargoItem
+	{
+		static void Postfix(int ___itemID)
+		{
+			Main.log($"Loaded CargoItem: {___itemID}");
+		}
 	}
 }
 

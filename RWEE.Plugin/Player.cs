@@ -18,6 +18,7 @@ namespace RWEE
 		{
 			static void Prefix(float amount, int type, ref int ___maxLevel, int baseLevel)
 			{
+				//PChar.Char.techLevel = 101;
 				//Main.log($"EarnXP {amount}");
 
 				if (PChar.Char.level >= 50)
@@ -36,27 +37,18 @@ namespace RWEE
 				//___maxLevel = Main.Old_PChar_MaxLevel;
 			}
 		}
-		[HarmonyPatch(typeof(PChar), "UpdateChar")]
-		static class PChar_UpdateChar
-		{
-			static void Prefix(ref int ___maxLevel)
-			{
-				___maxLevel = Main.NEW_PCHAR_MAXLEVEL;
-			}
-			static void Postfix(ref int ___maxLevel)
-			{
-				___maxLevel = Main.OLD_PCHAR_MAXLEVEL;
-			}
-		}
 		[HarmonyPatch(typeof(PChar), "TechLevelUp")]
 		static class PChar_TechLevelUp
 		{
 			static bool Prefix()
 			{
-				Main.error("TechLevelUp");
-				if (PChar.Char.fighterPilot >= Main.NEW_SECT_CAP)
+				//Main.error("TechLevelUp");
+				//if (PChar.Char.techLevel < 101)
+				//	PChar.Char.techLevel = 101;
+
+				if (PChar.Char.techLevel >= Main.NEW_SECT_CAP)
 					return false;
-				Main.error("true");
+				//Main.error("true");
 				return true;
 			}
 		}
@@ -111,75 +103,31 @@ namespace RWEE
 			}
 		}
 		
-		[HarmonyPatch(typeof(PChar), "GetRelevantLevelRank")]
-		static class PChar_GetRelevantLevelRank
+		[HarmonyPatch(typeof(PChar), "UpdateChar")]
+		static class PChar_UpdateChar
 		{
-			static void Prefix(int statLevel, int compareLevel, int flatBonus, float finalMod, ref int __result)
+			static void Postfix()
 			{
-
-/*				int num = 0;
-				if (statLevel >= PChar.maxLevel)
+				if (PChar.Char.level >= Main.NEW_PCHAR_MAXLEVEL)
 				{
-					__result = 0;
-					return false;
+					PChar.Char.currXP = (float)PChar.GetlevelEXP(Main.NEW_PCHAR_MAXLEVEL);
 				}
-				if (statLevel <= 20)
+				if (PChar.Char.fighterPilot > Main.OLD_PCHAR_MAXLEVEL)
 				{
-					int num2 = statLevel - 5;
-					if (num2 < 0)
-					{
-						num2 = 0;
-					}
-					num = compareLevel - num2 + 1;
-					num = Mathf.Clamp(num, 0, 8);
+					PChar.Char.fighterPilot = Main.OLD_PCHAR_MAXLEVEL;
 				}
-				else
+				if (PChar.Char.fleetCommander > Main.OLD_PCHAR_MAXLEVEL)
 				{
-					float num3 = (float)statLevel * 0.75f;
-					float num4 = (float)statLevel * 0.25f;
-					float num5 = ((float)compareLevel - num3) / num4;
-					if (num5 < 0f)
-					{
-						num = 0;
-					}
-					else
-					{
-						if (num5 <= 0.2f)
-						{
-							num = 1;
-						}
-						if (0.2f < num5 && num5 <= 0.4f)
-						{
-							num = 2;
-						}
-						if (0.4f < num5 && num5 <= 0.6f)
-						{
-							num = 3;
-						}
-						if (0.6f < num5 && num5 <= 0.8f)
-						{
-							num = 4;
-						}
-						if (0.8f < num5 && num5 <= 1f)
-						{
-							num = 5;
-						}
-						if (1f < num5 && num5 <= 1.2f)
-						{
-							num = 6;
-						}
-						if (1.2f < num5 && num5 <= 1.4f)
-						{
-							num = 7;
-						}
-						if (1.4f < num5)
-						{
-							num = 8;
-						}
-					}
+					PChar.Char.fleetCommander = Main.OLD_PCHAR_MAXLEVEL;
 				}
-				__result=  Mathf.RoundToInt((float)(num + flatBonus) * (1f + finalMod));
-				return false;*/
+				if (PChar.Char.geology > Main.OLD_PCHAR_MAXLEVEL)
+				{
+					PChar.Char.geology = Main.OLD_PCHAR_MAXLEVEL;
+				}
+				if (PChar.Char.explorer > Main.OLD_PCHAR_MAXLEVEL)
+				{
+					PChar.Char.explorer = Main.OLD_PCHAR_MAXLEVEL;
+				}
 			}
 		}
 		

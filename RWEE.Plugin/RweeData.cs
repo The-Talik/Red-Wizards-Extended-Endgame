@@ -23,7 +23,8 @@ namespace RWEE
 			{
 				Main.log("Updating Universe.");
 				int sectorsUpdated = 0;
-				for (int i = 0; i < GameData.data.sectors.Count; i++) {
+				for (int i = 0; i < GameData.data.sectors.Count; i++)
+				{
 					int cX = GameData.data.sectors[i].x;
 					int cY = GameData.data.sectors[i].y;
 					int staticLevel = (int)Vector2.Distance(new Vector2(25f, 14f), new Vector2((float)cX, (float)cY));
@@ -34,12 +35,12 @@ namespace RWEE
 						sectorsUpdated++;
 						int newLevel = Sectors.calculateLevel(cX, cY, staticLevel);
 						Main.warn($"Sector level updated from {GameData.data.sectors[i].level} to {newLevel}");
-							GameData.data.sectors[i].AdjustLevel(newLevel, false, false, false);
-						
+						GameData.data.sectors[i].AdjustLevel(newLevel, false, false, false);
+
 					}
 					Main.log($"Sector level min/act/max: {staticLevel} {minLevel} {GameData.data.sectors[i].level} {maxLevel}");
 				}
-				if(sectorsUpdated>0)
+				if (sectorsUpdated > 0)
 				{
 					SimplePopup.Show($"{sectorsUpdated} sectors have been leveled beyond the normal cap of 55. If you might want to uninstall this mod, it is recommended that you create a copy of your save file before your next save.", null, 1);
 				}
@@ -51,7 +52,10 @@ namespace RWEE
 	[HarmonyPatch(typeof(GameData), "SaveGame")]
 	static class Patch_GameData_SaveGame
 	{
-		static void Prefix() { RweeData.Flush(); }
+		static void Prefix()
+		{
+			RweeData.Flush();
+		}
 	}
 	public static class RweeData
 	{
@@ -174,4 +178,12 @@ namespace RWEE
 			return sb.ToString();
 		}
 	}
+/*	[HarmonyPatch(typeof(GameData), "LoadGameAsync")]
+	static class GameData_LoadGameAsync
+	{
+		static void Postfix()
+		{
+			Main.log($"GameData loaded");
+		}
+	*/
 }
