@@ -12,7 +12,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Experimental.Playables;
-
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 /**
  * Item Types:
  * 1 = weapons, 2 = equipment, 3 = item (goods), 4 == ship, 5 == crew member
@@ -31,7 +32,7 @@ namespace RWEE
 	}
 	internal class Items
 	{
-		public static bool debugUpgrades = false;  //always upgrade items from high level bosses.  Always return mythic relics when scrapping.
+		public static bool debugUpgrades = true;  //always upgrade items from high level bosses.  Always return mythic relics when scrapping.
 																							 //List<Item> relics;
 		static int[][] typeMap;
 
@@ -43,11 +44,37 @@ namespace RWEE
 			[HarmonyPriority(Priority.VeryLow)]
 			static void Postfix(ref List<Equipment> ___equipments)
 			{
+
+//				Main.error("Tmp IdRefMapJson: " + JsonConvert.SerializeObject(tmp, Formatting.None));
+
+				//adjust tech levels to ensure end game items are dropped by endgame bosses.
+				var item = ___equipments.FirstOrDefault(i => i != null && i.id == 81); //Superior Hull Reinforcement
+				item.techLevel = 17;
+				item = ___equipments.FirstOrDefault(i => i != null && i.id == 101); //Superior Hull Reinforcement
+				item.techLevel = 30;
+				item = ___equipments.FirstOrDefault(i => i != null && i.id == 75); //Lithrium
+				item.techLevel = 20;
+				item.sortPower = 25;
+				item = ___equipments.FirstOrDefault(i => i != null && i.id == 100); //Energy
+				item.techLevel = 25;
+				item.sortPower = 20;
+				item = ___equipments.FirstOrDefault(i => i != null && i.id == 86); //Speed booster iii
+				item.techLevel = 21;
+				item = ___equipments.FirstOrDefault(i => i != null && i.id == 151); //Pirate Heavy Booster
+				item.techLevel = 21;
+				item = ___equipments.FirstOrDefault(i => i != null && i.id == 150); //Pirate Booster
+				item.techLevel = 15;
+				item.sortPower = 24;
+				item = ___equipments.FirstOrDefault(i => i != null && i.id == 113); //Nodolo's Combat Mod
+				item.techLevel = 22;
+				item = ___equipments.FirstOrDefault(i => i != null && i.id == 162); //PMC Collectors
+				item.techLevel = 18;
+
 				var template = ___equipments.FirstOrDefault(i => i != null && i.id == 151);
 				if (template == null) { Main.warn("Template id 151 not found"); return; }
 
-				int nextId = ___equipments.Max(i => i?.id ?? -1) + 1;
-
+				//int nextId = ___equipments.Max(i => i?.id ?? -1) + 1;
+				int nextId = 12000;
 				// Runtime-safe deep-ish clone for ScriptableObjects
 				var clone = UnityEngine.Object.Instantiate(template);
 
@@ -64,7 +91,7 @@ namespace RWEE
 
 				clone.id = nextId;
 				clone.equipName = "Pirate Capital Booster";
-				clone.refName = "pirate_capital_booster";  // keep refName unique/stable
+				clone.refName = "Pirate Capital Booster";  // keep refName unique/stable
 				clone.minShipClass = ShipClassLevel.Dreadnought;
 				clone.techLevel = 58;
 				clone.space = 6f;
@@ -101,8 +128,8 @@ namespace RWEE
 				ancient.rarity = 4; //purple
 				if (ancient == null) { Main.log("[LegendaryCatalyst] Ancient Relic not found"); return; }
 
-				int nextId = ___items.Max(i => i?.id ?? -1) + 1;
-				//nextId += 1000;
+				//int nextId = ___items.Max(i => i?.id ?? -1) + 1;
+				int nextId = 12000;
 				foreach (EquipmentType et in Enum.GetValues(typeof(EquipmentType)))
 				{
 					// optional skips:

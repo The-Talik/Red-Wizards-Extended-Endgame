@@ -4,12 +4,75 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using System.Reflection;
 
 namespace RWEE
 {
 	internal class DataDumps
 	{
-		const bool show = true;
+		const bool show = false;
+
+		// CSV filenames
+		static readonly string ItemsCsv = "Items.csv";
+		static readonly string EquipCsv = "Equipment.csv";
+		static readonly string WeaponsCsv = "Weapons.csv";
+
+		static string GetOutputFolder()
+		{
+			try
+			{
+				var asm = Assembly.GetExecutingAssembly();
+				var dir = Path.GetDirectoryName(asm.Location) ?? Environment.CurrentDirectory;
+				var outDir = Path.Combine(dir, "DataDumps");
+				if (!Directory.Exists(outDir)) Directory.CreateDirectory(outDir);
+				return outDir;
+			}
+			catch
+			{
+				return Environment.CurrentDirectory;
+			}
+		}
+
+		static void EnsureCsvHeader(string fileName, string headerLine)
+		{
+			try
+			{
+				var path = Path.Combine(GetOutputFolder(), fileName);
+				if (!File.Exists(path))
+				{
+					File.WriteAllText(path, headerLine + Environment.NewLine, Encoding.UTF8);
+				}
+			}
+			catch (Exception ex)
+			{
+				Main.error($"[CSV] Failed to ensure header for {fileName}: {ex}");
+			}
+		}
+
+		static void AppendCsvRow(string fileName, params string[] columns)
+		{
+			try
+			{
+				var path = Path.Combine(GetOutputFolder(), fileName);
+				var line = string.Join(",", columns.Select(CsvEscape));
+				File.AppendAllText(path, line + Environment.NewLine, Encoding.UTF8);
+			}
+			catch (Exception ex)
+			{
+				Main.error($"[CSV] Failed to append row to {fileName}: {ex}");
+			}
+		}
+
+		static string CsvEscape(string s)
+		{
+			if (s == null) return "";
+			// Escape quotes by doubling them and wrap whole field in quotes if it contains comma, quote or newline
+			var needsQuotes = s.Contains(",") || s.Contains("\"") || s.Contains("\n") || s.Contains("\r");
+			var escaped = s.Replace("\"", "\"\"");
+			return needsQuotes ? $"\"{escaped}\"" : escaped;
+		}
+
 		// =========================
 		// Item dump
 		// =========================
@@ -33,12 +96,70 @@ namespace RWEE
 
 					Main.log($"[Items] Dumping {items.Count} items…");
 
+					// ensure CSV header
+					EnsureCsvHeader(ItemsCsv, "id,name,refName,type,rarity,itemLevel,levelPlus,basePrice,priceVariation,weight,tradeQty,prodLvlReq,flags,tradeChance,craftMats,prodMats");
+
 					for (int i = 0; i < items.Count; i++)
 					{
 						var it = items[i];
 						if (it == null) continue;
 
 						Main.log(FormatItem(it));
+
+						// write CSV row
+						try
+						{
+							var name =
+								!string.IsNullOrEmpty(it.itemName) ? it.itemName :
+								(!string.IsNullOrEmpty(it.refName) ? it.refName :
+								it.GetNameModified(0));
+
+							var flags = new List<string>();
+							if (it.IsAmmo) flags.Add("Ammo");
+							if (it.IsFabricated) flags.Add($"Fab(ID={it.defaultFabricatorID},Y={it.productionYield})");
+							if (it.CanBeMined) flags.Add($"Mine(geo={it.geologyRequired})");
+							if (it.IsBlueprint) flags.Add("Blueprint");
+							if (it.IsContainer) flags.Add("Container");
+							if (it.IsBasicOre) flags.Add("BasicOre");
+							if (!it.canBeTraded) flags.Add("NoTrade");
+							if (!it.randomDrop) flags.Add("NoRandomDrop");
+							if (it.craftable) flags.Add($"Craft(yield={it.craftingYield})");
+
+							string tradeChance = it.tradeChance != null && it.tradeChance.Length > 0
+								? string.Join("|", it.tradeChance)
+								: "-";
+
+							string craftMats = (it.craftingMaterials != null && it.craftingMaterials.Count > 0)
+								? string.Join("|", it.craftingMaterials.Select(cm => $"{cm.itemID}x{cm.quantity}"))
+								: "-";
+
+							string prodMats = (it.productionMaterials != null && it.productionMaterials.Count > 0)
+								? string.Join("|", it.productionMaterials.Select(pm => $"{pm.itemID}x{pm.quantity}"))
+								: "-";
+
+							AppendCsvRow(ItemsCsv,
+								it.id.ToString(),
+								name,
+								it.refName ?? "",
+								it.type.ToString(),
+								it.rarity.ToString(),
+								it.itemLevel.ToString(),
+								it.levelPlus.ToString(),
+								it.basePrice.ToString("0.##"),
+								it.priceVariation.ToString("0.##"),
+								it.weight.ToString("0.###"),
+								it.TradeQuantity.ToString(),
+								it.ProductionLevelRequired.ToString(),
+								string.Join("|", flags),
+								tradeChance,
+								craftMats,
+								prodMats
+							);
+						}
+						catch (Exception ex)
+						{
+							Main.error("[CSV Items] Failed to write item row: " + ex);
+						}
 					}
 
 					Main.log("[Items] Done.");
@@ -122,11 +243,58 @@ namespace RWEE
 					}
 
 					Main.log($"[Equip] Dumping {list.Count} equipment…");
+
+					// ensure CSV header
+					EnsureCsvHeader(EquipCsv, "id,name,refName,type,primaryEffect,minShipClass,itemLevel,techLevel,sortPower,space,massFlat,massChange,energyCost,energyCostPerShipClass,rarityMod,dropLevel,lootChance,sellChance,flags,reqItem,effects");
+
 					for (int i = 0; i < list.Count; i++)
 					{
 						var eq = list[i];
 						if (eq == null) continue;
 						Main.log(FormatEquipment(eq));
+
+						// write CSV row
+						try
+						{
+							string effects = (eq.effects != null && eq.effects.Count > 0)
+								? string.Join("|", eq.effects.Select(x =>
+								{
+									string s = $"{x.type}:{x.value:0.##}";
+									try { s += (x.mod != 0f ? $";m={x.mod:0.##}" : ""); } catch { }
+									return s;
+								}))
+								: "-";
+
+							string reqItem = (eq.requiredItemID >= 0 ? $"{eq.requiredItemID}x{eq.requiredQnt}" : "-");
+
+							AppendCsvRow(EquipCsv,
+								eq.id.ToString(),
+								!string.IsNullOrEmpty(eq.equipName) ? eq.equipName : (eq.refName ?? ""),
+								eq.refName ?? "",
+								eq.type.ToString(),
+								(eq.effects != null && eq.effects.Count > 0) ? eq.effects[0].type.ToString() : "-",
+								eq.minShipClass.ToString(),
+								eq.itemLevel.ToString(),
+								eq.techLevel.ToString(),
+								eq.sortPower.ToString(),
+								eq.space.ToString("0.##"),
+								eq.massFlat.ToString("0.##"),
+								eq.massChange.ToString("0.##"),
+								eq.energyCost.ToString("0.##"),
+								(eq.energyCostPerShipClass ? "1" : "0"),
+								eq.rarityMod.ToString("0.##"),
+								eq.dropLevel.ToString(),
+								eq.lootChance.ToString("0.###"),
+								eq.sellChance.ToString("0.###"),
+								FlagStr(eq),
+								reqItem,
+								effects
+							);
+						}
+						catch (Exception ex)
+						{
+							Main.error("[CSV Equip] Failed to write equipment row: " + ex);
+						}
 					}
 					Main.log("[Equip] Done.");
 				}
@@ -218,11 +386,63 @@ namespace RWEE
 					}
 
 					Main.log($"[Weapons] Dumping {list.Count} weapons (source='{src}')…");
+
+					// ensure CSV header
+					EnsureCsvHeader(WeaponsCsv, "index,name,type,compType,damageType,space,damage,rateOfFire,burst,range,speed,aoe,proximityDmgMod,fluxDamageMod,heatDamageMod,techLevel,dropLevel,itemLevel,energyShot,energyPerSec,heatShotRaw,heatPerSec,power,flags");
+
 					for (int i = 0; i < list.Count; i++)
 					{
 						var w = list[i];
 						if (w == null) continue;
 						Main.log(FormatWeapon(w));
+
+						// write CSV row
+						try
+						{
+							// name fallback
+							string name = string.IsNullOrEmpty(w.name) ? $"Weapon#{w.index}" : w.name;
+
+							// energy/heat per-shot (raw; no player skills)
+							float energyShot = w.energyCost;
+							float heatShotRaw = w.heatGenMod * (w.damage * 0.75f + 1f);
+
+							// per-second considering burst mechanics
+							float rof = Math.Max(w.rateOfFire, 0.0001f);
+							float burstDenom = Math.Max(w.rateOfFire + w.shortCooldown * w.burst, 0.0001f);
+							float energyPerSec = (w.burst == 0) ? (energyShot / rof) : (energyShot * (w.burst + 1) / burstDenom);
+							float heatPerSec = (w.burst == 0) ? (heatShotRaw / rof) : (heatShotRaw * (w.burst + 1) / burstDenom);
+
+							AppendCsvRow(WeaponsCsv,
+								w.index.ToString(),
+								name,
+								w.type.ToString(),
+								w.compType.ToString(),
+								w.damageType.ToString(),
+								w.space.ToString("0.##"),
+								w.damage.ToString("0.##"),
+								w.rateOfFire.ToString("0.###"),
+								w.burst.ToString(),
+								w.range.ToString(),
+								w.speed.ToString(),
+								w.aoe.ToString("0.##"),
+								w.proximityDmgMod.ToString("0.###"),
+								w.fluxDamageMod.ToString("0.###"),
+								w.heatDamageMod.ToString("0.###"),
+								w.techLevel.ToString(),
+								w.dropLevel.ToString(),
+								w.itemLevel.ToString(),
+								energyShot.ToString("0.##"),
+								energyPerSec.ToString("0.##"),
+								heatShotRaw.ToString("0.##"),
+								heatPerSec.ToString("0.##"),
+								w.power().ToString("0.##"),
+								(w.tradable ? "Trade" : "NoTrade") + (w.massKiller ? "|MassKiller" : "") + (w.autoTargeting ? "|AutoTarget" : "")
+							);
+						}
+						catch (Exception ex)
+						{
+							Main.error("[CSV Weapons] Failed to write weapon row: " + ex);
+						}
 					}
 					Main.log("[Weapons] Done.");
 				}
@@ -249,7 +469,7 @@ namespace RWEE
 					if (l != null) return (l, f.Name);
 				}
 
-				// Fallback: find first field that looks like List<TWeapon> / TWeapon[]
+				// Fallback: find first field that looks like List<TWeapon> / TWeapon[] 
 				foreach (var fld in gi.GetType().GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic))
 				{
 					var trial = AsList(fld.GetValue(gi));

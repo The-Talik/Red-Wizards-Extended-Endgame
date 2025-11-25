@@ -37,7 +37,7 @@ namespace RWEE
 					//Main.log($"Applying AI bonus. lev: {aiChar.level} hp: {___baseHP} shield: {___baseShield} energy: {___baseEnergy} regen: {___hpRegen} regen shield-recharge: {___shieldRecharge} dam bonus: {___ss.dmgBonus}");
 					//float mod = aiChar.level / 50;  //1x at L50, 2x at L100, 3x at L150, etc
 
-					float mod = levelToMod(aiChar.level * (aiChar.AIType==4 || aiChar.AIType==3 ? 1.3f : 1f)); //bosses are harder, but give better loot.
+					float mod = levelToMod(aiChar.level * (aiChar.AIType == 4 || aiChar.AIType == 3 ? 1.3f : 1f)); //bosses are harder, but give better loot.
 					if (mod <= 0)
 						mod = 0;
 					___baseHP *= (1 + mod);
@@ -50,7 +50,7 @@ namespace RWEE
 					___acceleration *= (1 + mod / 10);
 
 					___ss.dmgBonus += mod;
-					Main.log($"Boosting AI {aiChar.Name()} {(1+mod)}x. lev: {aiChar.level} hp: {origBaseHP}→{___baseHP} shield: {origBaseShield}→{___baseShield}" +
+					Main.log($"Boosting AI {aiChar.Name()} {(1 + mod)}x. lev: {aiChar.level} hp: {origBaseHP}→{___baseHP} shield: {origBaseShield}→{___baseShield}" +
 						$"energy: {origBaseEnergy}→{___baseEnergy} regen: {origHpRegen}→{___hpRegen} shield-recharge: {origShieldRecharge}→{___shieldRecharge} dam bonus: origDamageBonus→{___ss.dmgBonus}");
 				}
 			}
@@ -85,7 +85,7 @@ namespace RWEE
 				}
 			}
 		}
-		
+
 		/**
 		 * Adjust AI to use strafe if they are faster than their target.
 		 */
@@ -129,7 +129,7 @@ namespace RWEE
 				___attackDistance = 250f * (1 + levelToMod(___Char.level));
 				___returnDistance = 350f * (1 + levelToMod(___Char.level));
 
-				if(__instance.targetEntity == null)
+				if (__instance.targetEntity == null)
 					return;
 				SpaceShip targetShip = __instance.targetEntity as SpaceShip;
 				if (!targetShip.IsPlayer)
@@ -164,7 +164,7 @@ namespace RWEE
 
 				if (getAcceleration(___ss) > getAcceleration(targetShip) * 2 && getTurnSpeed(___ss) > getTurnSpeed(targetShip) * 2)
 				{
-					
+
 					//we are more maneuverable than our target.
 					//Main.log("We qualify for tactic upgrade");
 					__instance.Char.currTactic = 2;
@@ -221,7 +221,7 @@ namespace RWEE
 			}
 			static void Postfix(AICharacter ___Char, SpaceShip ___ss)
 			{
-								Main.log($"Done generating AIControl level:{___Char.level} rank:{___Char.rank} loot:{___ss.loots.Count}");
+				Main.log($"Done generating AIControl level:{___Char.level} rank:{___Char.rank} loot:{___ss.loots.Count}");
 				if (___Char.rank < 1)
 					return;
 				//___ss.loots
@@ -263,12 +263,12 @@ namespace RWEE
 		[HarmonyPatch(typeof(EquipmentDB), "GetRandomEquipment")]
 		static class EquipmentDB_GetRandomEquipment
 		{
-			static bool Prefix(
-				float minSpace, float maxSpace, int minPower, int maxPower, ref
-				int effectType, ShipClassLevel maxShipClass, int faction,
-				bool enableNoRarity, DropLevel maxDropLevel, int factionExtraChance, System.Random rand, ref Equipment __result)
+			static bool Prefix(List<Equipment> ___equipments,
+	float minSpace, float maxSpace, int minPower, int maxPower, ref
+	int effectType, ShipClassLevel maxShipClass, int faction,
+	bool enableNoRarity, DropLevel maxDropLevel, int factionExtraChance, System.Random rand, ref Equipment __result)
 			{
-				/*Main.log(
+				Main.log(
 					$"GetRandomEquipment(" +
 					$"minSpace={minSpace:0.##}, maxSpace={maxSpace:0.##}, " +
 					$"minPower={minPower}, maxPower={maxPower}, " +
@@ -276,73 +276,237 @@ namespace RWEE
 					$"faction={faction}, enableNoRarity={enableNoRarity}, " +
 					$"maxDropLevel={maxDropLevel}({(int)maxDropLevel}), factionExtraChance={factionExtraChance}, " +
 					$"rand={(rand == null ? "null" : rand.GetHashCode().ToString())}" +
-					$")");*/
+					$")");
 				if (effectType >= 0)
 					return true;
-				//EquipmentDB.ValidateDatabase();
+				if (minPower < 50 +UnityEngine.Random.Range(0,100))  //L50 = always return;  L 150 = never
+					return true;
 				bool flag = GameData.data.gameMode == 1;
+				//int type = rand.Next(0, EquipmentType.GetNames(typeof(EquipmentType)).Count());
+				//Main.log($"Looking for type {(EquipmentType)type}");
+				List<int> list;
+				//Cherry pick end-game gear
+				//switch ((EquipmentType)type)
+				//{
+				//	case EquipmentType.Armor:
+				list = new List<int> { 57, 8, 75, 100, 99, 76, 52, 179, 101, 180, 136, 129,
+				//		};
+				//		break;
+				//	case EquipmentType.Battery:
+				//		list = new List<int> { 
+							110, 111, 112,
+				//		};
+				//		break;
+				//	case EquipmentType.Booster:
+				//		list = new List<int> {
+							12, 24, 85, 86, 150, 151, 132, 135 ,198,
+						//};
+				//		break;
+				//	case EquipmentType.Computer:
+				//		list = new List<int> {
+							156, 183, 184, 185, 27,63, 90, 93, 60, 171, 105,
+						//};
+				//		break;
+				//	case EquipmentType.Device:
+				//		list = new List<int> {
+						181, 159, 158, 160, 114, 98, 165, 113, 162, 104,145,
+						//};
+				//		break;
+				//	case EquipmentType.Engine:
+				//		list = new List<int> {
+							49, 41, 123, 147, 43, 149, 66, 97, 106, 146, 148, 107,
+						//};
+				//		break;
+				//	case EquipmentType.Generator:
+				//		list = new List<int> {
+							51, 157, 67,108,68,109,
+						//};
+				//		break;
+				//	case EquipmentType.Maneuverability:
+				//		list = new List<int>{
+						125, 128,
+						//};
+				//		break;
+				//	case EquipmentType.Sensor:
+				//		list = new List<int> {
+							50, 38, 140,
+						//};
+				//		break;
+				//	case EquipmentType.Shield:
+				//		list = new List<int> {
+							53, 54, 48, 56, 103, 69, 155,
+						//};
+				//		break;
+				//	case EquipmentType.Utility:
+				//		list = new List<int> {
+							30, 193, 36, 37, 47, 154, 117, 122, 143, 119, 186 };
+				//		break;
+				//}
+				//var fi = AccessTools.Field(typeof(EquipmentDB), "equipments");
+				//var equipments = fi?.GetValue(null) as List<Equipment>;
 				int num = 0;
-				if (minPower >= maxPower)
+				
+				while (num < 100)
 				{
-					minPower = maxPower - 1;
-				}
-				if (maxSpace < 1f)
-				{
-					maxSpace = 1f;
-				}
-				List<Equipment> list = new List<Equipment>();
-				var fi = AccessTools.Field(typeof(EquipmentDB), "equipments");
-				var equipments = fi?.GetValue(null) as List<Equipment>;
-				int type = rand.Next(0, EquipmentType.GetNames(typeof(EquipmentType)).Count());
-				Main.log($"Looking for type {(EquipmentType)type}");
-				while (list.Count < 5)
-				{
-					Main.log($"loop {num} Power: {minPower}-{maxPower} Space: {minSpace}-{maxSpace}");
-					for (int i = 0; i < equipments.Count; i++)
+					Main.log($"loop {num}");
+					int id = list[UnityEngine.Random.Range(0, list.Count)];
+					Equipment equipment = ___equipments.FirstOrDefault(i => i != null && i.id == id);
+					if (equipment == null)
 					{
-						Equipment equipment = equipments[i];
-						if (equipment.space >= minSpace
-							&& equipment.space <= maxSpace
-							&& equipment.itemLevel >= minPower
-							&& equipment.itemLevel <= maxPower
-							&& rand.Next(1, 101) <= equipment.lootChance
-							&& equipment.dropLevel <= maxDropLevel
-							&& (equipment.rarityMod > 0f || enableNoRarity)
-							&& (int)equipment.type == type
-							&& (!flag || equipment.spawnInArena)
-							&& equipment.minShipClass <= maxShipClass
-							&& (equipment.repReq.factionIndex == 0 || equipment.repReq.factionIndex == faction))
+						Main.warn($"equipment null id: {id}");
+					}
+					else {
+						int lootChance = equipment.lootChance;
+						if (factionExtraChance > 0 && equipment.repReq.factionIndex > 0)
+							lootChance *= factionExtraChance;
+						Main.log("looking");
+						if (equipment != null
+							&& equipment.space >= minSpace
+												&& equipment.space <= maxSpace
+												&& UnityEngine.Random.Range(1, 101) <= lootChance
+												&& equipment.dropLevel <= maxDropLevel
+												&& (equipment.rarityMod > 0f || enableNoRarity)
+												&& (!flag || equipment.spawnInArena)
+												&& equipment.minShipClass <= maxShipClass
+												&& (equipment.repReq.factionIndex == 0 || equipment.repReq.factionIndex == faction))
 						{
-							Main.log($"Adding loot contender: {equipment.equipName}");
-							list.Add(equipment);
-							if (factionExtraChance > 0 && equipment.repReq.factionIndex > 0)
-							{
-								for (int j = 0; j < factionExtraChance; j++)
-								{
-									list.Add(equipment);
-								}
-							}
+							Main.log($"found {equipment.equipName}");
+							__result = equipment;
+							return false;
 						}
+					}
+					minSpace -= 1f;
+					maxSpace += 1f;
+					if (num > 5 && maxShipClass < ShipClassLevel.Kraken)
+					{
+						maxShipClass++;
+						num = 0;
 					}
 					num++;
-					if (list.Count < 5)
-					{
-						minPower--;
-						maxPower = (int)(maxPower + (1 + (int)maxDropLevel * (int)DropLevel.Boss));
-						minSpace -= 1f;
-						maxSpace += 1f;
-						if (num > 5 && maxShipClass < ShipClassLevel.Kraken)
-						{
-							maxShipClass++;
-							num = 0;
-						}
-						list.Clear();
-					}
 				}
-				Main.log($"Contenders: {list.Count}");	
-				__result = list[rand.Next(0, list.Count)];
-				return false;
+				Main.warn("Could not find item.  Returning to default method.");
+				return true;
 			}
+			/*
+			static bool Prefix(
+			float minSpace, float maxSpace, int minPower, int maxPower, ref
+			int effectType, ShipClassLevel maxShipClass, int faction,
+			bool enableNoRarity, DropLevel maxDropLevel, int factionExtraChance, System.Random rand, ref Equipment __result)
+		{
+			/*Main.log(
+				$"GetRandomEquipment(" +
+				$"minSpace={minSpace:0.##}, maxSpace={maxSpace:0.##}, " +
+				$"minPower={minPower}, maxPower={maxPower}, " +
+				$"effectType={effectType}, maxShipClass={maxShipClass}({(int)maxShipClass}), " +
+				$"faction={faction}, enableNoRarity={enableNoRarity}, " +
+				$"maxDropLevel={maxDropLevel}({(int)maxDropLevel}), factionExtraChance={factionExtraChance}, " +
+				$"rand={(rand == null ? "null" : rand.GetHashCode().ToString())}" +
+				$")");*
+			if (effectType >= 0)
+				return true;
+			if(minPower < 50)
+				return true;
+			//EquipmentDB.ValidateDatabase();
+			bool flag = GameData.data.gameMode == 1;
+			int num = 0;
+			if (minPower >= maxPower)
+			{
+				minPower = maxPower - 1;
+			}
+			if (maxSpace < 1f)
+			{
+				maxSpace = 1f;
+			}
+			List<Equipment> list = new List<Equipment>();
+			var fi = AccessTools.Field(typeof(EquipmentDB), "equipments");
+			var equipments = fi?.GetValue(null) as List<Equipment>;
+			int type = rand.Next(0, EquipmentType.GetNames(typeof(EquipmentType)).Count());
+			Main.log($"Looking for type {(EquipmentType)type}");
+							int count = 5;
+							switch((EquipmentType)type)
+							{
+								case EquipmentType.Armor:
+									count = 10;
+									break;
+								case EquipmentType.Battery:
+									count = 3;
+									break;
+								case EquipmentType.Booster:
+									count = 5;
+									break;
+								case EquipmentType.Computer:
+									count = 6;
+									break;
+								case EquipmentType.Device:
+									count = 10;
+									break;
+								case EquipmentType.Engine:
+									count = 10;
+									break;
+								case EquipmentType.Generator:
+									count = 10;
+									break;
+								case EquipmentType.Maneuverability:
+									count = 10;
+									break;
+								case EquipmentType.Sensor:
+									count = 10;
+									break;
+								case EquipmentType.Shield:
+									count = 10;
+									break;
+								case EquipmentType.Utility:
+									count = 10;
+									break;
+							}
+							while (list.Count < 5)
+							{
+								Main.log($"loop {num} Power: {minPower}-{maxPower} Space: {minSpace}-{maxSpace}");
+								for (int i = 0; i < equipments.Count; i++)
+								{
+									Equipment equipment = equipments[i];
+									if (equipment.space >= minSpace
+										&& equipment.space <= maxSpace
+										&& equipment.itemLevel + UnityEngine.Random.Range(-5,5) >= minPower
+										&& equipment.itemLevel + UnityEngine.Random.Range(-5, 5) <= maxPower
+										&& rand.Next(1, 101) <= equipment.lootChance
+										&& equipment.dropLevel <= maxDropLevel
+										&& (equipment.rarityMod > 0f || enableNoRarity)
+										&& (int)equipment.type == type
+										&& (!flag || equipment.spawnInArena)
+										&& equipment.minShipClass <= maxShipClass
+										&& (equipment.repReq.factionIndex == 0 || equipment.repReq.factionIndex == faction))
+									{
+										Main.log($"Adding loot contender: {equipment.equipName}");
+										list.Add(equipment);
+										if (factionExtraChance > 0 && equipment.repReq.factionIndex > 0)
+										{
+											for (int j = 0; j < factionExtraChance; j++)
+											{
+												list.Add(equipment);
+											}
+										}
+									}
+								}
+								num++;
+								if (list.Count < 5)
+								{
+									minPower--;
+									maxPower = (int)(maxPower + (1 + (int)maxDropLevel * (int)DropLevel.Boss));
+									minSpace -= 1f;
+									maxSpace += 1f;
+									if (num > 5 && maxShipClass < ShipClassLevel.Kraken)
+									{
+										maxShipClass++;
+										num = 0;
+									}
+									list.Clear();
+								}
+							}
+							Main.log($"Contenders: {list.Count}");	
+							__result = list[rand.Next(0, list.Count)];
+							return false;
+						}*/
 			static void Postfix(ref Equipment __result)
 			{
 				//Main.log($"Found {__result.name}");

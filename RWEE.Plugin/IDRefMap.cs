@@ -1,31 +1,64 @@
 ﻿using HarmonyLib;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using UnityEngine;
 
+
+
+
 namespace RWEE
 {
-	internal static class IdRefMap
+	public class IdRefMapJson
 	{
-		[Serializable]
-		public class IdRefMapJson
-		{
-			public List<Pair> Items = new List<Pair>();
-			public List<Pair> Equipment = new List<Pair>();
+		public List<Pair> Items = new List<Pair>();
+		public List<Pair> Equipment = new List<Pair>();
 
-			[Serializable]
-			public class Pair
+		public class Pair
+		{
+			public int Id;
+			public string Name;
+			[IgnoreDataMember]
+			public int NewId;
+		}
+	}
+	internal static class JsonUtil
+	{
+		internal static string ToJson<T>(T obj)
+		{
+			if (obj == null)
+				return string.Empty;
+
+			var serializer = new DataContractJsonSerializer(typeof(T));
+			using (var ms = new MemoryStream())
 			{
-				public int Id;
-				public string Name;
-				[NonSerialized]
-				public int NewId;
+				serializer.WriteObject(ms, obj);
+				return Encoding.UTF8.GetString(ms.ToArray());
 			}
 		}
+
+		internal static T FromJson<T>(string json)
+		{
+			if (string.IsNullOrEmpty(json))
+				return default;
+
+			var serializer = new DataContractJsonSerializer(typeof(T));
+			using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(json)))
+			{
+				var obj = serializer.ReadObject(ms);
+				return (T)obj;
+			}
+		}
+	}
+	internal static class IdRefMap
+	{
+
 		internal static readonly IdRefMapJson Map = new IdRefMapJson();
 //		internal static readonly Dictionary<int, string> Map = new Dictionary<int, string>(1024);
 		private static string GetSaveField()
@@ -66,7 +99,21 @@ namespace RWEE
 					Map.Equipment.Add(new IdRefMapJson.Pair { Id = eq.id, Name = eq.refName ?? string.Empty });
 				}
 
-				var json = JsonUtility.ToJson(Map, false);
+				Main.log($"Map before JSON: items={Map.Items.Count} equip={Map.Equipment.Count} firstItem='{Map.Items[0].Name}'");
+				//var json = UnityEngine.JsonUtility.ToJson(Map, false);
+				//var json = JsonConvert.SerializeObject(Map, Formatting.None);
+				//string json;
+/*				var serializer = new DataContractJsonSerializer(typeof(IdRefMapJson));
+				using (var ms = new MemoryStream())
+				{
+					serializer.WriteObject(ms, Map);
+					json = Encoding.UTF8.GetString(ms.ToArray());
+				}*/
+				var json = JsonUtil.ToJson(Map);
+				if (json == "{}")
+					Main.error($"EMPTY JSON: {json}");
+				else
+					Main.log($"JSON: {json}");
 				SetSaveField(json);
 				Main.log($"Saved id/ref map (items={Map.Items.Count} equip={Map.Equipment.Count}).");
 			}
@@ -78,6 +125,7 @@ namespace RWEE
 
 		internal static void LoadFromGameData()
 		{
+			Main.log("RefMap LoadFromGameData");
 			try
 			{
 				// 0) Always start clean
@@ -90,13 +138,22 @@ namespace RWEE
 
 				if (!string.IsNullOrEmpty(json))
 				{
-					try { data = JsonUtility.FromJson<IdRefMapJson>(json); }
+					Main.log($"Found json: {json}");
+					try {
+						data = JsonUtil.FromJson<IdRefMapJson>(json);
+					}
 					catch (Exception ex) { Main.warn("Bad id/ref JSON in save, will use defaults: " + ex.Message); }
+					Main.log($"Loaded items: {data.Items.Count} equip: {data.Equipment.Count}");
+				}
+				else
+				{
+					Main.warn("No id/ref JSON found in save.");
 				}
 
 				// 2) Fallback defaults if missing/corrupt
-				if (data == null || data.Items == null)
+				if (data == null || data.Items == null || data.Items.Count == 0)
 				{
+					Main.warn("Using Defaults");
 					data = new IdRefMapJson
 					{
 						Items = new List<IdRefMapJson.Pair>
@@ -124,11 +181,13 @@ namespace RWEE
 							new IdRefMapJson.Pair { Id = 91, Name = "mystic_relic_utility" },
 							new IdRefMapJson.Pair { Id = 92, Name = "arcane_orb_utility" }
 						},
-						Equipment = new List<IdRefMapJson.Pair>()
+						Equipment = new List<IdRefMapJson.Pair>
+						{
+							new IdRefMapJson.Pair { Id = 198, Name = "Pirate Capital Booster" }
+						}
 					};
 					Main.warn("No saved id/ref map found; using defaults.");
 				}
-
 				// 3) Build remap lists only for CHANGED ids (name wins)
 				var dbItems = ItemDB.GetItems(false);
 				for (int i = 0; i < data.Items.Count; i++)
@@ -167,7 +226,7 @@ namespace RWEE
 					}
 				}
 
-				Main.log($"Loaded id/ref map ID changes: (items={Map.Items.Count} equip={Map.Equipment.Count}).");
+				Main.log($"Loaded id/ref map ID changes: (items={Map.Items.Count}/{data.Items.Count} equip={Map.Equipment.Count}/{data.Equipment.Count}).");
 			}
 			catch (Exception ex)
 			{
@@ -193,6 +252,28 @@ namespace RWEE
 				{
 					Main.warn($" Updating Item ID: {items[i].equipmentID}->{newID}");
 					items[i].equipmentID = newID;
+				}
+			}
+		}
+		internal static void fixItems(ref List<ItemStockData> items)
+		{
+			for (int i = 0; i < items.Count; i++)
+			{
+				if (TryGetNewID(items[i].itemType, items[i].itemID, out var newID))
+				{
+					Main.warn($" Updating Item ID: {items[i].itemID}->{newID}");
+					items[i].itemID = newID;
+				}
+			}
+		}
+		internal static void fixItems(ref List<MarketItem> items)
+		{
+			for (int i = 0; i < items.Count; i++)
+			{
+				if (TryGetNewID(items[i].itemType, items[i].itemID, out var newID))
+				{
+					Main.warn($" Updating Item ID: {items[i].itemID}->{newID}");
+					items[i].itemID = newID;
 				}
 			}
 		}
@@ -237,18 +318,47 @@ namespace RWEE
 			[HarmonyPriority(Priority.Last)]
 			static void Postfix()
 			{
+				Main.log("Fixing item ID Refmap");
+				int i;
 				IdRefMap.LoadFromGameData();
 				IdRefMap.fixItems(ref GameData.data.spaceShipData.cargo);
-				//IdRefMap.fixItems(ref GameData.data.spaceShipData.equipments);
-
-
-				//public List<InstalledEquipment> equipments;
-				//public List<EquipedWeapon> weapons;
-				//public List<ContainerData> containers;
-				//public List<ShipLoadout> shipLoadouts;
-				//public GalacticMarket galacticMarket;
-				//public List<Station> stationList;
-		}
+				for (i = 0; i < GameData.data.containers.Count; i++)
+					IdRefMap.fixItems(ref GameData.data.containers[i].items);
+				IdRefMap.fixItems(ref GameData.data.spaceShipData.equipments);
+				//IdRefMap.fixItems(ref GameData.data.spaceShipData.weapons);
+				//docked ships
+				for (i = 0; i < GameData.data.shipLoadouts.Count; i++)
+				{
+					Main.warn($"Ship Loadout {i}");
+					IdRefMap.fixItems(ref GameData.data.shipLoadouts[i].data.cargo);
+					IdRefMap.fixItems(ref GameData.data.shipLoadouts[i].data.equipments);
+					//IdRefMap.fixItems(ref GameData.data.shipLoadouts[i].data.weapons);
+				}
+				for (i = 0; i < GameData.data.character.mercenaries.Count; i++)
+				{
+					Main.warn($"mercenary {i}");
+					IdRefMap.fixItems(ref GameData.data.character.mercenaries[i].shipData.cargo);
+					IdRefMap.fixItems(ref GameData.data.character.mercenaries[i].shipData.equipments);
+				}
+					for (i = 0; i < GameData.data.stationList.Count; i++)
+				{
+				//	IdRefMap.fixItems(ref GameData.data.stationList[i].itemStock.items);
+				//	IdRefMap.fixItems(ref GameData.data.stationList[i].sm_Market.persistentItems);
+				}
+				/*for (i = 0; i < GameData.data.sectors.Count; i++)
+				{
+					for (int j = 0; j < GameData.data.sectors[i].aiChars.Count; i++)
+					{
+						
+					}
+				}*/
+					//public List<InstalledEquipment> equipments;
+					//public List<EquipedWeapon> weapons;
+					//public List<ContainerData> containers;
+					//public List<ShipLoadout> shipLoadouts;
+					//public GalacticMarket galacticMarket;
+					//public List<Station> stationList;
+			}
 		}
 
 		// (Optional) Clear/init on new games so the field exists even before first save

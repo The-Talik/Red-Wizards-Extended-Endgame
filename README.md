@@ -37,6 +37,7 @@ Changes from base game:
   - Enemies will flee when health gets low
   - Enemies adjust their tactics based on who they are attacking (ie, they will switch to hit and run if they are more maneuverable than their target)
   - Ravagers and Marauders will attack you from further away preventing long range attack spamming
+ - Equipment drops adjusted to give endgame equipment, even if they are too low of a level for the enemy.
  Players:
  - Player level cap increased to 100
  - XP gain slowed down progressively after level 50
@@ -67,6 +68,8 @@ Changes from base game:
  - Ancient artifacts are purple, instead of blue
 
 Changelog:
+1.1.1
+ - Reworked L55+ enemy drops so all endgame loot has a chance to drop.
 1.1.0
  - Item ID inconsistency (Internal change)
  - ID fix for Pirate Capital Booster
@@ -131,6 +134,7 @@ Looser down-the-road ideas:
  - Way to make ramming builds more viable late-game
  - Some form of endgame state that requires you to piss off all factions but one, in order to gain some super reward.
  - Maybe a separate higher-level version of Space Pilot and Fleet Commander that only starts when the base skills are maxed out.  This would allow the game to keep the standard L55-60 skills as hard to get, but introduce a new set of skill upgrades.
+ - Allow higher versions of items (mk, etc.) to be intentionally turned down to mimic their weaker versions.
  - Balance for ultra-late-game sectors L150+
   - Tiers 8 (Celestial) and 9(Transcendent)
   -  allow very high level enemies to drop ship blueprints

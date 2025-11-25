@@ -90,7 +90,7 @@ namespace RWEE
 		{
 			static void Postfix()
 			{
-				PlayerControl.inst.ReleaseControls(true);
+				//PlayerControl.inst.ReleaseControls(true);
 			}
 		}
 	}
