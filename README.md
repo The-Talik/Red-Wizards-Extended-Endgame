@@ -13,7 +13,7 @@ Installation Instructions:
  3. Place the RedWizardsExtendedEndgame.Patcher.dll file in PebInEx\patchers
  4. Profit!
 
-Current Version: 1.1.0
+Current Version: 1.1.1
 Download: https://www.nexusmods.com/starvalor/mods/55
 Alternate: https://github.com/The-Talik/Red-Wizards-Extended-Endgame/releases
 
