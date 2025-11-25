@@ -53,6 +53,10 @@ namespace RWEE
 					Main.log($"Boosting AI {aiChar.Name()} {(1 + mod)}x. lev: {aiChar.level} hp: {origBaseHP}→{___baseHP} shield: {origBaseShield}→{___baseShield}" +
 						$"energy: {origBaseEnergy}→{___baseEnergy} regen: {origHpRegen}→{___hpRegen} shield-recharge: {origShieldRecharge}→{___shieldRecharge} dam bonus: origDamageBonus→{___ss.dmgBonus}");
 				}
+				else
+				{
+					Main.log($"Ignoring AI {aiChar.Name()}");
+				}
 			}
 		}
 		static public float levelToMod(float level)

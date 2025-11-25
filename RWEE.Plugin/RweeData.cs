@@ -46,6 +46,29 @@ namespace RWEE
 				}
 			}
 			RweeData.SetString("RWEESaveVersion", Main.pluginVersion);
+			if(Items.debugUpgrades)
+			{
+				var items = ItemDB.GetItems(false);
+				//CargoSystem cs = PlayerControl.inst.GetCargoSystem;
+				for (int i=0; i< items.Count; i++)
+				{
+					if (items[i].refName.StartsWith("rwee"))
+					{
+						GameData.data.AddCargoItemForced(3, items[i].id, items[i].rarity, 1, -1);
+						SideInfo.AddMsg(Lang.Get(6, 18, ItemDB.GetItemNameModified(items[i].id, 2)));
+					}
+				}
+				var equipments = EquipmentDB.GetList(99999);
+				//CargoSystem cs = PlayerControl.inst.GetCargoSystem;
+				for (int i = 0; i < equipments.Count; i++)
+				{
+					if (equipments[i].refName.StartsWith("rwee"))
+					{
+						GameData.data.AddCargoItemForced(2, equipments[i].id, 1, 1, -1);
+						SideInfo.AddMsg(Lang.Get(6, 18, ItemDB.GetItemNameModified(equipments[i].id, 2)));
+					}
+				}
+			}
 		}
 	}
 

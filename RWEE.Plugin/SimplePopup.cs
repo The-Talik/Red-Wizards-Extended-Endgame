@@ -9,7 +9,7 @@ namespace RWEE
 
 		private string _message = "";
 		private string _url = null;
-		private Rect _win = new Rect(0, 0, 520, 220);
+		private Rect _win = new Rect(0, 0, Math.Max(500,Screen.width / 3), 220);
 		private bool _visible;
 		private GUIStyle _label, _btn, _title;
 		private bool _stylesBuilt;
@@ -63,20 +63,21 @@ namespace RWEE
 
 		private void OnGUI()
 		{
-			GUI.depth = -10000;
+			GUI.depth = 0;
 			if (!_visible) return;
 
 			if (!_stylesBuilt) BuildStyles();
 
 			// dim bg
 			var old = GUI.color;
-			GUI.color = new Color(0, 0, 0, 0.5f);
-			GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.blackTexture);
-			
+			GUI.color = new Color(0, 0f, 0, .5f);
+
+			GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture); //This does not work at all
+			GUI.depth = 1;
 
 			// apply bigger window title
 			GUI.skin.window = _title;
-			GUI.color = new Color(1f, 1f, 1f, 1f);
+			GUI.color = new Color(1f, 1f, 1f, 1f); // Why is this still semi transparent?
 			_win = GUILayout.Window(0x5EED123, _win, DoWindow, "Red Wizards Extended Endgame");
 			GUI.color = old;
 		}

@@ -66,7 +66,7 @@ namespace RWEE
 				var json = req.downloadHandler.text;
 				RemoteVersion rv = null;
 				Main.warn(json);
-				try { rv = JsonUtility.FromJson<RemoteVersion>(json); }
+				try { rv = JsonUtil.FromJson<RemoteVersion>(json); }
 				catch (Exception ex)
 				{
 					log?.LogWarning("Version JSON parse error: " + ex.Message);
@@ -87,10 +87,10 @@ namespace RWEE
 						if (e == null) continue;
 						if (VersionControl.IsNewer(e.v, localVer) && e.ch != null)
 						{
-							msg += "\n" + e.v;
+							msg += "\n<b>" + e.v + "</b>";
 							for (int j = 0; j < e.ch.Length; j++)
 							{
-								msg += "\n" + e.ch[j];
+								msg += "\n - " + e.ch[j];
 							}
 						}
 					}

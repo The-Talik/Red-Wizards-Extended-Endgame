@@ -28,34 +28,6 @@ namespace RWEE
 			public int NewId;
 		}
 	}
-	internal static class JsonUtil
-	{
-		internal static string ToJson<T>(T obj)
-		{
-			if (obj == null)
-				return string.Empty;
-
-			var serializer = new DataContractJsonSerializer(typeof(T));
-			using (var ms = new MemoryStream())
-			{
-				serializer.WriteObject(ms, obj);
-				return Encoding.UTF8.GetString(ms.ToArray());
-			}
-		}
-
-		internal static T FromJson<T>(string json)
-		{
-			if (string.IsNullOrEmpty(json))
-				return default;
-
-			var serializer = new DataContractJsonSerializer(typeof(T));
-			using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(json)))
-			{
-				var obj = serializer.ReadObject(ms);
-				return (T)obj;
-			}
-		}
-	}
 	internal static class IdRefMap
 	{
 
@@ -158,32 +130,32 @@ namespace RWEE
 					{
 						Items = new List<IdRefMapJson.Pair>
 						{
-							new IdRefMapJson.Pair { Id = 71, Name = "mystic_relic_generator" },
-							new IdRefMapJson.Pair { Id = 72, Name = "arcane_orb_generator" },
-							new IdRefMapJson.Pair { Id = 73, Name = "mystic_relic_battery" },
-							new IdRefMapJson.Pair { Id = 74, Name = "arcane_orb_battery" },
-							new IdRefMapJson.Pair { Id = 75, Name = "mystic_relic_engine" },
-							new IdRefMapJson.Pair { Id = 76, Name = "arcane_orb_engine" },
-							new IdRefMapJson.Pair { Id = 77, Name = "mystic_relic_booster" },
-							new IdRefMapJson.Pair { Id = 78, Name = "arcane_orb_booster" },
-							new IdRefMapJson.Pair { Id = 79, Name = "mystic_relic_maneuverability" },
-							new IdRefMapJson.Pair { Id = 80, Name = "arcane_orb_maneuverability" },
-							new IdRefMapJson.Pair { Id = 81, Name = "mystic_relic_armor" },
-							new IdRefMapJson.Pair { Id = 82, Name = "arcane_orb_armor" },
-							new IdRefMapJson.Pair { Id = 83, Name = "mystic_relic_shield" },
-							new IdRefMapJson.Pair { Id = 84, Name = "arcane_orb_shield" },
-							new IdRefMapJson.Pair { Id = 85, Name = "mystic_relic_sensor" },
-							new IdRefMapJson.Pair { Id = 86, Name = "arcane_orb_sensor" },
-							new IdRefMapJson.Pair { Id = 87, Name = "mystic_relic_computer" },
-							new IdRefMapJson.Pair { Id = 88, Name = "arcane_orb_computer" },
-							new IdRefMapJson.Pair { Id = 89, Name = "mystic_relic_device" },
-							new IdRefMapJson.Pair { Id = 90, Name = "arcane_orb_device" },
-							new IdRefMapJson.Pair { Id = 91, Name = "mystic_relic_utility" },
-							new IdRefMapJson.Pair { Id = 92, Name = "arcane_orb_utility" }
+							new IdRefMapJson.Pair { Id = 71, Name = "rwee_mystic_relic_generator" },
+							new IdRefMapJson.Pair { Id = 72, Name = "rwee_arcane_orb_generator" },
+							new IdRefMapJson.Pair { Id = 73, Name = "rwee_mystic_relic_battery" },
+							new IdRefMapJson.Pair { Id = 74, Name = "rwee_arcane_orb_battery" },
+							new IdRefMapJson.Pair { Id = 75, Name = "rwee_mystic_relic_engine" },
+							new IdRefMapJson.Pair { Id = 76, Name = "rwee_arcane_orb_engine" },
+							new IdRefMapJson.Pair { Id = 77, Name = "rwee_mystic_relic_booster" },
+							new IdRefMapJson.Pair { Id = 78, Name = "rwee_arcane_orb_booster" },
+							new IdRefMapJson.Pair { Id = 79, Name = "rwee_mystic_relic_maneuverability" },
+							new IdRefMapJson.Pair { Id = 80, Name = "rwee_arcane_orb_maneuverability" },
+							new IdRefMapJson.Pair { Id = 81, Name = "rwee_mystic_relic_armor" },
+							new IdRefMapJson.Pair { Id = 82, Name = "rwee_arcane_orb_armor" },
+							new IdRefMapJson.Pair { Id = 83, Name = "rwee_mystic_relic_shield" },
+							new IdRefMapJson.Pair { Id = 84, Name = "rwee_arcane_orb_shield" },
+							new IdRefMapJson.Pair { Id = 85, Name = "rwee_mystic_relic_sensor" },
+							new IdRefMapJson.Pair { Id = 86, Name = "rwee_arcane_orb_sensor" },
+							new IdRefMapJson.Pair { Id = 87, Name = "rwee_mystic_relic_computer" },
+							new IdRefMapJson.Pair { Id = 88, Name = "rwee_arcane_orb_computer" },
+							new IdRefMapJson.Pair { Id = 89, Name = "rwee_mystic_relic_device" },
+							new IdRefMapJson.Pair { Id = 90, Name = "rwee_arcane_orb_device" },
+							new IdRefMapJson.Pair { Id = 91, Name = "rwee_mystic_relic_utility" },
+							new IdRefMapJson.Pair { Id = 92, Name = "rwee_arcane_orb_utility" }
 						},
 						Equipment = new List<IdRefMapJson.Pair>
 						{
-							new IdRefMapJson.Pair { Id = 198, Name = "Pirate Capital Booster" }
+							new IdRefMapJson.Pair { Id = 198, Name = "rwee Pirate Capital Booster" }
 						}
 					};
 					Main.warn("No saved id/ref map found; using defaults.");

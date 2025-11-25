@@ -58,7 +58,7 @@ namespace RWEE
 				 .SetValue(205);*/
 
 			Log.LogInfo("Harder Endgame Loaded");
-			const string VERSION_URL = "https://mezr.com/star_valor.json";
+			const string VERSION_URL = "https://mezr.com/star_valor.json.php";
 			if(typeof(GameDataInfo).GetField("rweeJson", BindingFlags.Public | BindingFlags.Instance) == null)
 			{
 				Main.error("Could not find rweeJson.  Did the prepatcher load?");
@@ -71,6 +71,7 @@ namespace RWEE
 			Main.log("Has GameDataInfo.rweeJson? " + (typeof(GameDataInfo).GetField("rweeJson", BindingFlags.Public | BindingFlags.Instance) != null));
 			VersionControl.Check(this, Logger, VERSION_URL, pluginVersion, (msg, link) =>
 			{
+
 				//Main.error(msg + (string.IsNullOrEmpty(link) ? "" : " → " + link));
 
 				SimplePopup.Show(msg, link,2);

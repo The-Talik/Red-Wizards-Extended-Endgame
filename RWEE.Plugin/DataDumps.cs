@@ -308,10 +308,7 @@ namespace RWEE
 			{
 				// Try common field names on EquipmentDB
 				var fi =
-					AccessTools.Field(typeof(EquipmentDB), "equipments") ??
-					AccessTools.Field(typeof(EquipmentDB), "equipment") ??
-					AccessTools.Field(typeof(EquipmentDB), "list") ??
-					AccessTools.Field(typeof(EquipmentDB), "items");
+					AccessTools.Field(typeof(EquipmentDB), "equipments");
 
 				return fi?.GetValue(null) as List<Equipment>;
 			}

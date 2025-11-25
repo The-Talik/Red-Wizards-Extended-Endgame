@@ -32,7 +32,7 @@ namespace RWEE
 	}
 	internal class Items
 	{
-		public static bool debugUpgrades = true;  //always upgrade items from high level bosses.  Always return mythic relics when scrapping.
+		public static bool debugUpgrades = false;  //always upgrade items from high level bosses.  Always return mythic relics when scrapping.
 																							 //List<Item> relics;
 		static int[][] typeMap;
 
@@ -73,8 +73,8 @@ namespace RWEE
 				var template = ___equipments.FirstOrDefault(i => i != null && i.id == 151);
 				if (template == null) { Main.warn("Template id 151 not found"); return; }
 
-				//int nextId = ___equipments.Max(i => i?.id ?? -1) + 1;
-				int nextId = 12000;
+				int nextId = ___equipments.Max(i => i?.id ?? -1) + 1;
+				//int nextId = 12000;
 				// Runtime-safe deep-ish clone for ScriptableObjects
 				var clone = UnityEngine.Object.Instantiate(template);
 
@@ -91,7 +91,7 @@ namespace RWEE
 
 				clone.id = nextId;
 				clone.equipName = "Pirate Capital Booster";
-				clone.refName = "Pirate Capital Booster";  // keep refName unique/stable
+				clone.refName = "rwee Pirate Capital Booster";  // keep refName unique/stable
 				clone.minShipClass = ShipClassLevel.Dreadnought;
 				clone.techLevel = 58;
 				clone.space = 6f;
@@ -128,8 +128,8 @@ namespace RWEE
 				ancient.rarity = 4; //purple
 				if (ancient == null) { Main.log("[LegendaryCatalyst] Ancient Relic not found"); return; }
 
-				//int nextId = ___items.Max(i => i?.id ?? -1) + 1;
-				int nextId = 12000;
+				int nextId = ___items.Max(i => i?.id ?? -1) + 1;
+				//int nextId = 12000;
 				foreach (EquipmentType et in Enum.GetValues(typeof(EquipmentType)))
 				{
 					// optional skips:
@@ -141,7 +141,7 @@ namespace RWEE
 					//Tier 5
 					var it = MakeRelicVariant(ancient, nextId++, 5,
 						$"Legendary {label} Catalyst",
-						"mystic_relic_" + label.ToLowerInvariant(),
+						"rwee_mystic_relic_" + label.ToLowerInvariant(),
 						label, "legendary_catalyst.png",
 						$"A low, steady hum radiates from within. As you hold it, old scars seem lighter and familiar tools feel newly made, as if the Catalyst is reminding matter what it was always capable of becoming.");
 					___items.Add(it);
@@ -149,7 +149,7 @@ namespace RWEE
 					//Tier 6
 					it = MakeRelicVariant(ancient, nextId++, 6,
 						$"Mythic {label} Relic",
-						"arcane_orb_" + label.ToLowerInvariant(),
+						"rwee_arcane_orb_" + label.ToLowerInvariant(),
 						label, "mythic_relic.png",
 						$"The Relic does not shine so much as it refuses darkness. Touching it is like reading a memory written in thunder — names you’ve never learned settle on your tongue as if they were yours.");
 					___items.Add(it);
@@ -273,28 +273,30 @@ namespace RWEE
 							return;
 						case 2:
 							Equipment equipment = EquipmentDB.GetEquipment(id);
+							string label = equipment.type.ToString();
 
-							int rand = RweeRand.Range(0, 100, "armor_mystic_relic_attempts");
+							int rand = RweeRand.Range(0, 100, label.ToLowerInvariant()+"_mystic_relic_attempts");
 							Main.log("random number:" + rand);
 							if (rand < 10 || Items.debugUpgrades)
 							{
-								string label = equipment.type.ToString();
-								Item item;
+								
+								Item item = null;
 								switch (rarity)
 								{
 									case 5:
-										item = GetItemByRefName("mystic_relic_" + label.ToLowerInvariant());
-										cs.StoreItem(3, item.id, 5, 1, 0f, -1, -1);
-										SoundSys.PlaySound(16, true);
+										item = GetItemByRefName("rwee_mystic_relic_" + label.ToLowerInvariant());
 										break;
 									case 6:
 									case 7:
-										item = GetItemByRefName("arcane_orb" + label.ToLowerInvariant());
-										cs.StoreItem(3, item.id, 5, 1, 0f, -1, -1);
-										SoundSys.PlaySound(16, true);
+										item = GetItemByRefName("rwee_arcane_orb_" + label.ToLowerInvariant());
 										break;
 								}
-
+								if (item != null)
+								{
+									cs.StoreItem(3, item.id, 5, 1, 0f, -1, -1);
+									SoundSys.PlaySound(16, true);
+									SideInfo.AddMsg(Lang.Get(6, 18, ItemDB.GetItemNameModified(item.id, 2)));
+								}
 							}
 							break;
 					}
@@ -447,7 +449,7 @@ namespace RWEE
 						switch (desiredTier)
 						{
 							case 5:
-								if (ItemDB.GetItem(cargoItem.itemID).refName == "mystic_relic_" + type.ToLowerInvariant())
+								if (ItemDB.GetItem(cargoItem.itemID).refName == "rwee_mystic_relic_" + type.ToLowerInvariant())
 								{
 									//Main.log($"found item {ItemDB.GetItem(cargoItem.itemID).refName} {i}");
 									__result = i;
@@ -455,7 +457,7 @@ namespace RWEE
 								}
 								break;
 							case 6:
-								if (ItemDB.GetItem(cargoItem.itemID).refName == "arcane_orb_" + type.ToLowerInvariant())
+								if (ItemDB.GetItem(cargoItem.itemID).refName == "rwee_arcane_orb_" + type.ToLowerInvariant())
 								{
 									//Main.log($"found item {ItemDB.GetItem(cargoItem.itemID).refName} {i}");
 									__result = i;
@@ -516,7 +518,7 @@ namespace RWEE
 			}
 		}
 
-				[HarmonyPatch(typeof(ItemDB), "GetRarityColor", new System.Type[] { typeof(int), typeof(bool) })]
+		[HarmonyPatch(typeof(ItemDB), "GetRarityColor", new System.Type[] { typeof(int), typeof(bool) })]
 		static class ItemDB_GetRarityColor
 		{
 			static bool Prefix(int rarity, bool allowColorblindMode, ref string __result)

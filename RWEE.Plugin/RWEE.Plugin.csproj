@@ -74,6 +74,9 @@
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Star Valor\Star Valor_Data\Managed\UnityEngine.JSONSerializeModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Star Valor\Star Valor_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.UnityWebRequestModule">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Star Valor\Star Valor_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
       <Private>False</Private>
@@ -87,12 +90,14 @@
     <Compile Include="IconLoader.cs" />
     <Compile Include="IDRefMap.cs" />
     <Compile Include="Items.cs" />
+    <Compile Include="JsonUtil.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RweeData.cs" />
     <Compile Include="RweeRand.cs" />
     <Compile Include="Sectors.cs" />
+    <Compile Include="Ships.cs" />
     <Compile Include="SimplePopup.cs" />
     <Compile Include="Stations.cs" />
     <Compile Include="VersionControl.cs" />

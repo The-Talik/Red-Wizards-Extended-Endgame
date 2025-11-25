@@ -33,7 +33,7 @@ public static class RWEEPatcher
 
 		total += ForceField(mod, "GameData", "sectorLevelCap", Instruction.Create(OpCodes.Ldc_I4, 205));
 
-		//total += ForceField(mod, "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, 100));
+
 		total += ReplaceFieldReadsWithConst(mod, "PChar", "EarnXP", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_PCHAR_MAXLEVEL));
 		total += ReplaceFieldReadsWithConst(mod, "PChar", "LevelUp", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_PCHAR_MAXLEVEL));
 		total += ReplaceFieldReadsWithConst(mod, "PChar", "GetRelevantLevelRank", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_SECT_CAP));
@@ -41,8 +41,9 @@ public static class RWEEPatcher
 		total += ReplaceFieldReadsWithConst(mod, "BaseCharacter", "GetKnowledgeProgress", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_SECT_CAP));
 		total += ReplaceFieldReadsWithConst(mod, "BaseCharacter", "GetKnowledgeProgressWithPoints", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_SECT_CAP));
 		total += ReplaceFieldReadsWithConst(mod, "BaseCharacter", "KnowledgeUp", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_SECT_CAP));
-		total += EnsureOptionalStringField(mod, "GameDataInfo", "rweeJson");
-		total += EnsureOptionalStringField(mod, "GameDataInfo", "rweeItemMapJson");
+		total += EnsureOptionalField(mod, "GameDataInfo", "rweeJson", mod.TypeSystem.String);
+		total += EnsureOptionalField(mod, "GameDataInfo", "rweeItemMapJson", mod.TypeSystem.String);
+		total += EnsureOptionalField(mod, "InstalledEquipment", "disabled", mod.TypeSystem.Boolean, false);
 		total += ReplaceConstFloatInMethod(mod, "AIMarauder", "SetActions", 500f, 2000f);
 		total += ReplaceConstFloatInMethod(mod, "AIMercenary", "SetActions", 250f, 500f);
 
@@ -236,7 +237,7 @@ public static class RWEEPatcher
 		return edits;
 	}
 
-	static int EnsureOptionalStringField(ModuleDefinition mod, string typeName, string fieldName)
+	static int EnsureOptionalField(ModuleDefinition mod, string typeName, string fieldName,TypeReference type, Boolean isSerializable = true)
 	{
 		var t = mod.Types.FirstOrDefault(x => x.Name == typeName);
 		if (t == null)
@@ -252,16 +253,25 @@ public static class RWEEPatcher
 			return 0;
 		}
 
-		// public string rweeJson;
-		var fld = new FieldDefinition(fieldName, FieldAttributes.Public, mod.TypeSystem.String);
+		// public [non]serialized <type> <fieldName>;
+		var attrs = Mono.Cecil.FieldAttributes.Public;
+		System.Reflection.ConstructorInfo ctor;
+		if (isSerializable)
+		{
+			ctor = typeof(System.Runtime.Serialization.OptionalFieldAttribute).GetConstructor(Type.EmptyTypes);
+		}
+		else
+		{
+			ctor = typeof(System.NonSerializedAttribute).GetConstructor(Type.EmptyTypes);
+			attrs |= FieldAttributes.NotSerialized;
+		}
 
-		// [OptionalField]
-		var ctor = typeof(System.Runtime.Serialization.OptionalFieldAttribute).GetConstructor(Type.EmptyTypes);
+		var fld = new FieldDefinition(fieldName, attrs, type);
 		var optAttrCtorRef = mod.ImportReference(ctor);
 		fld.CustomAttributes.Add(new CustomAttribute(optAttrCtorRef));
 
+		Log("Added " + typeName + "." + fieldName + "");
 		t.Fields.Add(fld);
-		Log("Added " + typeName + "." + fieldName + " [OptionalField]");
 		return 1;
 	}
 	static int ReplaceConstFloatInMethod(ModuleDefinition mod, string typeName, string methodName, float oldVal, float newVal)

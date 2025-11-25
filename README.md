@@ -69,7 +69,9 @@ Changes from base game:
 
 Changelog:
 1.1.1
- - Reworked L55+ enemy drops so all endgame loot has a chance to drop.
+ - Reworked L55+ enemy drops so all endgame loot has a chance to drop
+ - Fixed bug with Tier 7 relics not dropping
+ - Standardize IDs and refNames for items from this mod
 1.1.0
  - Item ID inconsistency (Internal change)
  - ID fix for Pirate Capital Booster
@@ -77,26 +79,26 @@ Changelog:
 1.0.5b
  - Fix for techLevel capping at 100
 1.0.5
- - Legendary and higher weapons are buffed roughly 1.5x to be more competitive with endgame player-made ones.
+ - Legendary and higher weapons are buffed roughly 1.5x to be more competitive with endgame player-made ones
  - Fixed a bug prevent tech from leveling past 100
- - Fixed a bug that allowed Mythic Relics to upgrade items past Tier 5.
- - Renamed relics and tiers from this mod.
- - Added Pirate Capital Booster.
+ - Fixed a bug that allowed Mythic Relics to upgrade items past Tier 5
+ - Renamed relics and tiers from this mod
+ - Added Pirate Capital Booster
 1.0.4b
- - hotfix for version popup message.
+ - hotfix for version popup message
 1.0.4
- - Adjusts item drop for high level enemies to give a more even spread of equipment types, and ensure reasonable weapons are always returned even if the item level is too high. for the default formula.
- - fix a bug with enemy stat scaling from the last build.
+ - Adjusts item drop for high level enemies to give a more even spread of equipment types, and ensure reasonable weapons are always returned even if the item level is too high. for the default formula
+ - fix a bug with enemy stat scaling from the last build
 1.0.3
  - Fixed a bug stopping tech from leveling past 50
- - Sector level up can now cause nearby, lower level sectors to level up.
+ - Sector level up can now cause nearby, lower level sectors to level up
  - Hideouts will occasionally respawn their marauders
- - Enemies over L50 adjust their tactics more intelligently.
+ - Enemies over L50 adjust their tactics more intelligently
 1.0.2
- - Added tier 6 and 7 rarity levels with Tier 6 upgrade items from scrapping.
- - Existing sectors now leveled up on first install.
+ - Added tier 6 and 7 rarity levels with Tier 6 upgrade items from scrapping
+ - Existing sectors now leveled up on first install
 1.0.1
- - Fixed a bug with Mythic Relics.
+ - Fixed a bug with Mythic Relics
 
 Roadmap:
  - Higher mk levels of QOL items, scanners, warp, collector beams, etc.
