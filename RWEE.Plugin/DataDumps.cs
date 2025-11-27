@@ -24,7 +24,7 @@ namespace RWEE
 			{
 				var asm = Assembly.GetExecutingAssembly();
 				var dir = Path.GetDirectoryName(asm.Location) ?? Environment.CurrentDirectory;
-				var outDir = Path.Combine(dir, "DataDumps");
+				var outDir = Path.Combine(dir, "../DataDumps");
 				if (!Directory.Exists(outDir)) Directory.CreateDirectory(outDir);
 				return outDir;
 			}

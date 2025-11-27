@@ -117,7 +117,8 @@ copy /Y "$(TargetPath)" %25DEST%25
 robocopy /NP /nfl /njh /njs /ndl /nc /ns /mir %25ASSETS%25 %25DEST%25\assets
 IF ERRORLEVEL 8 exit /b %25ERRORLEVEL%25
 
-robocopy /NP /nfl /njh /njs /ndl /nc /ns /mir %25DEST%25 %25RELEASE_ROOT%25\plugins
+#xcopy "%25DEST%25\*" "%25RELEASE_ROOT%25\RedWizardExpandedEndgame_plugins\" /E /I /Y /Q
+robocopy /NP /nfl /njh /njs /ndl /nc /ns /mir %25DEST%25 %25RELEASE_ROOT%25\RedWizardExpandedEndgame_plugins
 IF ERRORLEVEL 8 exit /b %25ERRORLEVEL%25
 
 copy /Y %25PATCHER_FILE%25 %25RELEASE_ROOT%25

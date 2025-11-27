@@ -4,6 +4,8 @@ using System.Linq;
 using BepInEx.Logging;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System.IO;
+using System.Xml.Linq;
 
 public static class RWEEPatcher
 {
@@ -26,13 +28,13 @@ public static class RWEEPatcher
 
 	public static void Patch(AssemblyDefinition asm)
 	{
+		string modVersion = "1.1.2";
 		Log("Patch() entered");
 
 		var mod = asm.MainModule;
 		int total = 0;
 
 		total += ForceField(mod, "GameData", "sectorLevelCap", Instruction.Create(OpCodes.Ldc_I4, 205));
-
 
 		total += ReplaceFieldReadsWithConst(mod, "PChar", "EarnXP", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_PCHAR_MAXLEVEL));
 		total += ReplaceFieldReadsWithConst(mod, "PChar", "LevelUp", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_PCHAR_MAXLEVEL));
@@ -47,6 +49,9 @@ public static class RWEEPatcher
 		total += ReplaceConstFloatInMethod(mod, "AIMarauder", "SetActions", 500f, 2000f);
 		total += ReplaceConstFloatInMethod(mod, "AIMercenary", "SetActions", 250f, 500f);
 
+		total += EnsureOptionalField(mod, "GameData", "rweePatcherVersion", mod.TypeSystem.String,false,true);
+		total += ForceField(mod, "GameData", "rweePatcherVersion", Instruction.Create(OpCodes.Ldstr, modVersion));
+		Log($"Injected prepatcher version '{modVersion}' into GameDataInfo.rweePatcherVersion");
 		Log("Patch() done. Replacements/Appends: " + total);
 	}
 
@@ -237,7 +242,7 @@ public static class RWEEPatcher
 		return edits;
 	}
 
-	static int EnsureOptionalField(ModuleDefinition mod, string typeName, string fieldName,TypeReference type, Boolean isSerializable = true)
+	static int EnsureOptionalField(ModuleDefinition mod, string typeName, string fieldName,TypeReference type, Boolean isSerializable = true, Boolean isStatic = false)
 	{
 		var t = mod.Types.FirstOrDefault(x => x.Name == typeName);
 		if (t == null)
@@ -264,6 +269,10 @@ public static class RWEEPatcher
 		{
 			ctor = typeof(System.NonSerializedAttribute).GetConstructor(Type.EmptyTypes);
 			attrs |= FieldAttributes.NotSerialized;
+		}
+		if(isStatic)
+		{
+			attrs |= FieldAttributes.Static;
 		}
 
 		var fld = new FieldDefinition(fieldName, attrs, type);

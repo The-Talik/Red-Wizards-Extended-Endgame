@@ -91,7 +91,7 @@ namespace RWEE
 
 				clone.id = nextId;
 				clone.equipName = "Pirate Capital Booster";
-				clone.refName = "rwee Pirate Capital Booster";  // keep refName unique/stable
+				clone.refName = "rwee_Pirate Capital Booster";  // keep refName unique/stable
 				clone.minShipClass = ShipClassLevel.Dreadnought;
 				clone.techLevel = 58;
 				clone.space = 6f;

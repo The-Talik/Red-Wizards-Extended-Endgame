@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using UnityEngine;
@@ -155,13 +156,14 @@ namespace RWEE
 						},
 						Equipment = new List<IdRefMapJson.Pair>
 						{
-							new IdRefMapJson.Pair { Id = 198, Name = "rwee Pirate Capital Booster" }
+							new IdRefMapJson.Pair { Id = 198, Name = "rwee_Pirate Capital Booster" }
 						}
 					};
 					Main.warn("No saved id/ref map found; using defaults.");
 				}
 				// 3) Build remap lists only for CHANGED ids (name wins)
 				var dbItems = ItemDB.GetItems(false);
+				string errors = "";
 				for (int i = 0; i < data.Items.Count; i++)
 				{
 					var saved = data.Items[i];
@@ -170,16 +172,21 @@ namespace RWEE
 					if (current == null || !string.Equals(saved.Name, current.refName, StringComparison.Ordinal))
 					{
 						// Find by refName in current DB
-						var match = dbItems.FirstOrDefault(it => it != null && it.refName == saved.Name);
+						var match = dbItems.FirstOrDefault(it => it != null && it.refName == saved.Name || it.refName == "rwee_" + saved.Name);
 						if (match != null)
 						{
 							saved.NewId = match.id;
 							Map.Items.Add(saved);
 							Main.warn($"ID item change detected: {saved.Name} {saved.Id}->{saved.NewId}");
 						}
+						else
+						{
+							errors += $"Item remap '{saved.Name}' (old id {saved.Id}) not found in current DB.\n";
+						}
 					}
+					
 				}
-
+		
 				var dbEquip = EquipmentDB.GetList(false);
 				for (int i = 0; i < data.Equipment.Count; i++)
 				{
@@ -188,16 +195,23 @@ namespace RWEE
 
 					if (current == null || !string.Equals(saved.Name, current.refName, StringComparison.Ordinal))
 					{
-						var match = dbEquip.FirstOrDefault(eq => eq != null && eq.refName == saved.Name);
+						var match = dbEquip.FirstOrDefault(eq => eq != null && eq.refName == saved.Name || eq.refName == "rwee_" + saved.Name);
 						if (match != null)
 						{
 							saved.NewId = match.id;
 							Map.Equipment.Add(saved);
 							Main.warn($"ID equip change detected: {saved.Name} {saved.Id}->{saved.NewId}");
 						}
+						else
+						{
+							errors += $"Item remap '{saved.Name}' (old id {saved.Id}) not found in current DB.\n";
+						}
 					}
 				}
-
+				if (errors != "")
+				{
+					Main.error("Errors during item ID remap:\n" + errors);
+				}
 				Main.log($"Loaded id/ref map ID changes: (items={Map.Items.Count}/{data.Items.Count} equip={Map.Equipment.Count}/{data.Equipment.Count}).");
 			}
 			catch (Exception ex)
@@ -293,30 +307,36 @@ namespace RWEE
 				Main.log("Fixing item ID Refmap");
 				int i;
 				IdRefMap.LoadFromGameData();
-				IdRefMap.fixItems(ref GameData.data.spaceShipData.cargo);
-				for (i = 0; i < GameData.data.containers.Count; i++)
-					IdRefMap.fixItems(ref GameData.data.containers[i].items);
+				if(GameData.data.spaceShipData.cargo != null)
+					IdRefMap.fixItems(ref GameData.data.spaceShipData.cargo);
+				if(GameData.data.containers != null)
+					for (i = 0; i < GameData.data.containers.Count; i++)
+						IdRefMap.fixItems(ref GameData.data.containers[i].items);
+
 				IdRefMap.fixItems(ref GameData.data.spaceShipData.equipments);
 				//IdRefMap.fixItems(ref GameData.data.spaceShipData.weapons);
 				//docked ships
-				for (i = 0; i < GameData.data.shipLoadouts.Count; i++)
-				{
-					Main.warn($"Ship Loadout {i}");
-					IdRefMap.fixItems(ref GameData.data.shipLoadouts[i].data.cargo);
-					IdRefMap.fixItems(ref GameData.data.shipLoadouts[i].data.equipments);
-					//IdRefMap.fixItems(ref GameData.data.shipLoadouts[i].data.weapons);
-				}
-				for (i = 0; i < GameData.data.character.mercenaries.Count; i++)
-				{
-					Main.warn($"mercenary {i}");
-					IdRefMap.fixItems(ref GameData.data.character.mercenaries[i].shipData.cargo);
-					IdRefMap.fixItems(ref GameData.data.character.mercenaries[i].shipData.equipments);
-				}
+				if (GameData.data.shipLoadouts != null)
+					for (i = 0; i < GameData.data.shipLoadouts.Count; i++)
+					{
+						Main.warn($"Ship Loadout {i}");
+						IdRefMap.fixItems(ref GameData.data.shipLoadouts[i].data.cargo);
+						IdRefMap.fixItems(ref GameData.data.shipLoadouts[i].data.equipments);
+						//IdRefMap.fixItems(ref GameData.data.shipLoadouts[i].data.weapons);
+					}
+				if (GameData.data.character.mercenaries != null)
+					for (i = 0; i < GameData.data.character.mercenaries.Count; i++)
+					{
+						Main.warn($"mercenary {i}");
+						IdRefMap.fixItems(ref GameData.data.character.mercenaries[i].shipData.cargo);
+						IdRefMap.fixItems(ref GameData.data.character.mercenaries[i].shipData.equipments);
+					}
+				if (GameData.data.stationList != null)
 					for (i = 0; i < GameData.data.stationList.Count; i++)
-				{
-				//	IdRefMap.fixItems(ref GameData.data.stationList[i].itemStock.items);
-				//	IdRefMap.fixItems(ref GameData.data.stationList[i].sm_Market.persistentItems);
-				}
+					{
+					//	IdRefMap.fixItems(ref GameData.data.stationList[i].itemStock.items);
+					//	IdRefMap.fixItems(ref GameData.data.stationList[i].sm_Market.persistentItems);
+					}
 				/*for (i = 0; i < GameData.data.sectors.Count; i++)
 				{
 					for (int j = 0; j < GameData.data.sectors[i].aiChars.Count; i++)

@@ -22,7 +22,7 @@ namespace RWEE
 	{
 		public const string pluginGuid = "mc.starvalor.extendedendgame";
 		public const string pluginName = "RWEE";//"Red Wizard's Extended Endgame";
-		public const string pluginVersion = "1.1.1";
+		public const string pluginVersion = "1.1.2";
 
 		//public System.Reflection.Assembly asm = typeof(Main).Assembly;
 		//public const string pluginVersion = asm.GetName().Version?.ToString()
@@ -40,29 +40,32 @@ namespace RWEE
 
 		public static void log(string msg) => Log?.LogInfo(msg);
 		public static void warn(string msg) => Log?.LogWarning(msg);
-		public static void error(string msg) => Log?.LogError(msg);
+		public static void error(string msg,bool showPopup = true)
+		{
+			Log?.LogError(msg);
+			SimplePopup.Show(msg);
+		}
 
 		private void Awake()
 		{
 			Log = Logger;
 			_harmony = new Harmony(pluginGuid);
 			_harmony.PatchAll(Assembly.GetExecutingAssembly());
-			Main.log($"sectorLevelCap={GameData.sectorLevelCap}  maxLevel={PChar.maxLevel}  ver={GameData.currVersion}{GameData.subVersion}");
-			/*
-			 * now in prepatcher
-			 * Traverse.Create(typeof(PChar))
-					.Field("maxLevel")
-					.SetValue(100);
-			Traverse.Create(typeof(GameData))
-				 .Field("sectorLevelCap")
-				 .SetValue(205);*/
+
 
 			Log.LogInfo("Harder Endgame Loaded");
 			const string VERSION_URL = "https://mezr.com/star_valor.json.php";
-			if(typeof(GameDataInfo).GetField("rweeJson", BindingFlags.Public | BindingFlags.Instance) == null)
+			var fi = typeof(GameData).GetField("rweePatcherVersion", BindingFlags.Public | BindingFlags.Static);
+			//Main.log("GameDataInfo fields: " + string.Join(", ", fi.Select(f => f.Name + (f.IsStatic ? "[static]" : "[inst]"))));
+			var patcherVersion = fi.GetValue(null) as string;
+			if(patcherVersion != pluginVersion)
+			{
+				Main.error($"Patcher version does not match plugin version.  Ensure both are up to date.  Patcher={patcherVersion} Plugin={pluginVersion}");
+			}
+
+			if (typeof(GameDataInfo).GetField("rweeJson", BindingFlags.Public | BindingFlags.Instance) == null)
 			{
 				Main.error("Could not find rweeJson.  Did the prepatcher load?");
-				SimplePopup.Show("Could not find rweeJson.  Did the prepatcher load?");
 			}
 			else
 			{
