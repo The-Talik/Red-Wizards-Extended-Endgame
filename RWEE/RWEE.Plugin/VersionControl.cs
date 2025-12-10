@@ -42,7 +42,10 @@ namespace RWEE
 			Action<string, string> onUpdateAvailable = null
 		)
 		{
-			try { ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12; } catch { }
+			logr.Log("[VersionControl] Checking for updates...");
+			try { ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12; } catch {
+				logr.Warn("[VersionControl] Error with security protocol");
+			}
 			host.StartCoroutine(CheckRoutine(log, versionUrl, localVersion, onUpdateAvailable));
 		}
 
@@ -61,28 +64,32 @@ namespace RWEE
 				// Unity 2019 API
 				if (req.isNetworkError || req.isHttpError)
 				{
-					log?.LogWarning("Version check failed: " + req.error);
+					logr.Warn("Version check failed: " + req.error);
 					yield break;
 				}
 
 				var json = req.downloadHandler.text;
 				RemoteVersion rv = null;
-				//logr.Warn(json);
+				
+				logr.Log("[VersionControl] " + json);
 				try { rv = RW.JsonUtils.FromJson<RemoteVersion>(json); }
 				catch (Exception ex)
 				{
-					log?.LogWarning("Version JSON parse error: " + ex.Message);
+					logr.Warn("Version JSON parse error: " + ex.Message);
 					yield break;
 				}
 				if (rv == null || string.IsNullOrEmpty(rv.version))
+				{
+					logr.Warn("Version JSON parse is empty");
 					yield break;
-
+				}
+				logr.Log($"[VersionControl] Remote version: {rv.version}, Local version: {localVer}");
 				if (IsNewer(rv.version, localVer))
 				{
 					var msg = !string.IsNullOrEmpty(rv.message)
 						? rv.message.Replace("{local}", localVer).Replace("{remote}", rv.version)
 						: ("A new version " + rv.version + " is available (you have " + localVer + ").");
-					logr.Error($"isNewer rv.changelog.Length: {rv.changelog.Length}");
+					logr.Error($"isNewer rv.changelog.Length: {rv.changelog.Length}", false);
 					for (int i = 0; i < (rv.changelog?.Length ?? 0); i++)
 					{
 						var e = rv.changelog[i];

@@ -24,7 +24,7 @@ namespace RWEE
 	{
 		public const string pluginGuid = "mc.starvalor.extendedendgame";
 		public const string pluginName = "RWEE";//"Red Wizard's Extended Endgame";
-		public const string pluginVersion = "1.1.2";
+		public const string pluginVersion = "1.1.3";
 
 		//public System.Reflection.Assembly asm = typeof(Main).Assembly;
 		//public const string pluginVersion = asm.GetName().Version?.ToString()
@@ -94,13 +94,15 @@ namespace RWEE
 			{
 				logr.Log("Found rweeJson.");
 			}
+
 			logr.Log("Has GameDataInfo.rweeJson? " + (typeof(GameDataInfo).GetField("rweeJson", BindingFlags.Public | BindingFlags.Instance) != null));
+			
 			VersionControl.Check(this, Logger, VERSION_URL, pluginVersion, (msg, link) =>
 			{
 
-				//logr.Error(msg + (string.IsNullOrEmpty(link) ? "" : " → " + link));
+				logr.Error(msg + (string.IsNullOrEmpty(link) ? "" : " → " + link),false);
 
-				RW.SimplePopup.Show(msg, link);
+				RW.SimplePopup.Show("Red Wizard's Extended Endgame", msg, link);
 				// Or open a page:
 				// if (!string.IsNullOrEmpty(link)) Application.OpenURL(link);
 			});

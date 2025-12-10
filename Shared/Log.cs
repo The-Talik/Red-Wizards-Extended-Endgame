@@ -55,16 +55,18 @@ namespace RW.Logging
 			if (verbosity >= level)
 				log?.LogWarning(msg);
 		}
-
-		public void Error(string msg, bool showPopup = false, int level = -1)
+		public void Error(string msg, bool stash = true, int level = -1)
 		{
 			if (verbosity >= level)
 			{
 				log?.LogError(msg);
-				errorCount++;
-				errors.Add(msg);
-				if (showPopup)
-					SimplePopup.Show("Error",msg);
+				if (stash)
+				{
+					errorCount++;
+					errors.Add(msg);
+				}
+				//if (showPopup)
+				//	SimplePopup.Show("Error",msg);
 			}
 		}
 		public void PopupErrors(string title = null, string text =null)
