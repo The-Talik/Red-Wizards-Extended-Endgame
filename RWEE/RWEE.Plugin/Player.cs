@@ -19,7 +19,7 @@ namespace RWEE
 			static void Prefix(float amount, int type, ref int ___maxLevel, int baseLevel)
 			{
 				//PChar.Char.techLevel = 101;
-				//Main.log($"EarnXP {amount}");
+				//logr.Log($"EarnXP {amount}");
 
 				if (PChar.Char.level >= 50)
 				{
@@ -42,13 +42,13 @@ namespace RWEE
 		{
 			static bool Prefix()
 			{
-				//Main.error("TechLevelUp");
+				//logr.Error("TechLevelUp");
 				//if (PChar.Char.techLevel < 101)
 				//	PChar.Char.techLevel = 101;
 
 				if (PChar.Char.techLevel >= Main.NEW_SECT_CAP)
 					return false;
-				//Main.error("true");
+				//logr.Error("true");
 				return true;
 			}
 		}

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-
+using static RWEE.Logging;
 namespace RWEE
 {
 	internal class Sectors
@@ -95,18 +95,18 @@ namespace RWEE
 		{
 			static void Postfix(List<Station> ___smallBases, int ___level, int ___x, int ___y, ref List<Hideout> ___hideouts)
 			{
-				Main.log($"UpdateSectorLevels Postfix New Level: {___level}");
+				logr.Log($"UpdateSectorLevels Postfix New Level: {___level}");
 				for (int i = 0; i < GameData.data.sectors.Count; i++)
 				{
 					int cX = GameData.data.sectors[i].x;
 					int cY = GameData.data.sectors[i].y;
 					int staticLevel = (int)Vector2.Distance(new Vector2((float)___x, (float)___y), new Vector2((float)cX, (float)cY));
 					if (___level - staticLevel > GameData.data.sectors[i].level)
-						Main.log($"Comparing to Sector Level: i:{i} curr: {___level} remote:{GameData.data.sectors[i].level} Distance: {staticLevel} Want: {___level - staticLevel}");
+						logr.Log($"Comparing to Sector Level: i:{i} curr: {___level} remote:{GameData.data.sectors[i].level} Distance: {staticLevel} Want: {___level - staticLevel}");
 
 					if (___level - staticLevel*4 > GameData.data.sectors[i].level + UnityEngine.Random.Range(1,10))
 					{
-						Main.warn("Leveling up sector");
+						logr.Warn("Leveling up sector");
 						GameData.data.sectors[i].level++;
 //						GameData.data.sectors[i].AdjustLevel(GameData.data.sectors[i].level+1, false, false, false);
 					}
@@ -117,15 +117,15 @@ namespace RWEE
 					HideoutStation hideoutStation;
 					if ((hideoutStation = (___smallBases[i] as HideoutStation)) != null && hideoutStation.type== HideoutType.Marauder)
 					{
-						//Main.log($"Hideout Station chars: {hideoutStation.aiChars} {hideoutStation.aiChars.Count}");
+						//logr.Log($"Hideout Station chars: {hideoutStation.aiChars} {hideoutStation.aiChars.Count}");
 						for(int j=0;j< hideoutStation.aiChars.Count;j++)
 						{
-							//Main.log($"char: {hideoutStation.aiChars[j]} {hideoutStation.aiChars[j].level}");
+							//logr.Log($"char: {hideoutStation.aiChars[j]} {hideoutStation.aiChars[j].level}");
 						}
 						if (hideoutStation.aiChars.Count < 2 && UnityEngine.Random.Range(0, 100) < 10)
 						{
 
-							Main.log("regenerating Mauraders");
+							logr.Log("regenerating Mauraders");
 							hideoutStation.GenerateShips();
 						}
 					}
@@ -134,18 +134,18 @@ namespace RWEE
 		}*/
 		public static void AdjustNeighboringSectors(TSector sector)
 		{
-			Main.log($"AdjustNeighboringSectors Comparing to: {sector.level}");
+			logr.Log($"AdjustNeighboringSectors Comparing to: {sector.level}");
 			for (int i = 0; i < GameData.data.sectors.Count; i++)
 			{
 				int cX = GameData.data.sectors[i].x;
 				int cY = GameData.data.sectors[i].y;
 				int staticLevel = (int)Vector2.Distance(new Vector2((float)sector.x, (float)sector.y), new Vector2((float)cX, (float)cY));
 				if (sector.level - staticLevel > GameData.data.sectors[i].level)
-					Main.log($"Comparing to Sector Level: i:{i} curr: {sector.level} remote:{GameData.data.sectors[i].level} Distance: {staticLevel} Want: {sector.level - staticLevel}");
+					logr.Log($"Comparing to Sector Level: i:{i} curr: {sector.level} remote:{GameData.data.sectors[i].level} Distance: {staticLevel} Want: {sector.level - staticLevel}");
 
 				if (sector.level - staticLevel * 4 > GameData.data.sectors[i].level)
 				{
-					Main.warn("Leveling up sector");
+					logr.Warn("Leveling up sector");
 					GameData.data.sectors[i].level++;
 					//						GameData.data.sectors[i].AdjustLevel(GameData.data.sectors[i].level+1, false, false, false);
 				}
@@ -156,15 +156,15 @@ namespace RWEE
 				HideoutStation hideoutStation;
 				if ((hideoutStation = (sector.smallBases[i] as HideoutStation)) != null && hideoutStation.type == HideoutType.Marauder)
 				{
-					//Main.log($"Hideout Station chars: {hideoutStation.aiChars} {hideoutStation.aiChars.Count}");
+					//logr.Log($"Hideout Station chars: {hideoutStation.aiChars} {hideoutStation.aiChars.Count}");
 					for (int j = 0; j < hideoutStation.aiChars.Count; j++)
 					{
-						//Main.log($"char: {hideoutStation.aiChars[j]} {hideoutStation.aiChars[j].level}");
+						//logr.Log($"char: {hideoutStation.aiChars[j]} {hideoutStation.aiChars[j].level}");
 					}
 					if (hideoutStation.aiChars.Count < 2 && UnityEngine.Random.Range(0, 100) < 10)
 					{
 
-						Main.log("regenerating Mauraders");
+						logr.Log("regenerating Mauraders");
 						hideoutStation.GenerateShips();
 					}
 				}

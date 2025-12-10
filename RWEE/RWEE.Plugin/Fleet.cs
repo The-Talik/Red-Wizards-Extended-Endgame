@@ -20,7 +20,7 @@ namespace RWEE
             {
                 radius = ___ss.stats.scannerPower;
                 //___ss.GetShipModel();
-                //Main.log($"Searcing for Asteroid: {radius} {___ss.stats.scannerPower}");
+                //logr.Log($"Searcing for Asteroid: {radius} {___ss.stats.scannerPower}");
 
             }
         }

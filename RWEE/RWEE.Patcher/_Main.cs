@@ -16,14 +16,14 @@ public static class RWEEPatcher
 	public static IEnumerable<string> TargetDLLs { get; } = new[] { "Assembly-CSharp.dll" };
 	static RWEEPatcher()
 	{
-		try { _log = Logger.CreateLogSource("RWEE.Preloader"); }
+		try { _log = logr.CreateLogSource("RWEE.Preloader"); }
 		catch { /* fallback will use Console */ }
 	}
 
 	static void Log(string s)
 	{
 		if (_log != null) _log.LogInfo(s);
-		else { try { System.Console.WriteLine(s); } catch { } }
+		else { try { System.logr.WriteLine(s); } catch { } }
 	}
 
 	public static void Patch(AssemblyDefinition asm)

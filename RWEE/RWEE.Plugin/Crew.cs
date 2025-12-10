@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RW;
-
+using static RWEE.Logging;
 namespace RWEE
 {
 	internal class Crew
@@ -27,7 +27,7 @@ namespace RWEE
 			static bool Prefix(ref int level, ref int minRarity, ref int maxRarity, int factionIndex, bool allowSpecial, SM_Academy academy, System.Random rand, ref bool ___loaded, ref CrewMember __result)
 			{
 				
-				Main.log($"Crew Orig: Level: {level} minRarity: {minRarity} maxRarity: {maxRarity} academy: {academy}");
+				logr.Log($"Crew Orig: Level: {level} minRarity: {minRarity} maxRarity: {maxRarity} academy: {academy}");
 				if (academy != null)
 				{
 					if (level > 50)
@@ -39,7 +39,7 @@ namespace RWEE
 				if (level > 60)
 					maxRarity++;
 				level = 1;
-				Main.log($"Crew Orig: Level: {level} minRarity: {minRarity} maxRarity: {maxRarity} academy: {academy}");
+				logr.Log($"Crew Orig: Level: {level} minRarity: {minRarity} maxRarity: {maxRarity} academy: {academy}");
 				if (!allowSpecial)
 					return true;
 				if (!___loaded)
@@ -52,7 +52,7 @@ namespace RWEE
 
 				float num = 30 - GameData.data.specialCrewUsed.Count;
 
-				//Main.log($"Crew: {CrewDB.GetAvailableSpecialCrewMember().Count} {num}");
+				//logr.Log($"Crew: {CrewDB.GetAvailableSpecialCrewMember().Count} {num}");
 
 				if (num < 5)
 				{
@@ -80,12 +80,12 @@ namespace RWEE
 		{
 			static void Prefix(int id)
 			{
-				Main.log($"Getting perk: {id}");
+				logr.Log($"Getting perk: {id}");
 				//if (id == 8)
 				{
-					Main.log("Unlocking Sam");
+					logr.Log("Unlocking Sam");
 					CrewMember cm = CrewDB.GetPredefinedCrewMember(11);
-					Main.log($"cm: {cm.aiChar.name}");
+					logr.Log($"cm: {cm.aiChar.name}");
 					cm.hidden = false;
 					cm = CrewDB.GetPredefinedCrewMember(11);
 				}
@@ -101,15 +101,15 @@ namespace RWEE
 			{
 				if (PChar.HasPerk(8))
 				{
-					Main.log("has Scoundrel perk");
+					logr.Log("has Scoundrel perk");
 					for (int i = 0; i < GameManager.predefinitions.crewMembers.Length; i++)
 					{
 						if (GameManager.predefinitions.crewMembers[i].id == 11)
 						{
 							GameManager.predefinitions.crewMembers[i].hidden = false;
-							Main.log("Unlocking Sam");
+							logr.Log("Unlocking Sam");
 						}
-						Main.log($"Crew: {GameManager.predefinitions.crewMembers[i].id} {GameManager.predefinitions.crewMembers[i].aiChar.name}");
+						logr.Log($"Crew: {GameManager.predefinitions.crewMembers[i].id} {GameManager.predefinitions.crewMembers[i].aiChar.name}");
 					}
 				}
 			}
@@ -117,13 +117,13 @@ namespace RWEE
 			{
 					if (PChar.HasPerk(8))
 					{
-							Main.log("has Scoundrel perk -- Unlocking Sam");
+							logr.Log("has Scoundrel perk -- Unlocking Sam");
 							CrewMember cm = CrewDB.GetPredefinedCrewMember(11);
 							cm.hidden = false;
 
 							/*for (int i = 0; i < ___crewList.Length; i++)
 							{
-									//Main.log($"Crew: {___crewList[i].id}");
+									//logr.Log($"Crew: {___crewList[i].id}");
 									/*if (CrewDB.predefCrew[i].id == 11)
 									{
 											CrewDB.predefCrew[i].hidden = false;

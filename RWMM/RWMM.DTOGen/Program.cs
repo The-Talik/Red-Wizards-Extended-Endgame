@@ -23,14 +23,14 @@ namespace RWMM.DTOGen
 
 			if (string.IsNullOrWhiteSpace(assembly_path) || string.IsNullOrWhiteSpace(output_dir))
 			{
-				Console.WriteLine("Usage:");
-				Console.WriteLine("  RWMM.DTOGen --assembly \"...\\Assembly-CSharp.dll\" --output \"...\\RWMM.Core\\Generated\\Dto\" --types \"Item,Equipment\"");
+				logr.WriteLine("Usage:");
+				logr.WriteLine("  RWMM.DTOGen --assembly \"...\\Assembly-CSharp.dll\" --output \"...\\RWMM.Core\\Generated\\Dto\" --types \"Item,Equipment\"");
 				return 1;
 			}
 
 			if (!File.Exists(assembly_path))
 			{
-				Console.WriteLine("Assembly not found: " + assembly_path);
+				logr.WriteLine("Assembly not found: " + assembly_path);
 				return 2;
 			}
 
@@ -61,7 +61,7 @@ namespace RWMM.DTOGen
 				var td = FindType(module, type_name);
 				if (td == null)
 				{
-					Console.WriteLine("[skip] Type not found: " + type_name);
+					logr.WriteLine("[skip] Type not found: " + type_name);
 					continue;
 				}
 
@@ -71,11 +71,11 @@ namespace RWMM.DTOGen
 				var out_path = Path.Combine(output_dir, dto_name + ".g.cs");
 				File.WriteAllText(out_path, code, new UTF8Encoding(false));
 
-				Console.WriteLine("[ok] " + dto_name + " -> " + out_path);
+				logr.WriteLine("[ok] " + dto_name + " -> " + out_path);
 				files_written++;
 			}
 
-			Console.WriteLine("Done. Files written: " + files_written);
+			logr.WriteLine("Done. Files written: " + files_written);
 			return 0;
 		}
 

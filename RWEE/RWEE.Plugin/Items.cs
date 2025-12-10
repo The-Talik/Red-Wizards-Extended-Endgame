@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Experimental.Playables;
+using static RWEE.Logging;
 /**
  * Item Types:
  * 1 = weapons, 2 = equipment, 3 = item (goods), 4 == ship, 5 == crew member
@@ -34,7 +35,7 @@ namespace RWEE
 	}
 	internal class Items
 	{
-		public static bool debugUpgrades = true;  //always upgrade items from high level bosses.  Always return mythic relics when scrapping.
+		public static bool debugUpgrades = false;  //always upgrade items from high level bosses.  Always return mythic relics when scrapping.
 																							 //List<Item> relics;
 		static int[][] typeMap;
 
@@ -47,7 +48,7 @@ namespace RWEE
 			static void Postfix(ref List<Equipment> ___equipments)
 			{
 
-				//				Main.error("Tmp IdRefMapJson: " + JsonConvert.SerializeObject(tmp, Formatting.None));
+				//				logr.Error("Tmp IdRefMapJson: " + JsonConvert.SerializeObject(tmp, Formatting.None));
 
 				//adjust tech levels to ensure end game items are dropped by endgame bosses.
 				var item = ___equipments.FirstOrDefault(i => i != null && i.id == 81); //Superior Hull Reinforcement
@@ -77,7 +78,7 @@ namespace RWEE
 				/*
 				 * Moved to RWMM
 				var template = ___equipments.FirstOrDefault(i => i != null && i.id == 151);
-				if (template == null) { Main.warn("Template id 151 not found"); return; }
+				if (template == null) { logr.Warn("Template id 151 not found"); return; }
 
 
 
@@ -133,7 +134,7 @@ namespace RWEE
 				var ancient = ListUtils.GetByRef<Item>(___items, "Ancient Relic");
 				//ancient.canUpgradeToTier += 2;  //for testing
 				//ancient.rarity = 4; //purple  //now handled as a resource
-				if (ancient == null) { Main.error("[LegendaryCatalyst] Ancient Relic not found"); return; }
+				if (ancient == null) { logr.Error("[LegendaryCatalyst] Ancient Relic not found"); return; }
 
 				int nextId = ___items.Max(i => i?.id ?? -1) + 1;
 				//int nextId = 12000;
@@ -178,7 +179,7 @@ namespace RWEE
 
 					//	//ObjUtils.SetRef(it, $"Legendary {label} Catalyst core");
 
-					//	Main.log_obj(it);
+					//	logr.LogObj(it);
 					//}
 					//return;
 					/*				Item it;
@@ -285,7 +286,7 @@ namespace RWEE
 						var it = items[i];
 						if (it != null) dict[it.id] = it;
 					}
-					Main.log($"[MysticRelic] Rebuilt item id dictionary: {f.Name}");
+					logr.Log($"[MysticRelic] Rebuilt item id dictionary: {f.Name}");
 				}
 			}
 		}
@@ -317,7 +318,7 @@ namespace RWEE
 							string label = equipment.type.ToString();
 
 							int rand = RweeRand.Range(0, 100, label.ToLowerInvariant() + "_mystic_relic_attempts");
-							Main.log("random number:" + rand);
+							logr.Log("random number:" + rand);
 							if (rand < 10 || Items.debugUpgrades)
 							{
 
@@ -350,10 +351,10 @@ namespace RWEE
 			Item item = items.Find((Item i) => i.refName == refName);
 			if (item != null)
 			{
-				Main.log($"found item {item.itemName}");
+				logr.Log($"found item {item.itemName}");
 				return item;
 			}
-			Main.error("ERROR on GetItemByRefName(string refName) for refName " + refName);
+			logr.Error("ERROR on GetItemByRefName(string refName) for refName " + refName);
 			
 			return items[4];
 		}
@@ -366,7 +367,7 @@ namespace RWEE
 		{
 			static void Postfix(int ___selectedItem, ref Station ___currStation, ref int __result)
 			{
-				Main.log($"TierUpgradePossible postfix {__result}");
+				logr.Log($"TierUpgradePossible postfix {__result}");
 				if (__result > 0)
 					return;
 				CargoSystem cs = PlayerControl.inst.GetCargoSystem;
@@ -378,7 +379,7 @@ namespace RWEE
 					return;
 
 				int desiredTier = cs.cargo[___selectedItem].rarity + 1;
-				Main.log($"Desired Tier: {desiredTier}");
+				logr.Log($"Desired Tier: {desiredTier}");
 				if (desiredTier == 5)
 				{
 					Equipment item = EquipmentDB.GetEquipment(cs.cargo[___selectedItem].itemID);
@@ -386,7 +387,7 @@ namespace RWEE
 					__result = GetUpgradeItemForTier(desiredTier, label, (___currStation != null) ? ___currStation.id : -1, (___currStation != null));
 
 					//Item upgradeItem = ItemDB.GetItem(__result);
-					//Main.log($"upgrade item: {upgradeItem.refName} {"mystic_relic_" + label.ToLowerInvariant()}");
+					//logr.Log($"upgrade item: {upgradeItem.refName} {"mystic_relic_" + label.ToLowerInvariant()}");
 				}
 				//return CargoSystem.GetUpgradeItemForTier(desiredTier, this.inStation ? this.currStation.id : -1, this.inStation);
 			}
@@ -477,7 +478,7 @@ namespace RWEE
 				if (__result > 0)
 					return;
 				string type = eqType.ToString();//read value
-																				//Main.log($"getting upgrade item for tier {desiredTier}");
+																				//logr.Log($"getting upgrade item for tier {desiredTier}");
 				CargoSystem cs = PlayerControl.inst.GetCargoSystem;
 				for (int i = 0; i < cs.cargo.Count; i++)
 				{
@@ -489,7 +490,7 @@ namespace RWEE
 							case 5:
 								if (ItemDB.GetItem(cargoItem.itemID).refName == "rwee_mystic_relic_" + type.ToLowerInvariant())
 								{
-									//Main.log($"found item {ItemDB.GetItem(cargoItem.itemID).refName} {i}");
+									//logr.Log($"found item {ItemDB.GetItem(cargoItem.itemID).refName} {i}");
 									__result = i;
 									return;
 								}
@@ -497,7 +498,7 @@ namespace RWEE
 							case 6:
 								if (ItemDB.GetItem(cargoItem.itemID).refName == "rwee_arcane_orb_" + type.ToLowerInvariant())
 								{
-									//Main.log($"found item {ItemDB.GetItem(cargoItem.itemID).refName} {i}");
+									//logr.Log($"found item {ItemDB.GetItem(cargoItem.itemID).refName} {i}");
 									__result = i;
 									return;
 								}
@@ -505,7 +506,7 @@ namespace RWEE
 						}
 					}
 				}
-				//Main.log($"Did not find item.");
+				//logr.Log($"Did not find item.");
 			}
 		}
 
@@ -521,7 +522,7 @@ namespace RWEE
 		{
 			static void Postfix(int power, int initialRarityBooster, bool enableNoRarity, int itemFaction, DropLevel maxDropLevel, int factionExtraChance, System.Random rand)
 			{
-				Main.log(
+				logr.Log(
 	$"[RWEE] GenerateLootItem args: power={power}, initialRarityBooster={initialRarityBooster}, " +
 	$"enableNoRarity={enableNoRarity}, itemFaction={itemFaction}, " +
 	$"maxDropLevel={(int)maxDropLevel}({maxDropLevel}), factionExtraChance={factionExtraChance}, " +
@@ -589,13 +590,13 @@ namespace RWEE
 				ref TWeapon __result)
 			{
 				int origMinPower = minPower;
-				//Main.log($"found {__result.name}");
+				//logr.Log($"found {__result.name}");
 				if (__result.index != 0)
 					return;
 				if (__result.index == 0 && __result.itemLevel >= minPower)
 					return;
 				minPower -= 10;
-				Main.log($"↪ Fixing ERROR. Increasing power range to {origMinPower}->{minPower} to {maxPower} and searching again.");
+				logr.Log($"↪ Fixing ERROR. Increasing power range to {origMinPower}->{minPower} to {maxPower} and searching again.");
 
 				__result = GameData.data.GetRandomWeapon(maxSpace, minPower, maxPower, ignoreType, maxDropLevel, faction, factionExtraChance, rand);
 			}
@@ -678,7 +679,7 @@ namespace RWEE
 	{
 		static void Postfix(int ___itemID)
 		{
-			Main.log($"Loaded CargoItem: {___itemID}");
+			logr.Log($"Loaded CargoItem: {___itemID}");
 		}
 	}
 	[HarmonyPatch(typeof(CargoItem), "GetNameWithQnt")]

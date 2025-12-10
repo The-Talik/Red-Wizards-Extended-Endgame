@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using UnityEngine;
-
+using static RWMM.Logging;
 namespace RWMM
 {
 	public class IdRefMapJson
@@ -73,7 +73,7 @@ namespace RWMM
 			if (fi != null)
 				fi.SetValue(GameData.data, json);
 			else
-				Main.error("Save field 'rweeItemMapJson' not found (prepatcher missing?).");
+				logr.Error("Save field 'rweeItemMapJson' not found (prepatcher missing?).");
 		}
 
 		internal static void SaveToGameData()
@@ -87,20 +87,20 @@ namespace RWMM
 				MakeMapType(Map.Equipment, equipment);
 
 				string firstItemName = Map.Items.Count > 0 ? Map.Items[0].Name : "<none>";
-				Main.log($"Map before JSON: items={Map.Items.Count} equip={Map.Equipment.Count} firstItem='{firstItemName}'");
+				logr.Log($"Map before JSON: items={Map.Items.Count} equip={Map.Equipment.Count} firstItem='{firstItemName}'");
 
 				var json = JsonUtils.ToJson(Map);
 				if (json == "{}")
-					Main.error($"EMPTY JSON: {json}");
+					logr.Error($"EMPTY JSON: {json}");
 				else
-					Main.log($"JSON: {json}");
+					logr.Log($"JSON: {json}");
 
 				SetSaveField(json);
-				Main.log($"Saved id/ref map (items={Map.Items.Count} equip={Map.Equipment.Count}).");
+				logr.Log($"Saved id/ref map (items={Map.Items.Count} equip={Map.Equipment.Count}).");
 			}
 			catch (Exception ex)
 			{
-				Main.warn("SaveToGameData failed: " + ex);
+				logr.Warn("SaveToGameData failed: " + ex);
 			}
 		}
 
@@ -126,13 +126,13 @@ namespace RWMM
 				}
 				catch (Exception ex)
 				{
-					Main.error($"Could not get id/ref for object of type {it.GetType()}: {ex.Message}");
+					logr.Error($"Could not get id/ref for object of type {it.GetType()}: {ex.Message}");
 					continue; // skip bad entry, don't bail the whole map
 				}
 
 				if (string.IsNullOrEmpty(refName))
 				{
-					Main.error($"Could not get refName for object of type {it.GetType()}.");
+					logr.Error($"Could not get refName for object of type {it.GetType()}.");
 					continue;
 				}
 
@@ -142,7 +142,7 @@ namespace RWMM
 
 		internal static void LoadFromGameData()
 		{
-			Main.log("RefMap LoadFromGameData");
+			logr.Log("RefMap LoadFromGameData");
 			try
 			{
 				// 0) Always start clean
@@ -155,36 +155,36 @@ namespace RWMM
 
 				if (!string.IsNullOrEmpty(json))
 				{
-					Main.log($"Found json: {json}");
+					logr.Log($"Found json: {json}");
 					try
 					{
 						data = JsonUtils.FromJson<IdRefMapJson>(json);
 					}
 					catch (Exception ex)
 					{
-						Main.warn("Bad id/ref JSON in save, will use defaults: " + ex.Message);
+						logr.Warn("Bad id/ref JSON in save, will use defaults: " + ex.Message);
 					}
 
 					if (data != null)
 					{
 						int itemsCount = data.Items != null ? data.Items.Count : 0;
 						int equipCount = data.Equipment != null ? data.Equipment.Count : 0;
-						Main.log($"Loaded items: {itemsCount} equip: {equipCount}");
+						logr.Log($"Loaded items: {itemsCount} equip: {equipCount}");
 					}
 					else
 					{
-						Main.warn("Parsed id/ref JSON is null; will use defaults.");
+						logr.Warn("Parsed id/ref JSON is null; will use defaults.");
 					}
 				}
 				else
 				{
-					Main.warn("No id/ref JSON found in save.");
+					logr.Warn("No id/ref JSON found in save.");
 				}
 
 				// 2) Fallback defaults if missing/corrupt
 				if (data == null || data.Items == null || data.Items.Count == 0)
 				{
-					Main.warn("Using Defaults");
+					logr.Warn("Using Defaults");
 					data = new IdRefMapJson
 					{
 						Items = new List<IdRefMapJson.Pair>
@@ -217,7 +217,7 @@ namespace RWMM
 							new IdRefMapJson.Pair { Id = 198, Name = "rwee_Pirate Capital Booster" }
 						}
 					};
-					Main.warn("No saved id/ref map found; using defaults.");
+					logr.Warn("No saved id/ref map found; using defaults.");
 				}
 
 				// 3) Build remap lists only for CHANGED ids (name wins)
@@ -226,11 +226,11 @@ namespace RWMM
 
 				int dataItemsCount2 = data.Items != null ? data.Items.Count : 0;
 				int dataEquipCount2 = data.Equipment != null ? data.Equipment.Count : 0;
-				Main.log($"Loaded id/ref map ID changes: (items={Map.Items.Count}/{dataItemsCount2} equip={Map.Equipment.Count}/{dataEquipCount2}).");
+				logr.Log($"Loaded id/ref map ID changes: (items={Map.Items.Count}/{dataItemsCount2} equip={Map.Equipment.Count}/{dataEquipCount2}).");
 			}
 			catch (Exception ex)
 			{
-				Main.error("LoadFromGameData failed: " + ex);
+				logr.Error("LoadFromGameData failed: " + ex);
 			}
 		}
 
@@ -273,7 +273,7 @@ namespace RWMM
 
 				if (current == null || !string.Equals(saved.Name, current_refName, StringComparison.Ordinal))
 				{
-					Main.log($"Remapping ID for '{saved.Name}' (old id {saved.Id})");
+					logr.Log($"Remapping ID for '{saved.Name}' (old id {saved.Id})");
 
 					// Find by refName in current DB
 					var match = ListUtils.GetByRef(dbItems, saved.Name);
@@ -284,11 +284,11 @@ namespace RWMM
 					{
 						saved.NewId = ObjUtils.GetField<int>(match, "id");
 						targetMap.Add(saved);
-						Main.warn($"ID item change detected: {saved.Name} {saved.Id}->{saved.NewId}");
+						logr.Warn($"ID item change detected: {saved.Name} {saved.Id}->{saved.NewId}");
 					}
 					else
 					{
-						Main.error($"Item remap '{saved.Name}' (old id {saved.Id}) not found in current DB.\n");
+						logr.Error($"Item remap '{saved.Name}' (old id {saved.Id}) not found in current DB.\n");
 					}
 				}
 			}
@@ -324,7 +324,7 @@ namespace RWMM
 				int oldID = ObjUtils.GetIdReference(items[i]);
 				if (TryGetNewID(items[i], oldID, out var newID) && newID != oldID)
 				{
-					Main.warn($" Updating {items[i].GetType()} ID: {oldID}->{newID}");
+					logr.Warn($" Updating {items[i].GetType()} ID: {oldID}->{newID}");
 					ObjUtils.SetIdReference(items[i], newID);
 				}
 			}
@@ -368,7 +368,7 @@ namespace RWMM
 			[HarmonyPriority(Priority.Last)]
 			static void Postfix()
 			{
-				Main.log("Fixing item ID Refmap");
+				logr.Log("Fixing item ID Refmap");
 				int i;
 				IdRefMap.LoadFromGameData();
 
@@ -388,7 +388,7 @@ namespace RWMM
 				if (GameData.data.shipLoadouts != null)
 					for (i = 0; i < GameData.data.shipLoadouts.Count; i++)
 					{
-						Main.warn($"Ship Loadout {i}");
+						logr.Warn($"Ship Loadout {i}");
 						if (GameData.data.shipLoadouts[i].data.cargo != null)
 							IdRefMap.fixItems(ref GameData.data.shipLoadouts[i].data.cargo);
 						if (GameData.data.shipLoadouts[i].data.equipments != null)
@@ -399,7 +399,7 @@ namespace RWMM
 				if (GameData.data.character.mercenaries != null)
 					for (i = 0; i < GameData.data.character.mercenaries.Count; i++)
 					{
-						Main.warn($"mercenary {i}");
+						logr.Warn($"mercenary {i}");
 						if (GameData.data.character.mercenaries[i].shipData.cargo != null)
 							IdRefMap.fixItems(ref GameData.data.character.mercenaries[i].shipData.cargo);
 						if (GameData.data.character.mercenaries[i].shipData.equipments != null)

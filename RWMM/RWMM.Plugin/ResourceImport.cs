@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using static RWMM.ResourceDump;
 using static RWMM.Resources_IO;
-
+using static RWMM.Logging;
 namespace RWMM
 {
 	internal class ResourceImport
@@ -24,41 +24,41 @@ namespace RWMM
 			var folders = GetPrototypeFolders();
 			foreach (var folder in folders)
 			{
-				Main.log($"Scanning prototype folder for {type_name}s: {folder}");
+				logr.Log($"Scanning prototype folder for {type_name}s: {folder}");
 				var json_files = DirUtils.FindJsonFiles(folder);
 				foreach (var json_file in json_files)
 				{
-					//Main.log($"Importing prototype file: {json_file}");
+					//logr.Log($"Importing prototype file: {json_file}");
 					var json_text = File.ReadAllText(json_file);
 					var type = GetFromJson("type", json_text);
 
 					if (type == null)
 					{
-						Main.warn($"    Could not determine type of prototype file: {json_file}");
+						logr.Warn($"    Could not determine type of prototype file: {json_file}");
 						continue;
 					}
 
 					if (type == type_name)
 					{
-						//Main.log($"  Found {type} file: {json_file} ");
+						//logr.Log($"  Found {type} file: {json_file} ");
 						ImportObject<T, TData>(json_text, ref list, json_file, Directory.GetParent(folder).FullName);
 					}
 				}
 			}
-			Main.log($"----Dumped and imported {list.Count} objects of type {typeof(T).Name}----");
+			logr.Log($"----Dumped and imported {list.Count} objects of type {typeof(T).Name}----");
 			if (Resources_IO.dump_data > 0)
-				Main.log_line_list<T>(list);
+				logr.LogLineList<T>(list);
 
 		}
 		public static void ImportObject<T, TData>(string json, ref List<T> list, string json_file, string base_folder)
 		{
-			Main.log("importing object json "+base_folder);
+			logr.Log("importing object json "+base_folder);
 			var wrap = JsonUtils.FromJson<Wrap<TData>>(json);
 			wrap.base_folder = base_folder;
-			Main.log_obj(wrap);
+			logr.LogObj(wrap);
 
 
-			Main.log($"    Importing {typeof(T).Name} ref: \"{wrap.refName}\" file: {json_file}");
+			logr.Log($"    Importing {typeof(T).Name} ref: \"{wrap.refName}\" file: {json_file}");
 
 
 			//First we look for an existing item to update.
@@ -70,11 +70,11 @@ namespace RWMM
 				return;
 
 			//Otherwise create a new one.
-			Main.error($"    Creating new prototypes not yet supported.  Clone an existing one instead for: {wrap.refName}");
+			logr.Error($"    Creating new prototypes not yet supported.  Clone an existing one instead for: {wrap.refName}");
 			return;
 
 			//obj = new T();
-			//Main.log($"    Creating new {typeof(T).Name} ref: {refName}");
+			//logr.Log($"    Creating new {typeof(T).Name} ref: {refName}");
 			//addNewProto<T, TData>(obj,ref list, wrap, refName);
 			//return;
 		}
@@ -96,7 +96,7 @@ namespace RWMM
 			var gameObj = ListUtils.GetByRef(list, wrap.refName);
 			if (gameObj == null)
 				return false;
-			Main.log($"    Found existing {typeof(T).Name} ref: {wrap.refName}, updating.");
+			logr.Log($"    Found existing {typeof(T).Name} ref: {wrap.refName}, updating.");
 
 			var clonedObj = ObjUtils.Clone<T>(gameObj);
 
@@ -108,7 +108,7 @@ namespace RWMM
 			if (ObjUtils.GetField<int>(gameObj, "expansion") == 0 && ObjUtils.GetField<int>(clonedObj, "expansion") != 0)
 			{
 				ObjUtils.SetField<int>(gameObj, "expansion", ObjUtils.GetField<int>(clonedObj, "expansion"));
-				Main.error($"Disabling expansion is not allowed");
+				logr.Error($"Disabling expansion is not allowed");
 			}
 			TryUpdateImages(gameObj, wrap);
 			showChangedFields<T>(clonedObj, gameObj);
@@ -123,7 +123,7 @@ namespace RWMM
 			var gameObj = ListUtils.GetByRef(list, wrap.cloneFrom);
 			if (gameObj == null)
 				return false;
-			Main.log($"    Found {typeof(T).Name} to clone from: {wrap.cloneFrom} for new object {wrap.refName} ");
+			logr.Log($"    Found {typeof(T).Name} to clone from: {wrap.cloneFrom} for new object {wrap.refName} ");
 
 			var clonedObj = ObjUtils.Clone<T>(gameObj);
 
@@ -139,7 +139,7 @@ namespace RWMM
 			}
 			if (ListUtils.GetBy<T>(list, "id", ObjUtils.GetField<int>(clonedObj, "id")) != null)
 			{
-				Main.error($"    ID conflict with {typeof(T).Name} ref: {wrap.refName} ID {ObjUtils.GetField<int>(clonedObj, "id")} is already in use. Skipping");
+				logr.Error($"    ID conflict with {typeof(T).Name} ref: {wrap.refName} ID {ObjUtils.GetField<int>(clonedObj, "id")} is already in use. Skipping");
 				return true;
 			}
 			ObjUtils.SetRef(clonedObj,wrap.refName);
@@ -158,7 +158,7 @@ namespace RWMM
 				var updatedValue = field.GetValue(updated);
 				if (!object.Equals(originalValue, updatedValue))
 				{
-					Main.log($"{field.Name}: '{originalValue}' -> '{updatedValue}'");
+					logr.Log($"{field.Name}: '{originalValue}' -> '{updatedValue}'");
 				}
 }
 		}

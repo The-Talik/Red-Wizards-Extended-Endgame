@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-
+using static RWMM.Logging;
 namespace RWMM
 {
 	public static class ResourceDump
@@ -19,7 +19,7 @@ namespace RWMM
 		{
 			string type_name = typeof(T).Name;
 			type_name = type_name.TrimStart('_');
-			Main.log($"-----Dumping {type_name}s-----");
+			logr.Log($"-----Dumping {type_name}s-----");
 
 
 			comments += $"  Top level 'refName' uses and overwrites 'obj.{ObjUtils.RefField(type_name)}'.";
@@ -33,7 +33,7 @@ namespace RWMM
 
 			Directory.CreateDirectory(res_root);
 
-			Main.log($"  Found {objects.Count()} {type_name}s");
+			logr.Log($"  Found {objects.Count()} {type_name}s");
 			int i = 0;
 			int j = 0;
 			foreach (var obj in objects)
@@ -41,12 +41,12 @@ namespace RWMM
 				if (obj == null)
 					continue;
 				var wrap = new Wrap<T>(type_name, obj);
-				//				Main.log($"Ref: {GetField(obj, "refName")} json: {JsonUtil.pretty(json)}");
+				//				logr.Log($"Ref: {GetField(obj, "refName")} json: {JsonUtil.pretty(json)}");
 				var ref_name = ObjUtils.GetRef(obj);
 				wrap.refName = ref_name;
 				if (string.IsNullOrWhiteSpace(ref_name))
 				{
-					Main.warn($"  Skipping {type_name} with no refName/nameRef/id (index {i})");
+					logr.Warn($"  Skipping {type_name} with no refName/nameRef/id (index {i})");
 					i++;
 					continue;
 				}
@@ -71,7 +71,7 @@ namespace RWMM
 				j++;
 
 			}
-			Main.log($"  Dumped {j}/{i} {type_name}s");
+			logr.Log($"  Dumped {j}/{i} {type_name}s");
 		}
 
 		private static string SanitizeFilename(string name)
@@ -230,7 +230,7 @@ public static void dump_vanilla_list<T>(string type_name, List<T> list)
 	if (!_dumped_types.Add(type_name))
 		return;
 
-	Main.log($"Dumping {type_name}s");
+	logr.Log($"Dumping {type_name}s");
 	//var base_root = Path.Combine(_rwmm_plugin_dir, "common", "base");
 	var res_root = Path.Combine(_rwmm_plugin_dir, "game_resources", type_name+"s");
 
@@ -242,17 +242,17 @@ public static void dump_vanilla_list<T>(string type_name, List<T> list)
 	var ordered = list
 		.OrderBy(x => get_ref_name(x) ?? "", StringComparer.Ordinal)
 		.ToList();
-	Main.log($"ordered {type_name}s: {ordered.Count}");
+	logr.Log($"ordered {type_name}s: {ordered.Count}");
 	try
 	{
 		var json = JsonUtil.ToJson(ordered);
-		Main.log("RWMM dump: " + json);
+		logr.Log("RWMM dump: " + json);
 		File.WriteAllText(path, json);
-		Main.log("RWMM dump: " + type_name + " -> " + path);
+		logr.Log("RWMM dump: " + type_name + " -> " + path);
 	}
 	catch (Exception e)
 	{
-		Main.warn("RWMM dump failed (" + type_name + "): " + e.Message);
+		logr.Warn("RWMM dump failed (" + type_name + "): " + e.Message);
 	}
 }
 
@@ -286,7 +286,7 @@ public static int import_list<T>(string type_name, List<T> target)
 		}
 		catch (Exception e)
 		{
-			Main.log("RWMM import failed (" + type_name + "): " + file + " :: " + e.Message);
+			logr.Log("RWMM import failed (" + type_name + "): " + file + " :: " + e.Message);
 			continue;
 		}
 
@@ -315,7 +315,7 @@ public static int import_list<T>(string type_name, List<T> target)
 	}
 
 	if (upserts > 0)
-		Main.log("RWMM import: " + type_name + " upserts=" + upserts);
+		logr.Log("RWMM import: " + type_name + " upserts=" + upserts);
 
 	return upserts;
 }

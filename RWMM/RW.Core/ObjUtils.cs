@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-
+using static RW.Core.Logging;
 namespace RW
 {
 	public static class ObjUtils
@@ -20,7 +20,7 @@ namespace RW
 			if (obj == null)
 			{
 				if (!silent)
-					Main.warn("ObjUtils.GetRef called with null object.");
+					logr.Warn("ObjUtils.GetRef called with null object.");
 				return default;
 			}
 			string field = RefField(obj.GetType().Name);
@@ -46,7 +46,7 @@ namespace RW
 				case "ShipModelData":
 					return "shipModelName";
 				default:
-					Main.error($"ObjUtils.refField<{typeName}> not implemented.");
+					logr.Error($"ObjUtils.refField<{typeName}> not implemented.");
 					return null;
 			}
 		}
@@ -69,7 +69,7 @@ namespace RW
 				case "ShipModelData":
 					return "shipModelName";*/
 				default:
-					//Main.error($"ObjUtils.refField<{typeName}> not implemented.");
+					//logr.Error($"ObjUtils.refField<{typeName}> not implemented.");
 					return null;
 			}
 		}
@@ -80,9 +80,9 @@ namespace RW
 			if (!silent)
 			{
 				if (string.IsNullOrEmpty(v))
-					Main.warn($"ObjUtils.GetRef returned null/empty for {obj.GetType().Name} (field '{field}') looking for {field}.");
+					logr.Warn($"ObjUtils.GetRef returned null/empty for {obj.GetType().Name} (field '{field}') looking for {field}.");
 				else
-					Main.log($"ObjUtils.GetRef: {obj.GetType().Name}.refName = '{v}'", 3);
+					logr.Log($"ObjUtils.GetRef: {obj.GetType().Name}.refName = '{v}'", 3);
 			}
 			return v;
 		}
@@ -90,11 +90,11 @@ namespace RW
 		{
 			if (obj == null)
 			{
-				Main.warn("ObjUtils.SetRef called with null object.");
+				logr.Warn("ObjUtils.SetRef called with null object.");
 				return;
 			}
 
-			Main.log($"ObjUtils.SetRef: targetType={obj.GetType().FullName} field=refName value='{value}'", 3);
+			logr.Log($"ObjUtils.SetRef: targetType={obj.GetType().FullName} field=refName value='{value}'", 3);
 			string field = RefField(obj.GetType().Name);
 			if (field == null)
 				return;
@@ -106,7 +106,7 @@ namespace RW
 			if (obj == null)
 			{
 				if (!silent)
-					Main.warn("[ObjUtils.GetRef] called with null object.");
+					logr.Warn("[ObjUtils.GetRef] called with null object.");
 				return -1;
 			}
 			switch (obj.GetType().Name)
@@ -119,7 +119,7 @@ namespace RW
 				case "InstalledEquipment":
 					return ObjUtils.GetField<int>(obj, "equipmentID",silent);
 				default:
-					Main.error($"[ObjUtils.GetIdReference]<{obj.GetType().Name}> not implemented.");
+					logr.Error($"[ObjUtils.GetIdReference]<{obj.GetType().Name}> not implemented.");
 					break;
 			}
 			return -1;
@@ -128,7 +128,7 @@ namespace RW
 		{
 			if (obj == null)
 			{
-				Main.warn("[ObjUtils.SetRef] called with null object.");
+				logr.Warn("[ObjUtils.SetRef] called with null object.");
 			}
 			switch (obj.GetType().Name)
 			{
@@ -142,7 +142,7 @@ namespace RW
 					ObjUtils.SetField<int>(obj, "equipmentID", id);
 					break;
 				default:
-					Main.error($"[ObjUtils.GetIdReference]<{obj.GetType().Name}> not implemented.");
+					logr.Error($"[ObjUtils.GetIdReference]<{obj.GetType().Name}> not implemented.");
 					break;
 			}
 		}
@@ -151,7 +151,7 @@ namespace RW
 			if (obj == null || string.IsNullOrEmpty(field))
 			{
 				if(!silent)
-					Main.warn($"[ObjUtils.GetField]<{typeof(T).Name}> called with null object or empty field name.");
+					logr.Warn($"[ObjUtils.GetField]<{typeof(T).Name}> called with null object or empty field name.");
 				return default;
 			}
 
@@ -167,11 +167,11 @@ namespace RW
 				{
 					value = prop.GetValue(obj, null);
 					if (!silent)
-						Main.log($"[ObjUtils.GetField] found property {type.FullName}.{field} (prop type={prop.PropertyType.Name}), value={(value == null ? "null" : value.ToString())}", 3);
+						logr.Log($"[ObjUtils.GetField] found property {type.FullName}.{field} (prop type={prop.PropertyType.Name}), value={(value == null ? "null" : value.ToString())}", 3);
 				}
 				catch (Exception ex)
 				{
-					Main.error($"[ObjUtils.GetField] exception reading property {type.FullName}.{field}: {ex}");
+					logr.Error($"[ObjUtils.GetField] exception reading property {type.FullName}.{field}: {ex}");
 					return default;
 				}
 			}
@@ -185,18 +185,18 @@ namespace RW
 					{
 						value = fi.GetValue(obj);
 						if (!silent)
-							Main.log($"[ObjUtils.GetField] found field {type.FullName}.{field} (field type={fi.FieldType.Name}), value={(value == null ? "null" : value.ToString())}", 3);
+							logr.Log($"[ObjUtils.GetField] found field {type.FullName}.{field} (field type={fi.FieldType.Name}), value={(value == null ? "null" : value.ToString())}", 3);
 					}
 					catch (Exception ex)
 					{
-						Main.error($"[ObjUtils.GetField] exception reading field {type.FullName}.{field}: {ex}");
+						logr.Error($"[ObjUtils.GetField] exception reading field {type.FullName}.{field}: {ex}");
 						return default;
 					}
 				}
 				else
 				{
 					if (!silent)
-						Main.warn($"[ObjUtils.GetField] neither property nor field '{field}' found on type {type.FullName}.");
+						logr.Warn($"[ObjUtils.GetField] neither property nor field '{field}' found on type {type.FullName}.");
 					return default;
 				}
 			}
@@ -223,7 +223,7 @@ namespace RW
 				ex is System.OverflowException
 			)
 			{
-				Main.warn(
+				logr.Warn(
 					$"ObjUtils.GetField<{typeof(T).Name}> failed for {type.FullName}.{field} (actual type {value.GetType().FullName}); returning default."
 				);
 				return default;
@@ -234,12 +234,12 @@ namespace RW
 		{
 			if (obj == null || string.IsNullOrEmpty(field))
 			{
-				Main.warn("ObjUtils.SetField called with null object or empty field name.");
+				logr.Warn("ObjUtils.SetField called with null object or empty field name.");
 				return;
 			}
 
 			var type = obj.GetType();
-			Main.log($"ObjUtils.SetField: objType={type.FullName} field={field} valueType={typeof(T).Name} value={(value == null ? "null" : value.ToString())}", 3);
+			logr.Log($"ObjUtils.SetField: objType={type.FullName} field={field} valueType={typeof(T).Name} value={(value == null ? "null" : value.ToString())}", 3);
 
 			// Try property first
 			var prop = type.GetProperty(field);
@@ -253,14 +253,14 @@ namespace RW
 					if (value == null)
 					{
 						prop.SetValue(obj, null, null);
-						Main.log($"ObjUtils.SetField: set property {type.FullName}.{field} = null", 3);
+						logr.Log($"ObjUtils.SetField: set property {type.FullName}.{field} = null", 3);
 						return;
 					}
 
 					if (targetType.IsAssignableFrom(value.GetType()))
 					{
 						prop.SetValue(obj, value, null);
-						Main.log($"ObjUtils.SetField: set property {type.FullName}.{field} = '{value}' (direct assign)", 3);
+						logr.Log($"ObjUtils.SetField: set property {type.FullName}.{field} = '{value}' (direct assign)", 3);
 						return;
 					}
 
@@ -268,19 +268,19 @@ namespace RW
 					if (typeof(UnityEngine.Object).IsAssignableFrom(targetType) && value is UnityEngine.Object)
 					{
 						prop.SetValue(obj, value, null);
-						Main.log($"ObjUtils.SetField: set property {type.FullName}.{field} = UnityEngine.Object '{value}'", 3);
+						logr.Log($"ObjUtils.SetField: set property {type.FullName}.{field} = UnityEngine.Object '{value}'", 3);
 						return;
 					}
 
 					// Try conversion for primitives and simple types
 					var converted = System.Convert.ChangeType(value, targetType);
 					prop.SetValue(obj, converted, null);
-					Main.log($"ObjUtils.SetField: set property {type.FullName}.{field} = '{converted}' (converted)", 3);
+					logr.Log($"ObjUtils.SetField: set property {type.FullName}.{field} = '{converted}' (converted)", 3);
 					return;
 				}
 				catch (Exception ex)
 				{
-					Main.warn($"ObjUtils.SetField: failed to set property {type.FullName}.{field}: {ex.Message}");
+					logr.Warn($"ObjUtils.SetField: failed to set property {type.FullName}.{field}: {ex.Message}");
 					return;
 				}
 			}
@@ -309,7 +309,7 @@ namespace RW
 			// Unity types
 			if (obj is UnityEngine.Object unity_obj)
 			{
-				Main.log($"ObjUtils.Clone: cloning UnityEngine.Object of type {unity_obj.GetType().FullName}", 3);
+				logr.Log($"ObjUtils.Clone: cloning UnityEngine.Object of type {unity_obj.GetType().FullName}", 3);
 				return (T)(object)UnityEngine.Object.Instantiate(unity_obj);
 			}
 
@@ -322,7 +322,7 @@ namespace RW
 
 				if (method != null)
 				{
-					Main.log($"ObjUtils.Clone: MemberwiseClone on {type.FullName}", 3);
+					logr.Log($"ObjUtils.Clone: MemberwiseClone on {type.FullName}", 3);
 					return (T)method.Invoke(obj, null);
 				}
 			}

@@ -14,8 +14,9 @@ namespace RW
 		private bool _visible;
 		private GUIStyle _label, _btn, _title;
 		private bool _stylesBuilt;
+		private string _title_text;
 
-		public static void Show(string message, string url = null)//1 = warn, 2=error
+		public static void Show(string title, string message, string url = null)//1 = warn, 2=error
 		{
 			if (_inst == null)
 			{
@@ -27,6 +28,7 @@ namespace RW
 			_inst._url = string.IsNullOrEmpty(url) ? null : url;
 			_inst._visible = true;
 			_inst.enabled = true;
+			_inst._title_text = title;
 			_inst.CenterWindow();
 			if (GameManager.instance != null)
 				GameManager.instance.PauseGame(true);
@@ -67,13 +69,13 @@ namespace RW
 			var old = GUI.color;
 			GUI.color = new Color(0, 0f, 0, .5f);
 
-			GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture); //This does not work at all
+			GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
 			GUI.depth = 1;
 
 			// apply bigger window title
 			GUI.skin.window = _title;
-			GUI.color = new Color(1f, 1f, 1f, 1f); // Why is this still semi transparent?
-			_win = GUILayout.Window(0x5EED123, _win, DoWindow, "Red Wizards Extended Endgame");
+			GUI.color = new Color(1f, 1f, 1f, 1f);
+			_win = GUILayout.Window(0x5EED123, _win, DoWindow, _inst._title_text);
 			GUI.color = old;
 		}
 

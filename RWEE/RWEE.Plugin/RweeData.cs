@@ -7,7 +7,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
-
+using static RWEE.Logging;
 namespace RWEE
 {
 	[HarmonyPatch(typeof(GameData), "SetGameData")]
@@ -17,11 +17,11 @@ namespace RWEE
 		{
 			RweeData.Init(true);
 			String saveVersion = RweeData.GetString("RWEESaveVersion");
-			Main.log($"Save version: {saveVersion} Local Version: {Main.pluginVersion}");
+			logr.Log($"Save version: {saveVersion} Local Version: {Main.pluginVersion}");
 			//if (VersionControl.IsNewer(Main.pluginVersion, saveVersion))
 			if (saveVersion == null)
 			{
-				Main.log("Updating Universe.");
+				logr.Log("Updating Universe.");
 				int sectorsUpdated = 0;
 				for (int i = 0; i < GameData.data.sectors.Count; i++)
 				{
@@ -34,15 +34,15 @@ namespace RWEE
 					{
 						sectorsUpdated++;
 						int newLevel = Sectors.calculateLevel(cX, cY, staticLevel);
-						Main.warn($"Sector level updated from {GameData.data.sectors[i].level} to {newLevel}");
+						logr.Warn($"Sector level updated from {GameData.data.sectors[i].level} to {newLevel}");
 						GameData.data.sectors[i].AdjustLevel(newLevel, false, false, false);
 
 					}
-					Main.log($"Sector level min/act/max: {staticLevel} {minLevel} {GameData.data.sectors[i].level} {maxLevel}");
+					logr.Log($"Sector level min/act/max: {staticLevel} {minLevel} {GameData.data.sectors[i].level} {maxLevel}");
 				}
 				if (sectorsUpdated > 0)
 				{
-					RW.SimplePopup.Show($"{sectorsUpdated} sectors have been leveled beyond the normal cap of 55. If you might want to uninstall this mod, it is recommended that you create a copy of your save file before your next save.");
+					RW.SimplePopup.Show("Red Wizard's Extended Endgame",$"{sectorsUpdated} sectors have been leveled beyond the normal cap of 55. If you might want to uninstall this mod, it is recommended that you create a copy of your save file before your next save.");
 				}
 			}
 			RweeData.SetString("RWEESaveVersion", Main.pluginVersion);
@@ -88,10 +88,10 @@ namespace RWEE
 
 		public static void Init(bool force = false)
 		{
-			//Main.log("RweeData.Init()");
+			//logr.Log("RweeData.Init()");
 			if (_fld == null)
 				_fld = typeof(GameDataInfo).GetField("rweeJson", BindingFlags.Public | BindingFlags.Instance);
-			//Main.log("RweeData.Init: initiated _fld");
+			//logr.Log("RweeData.Init: initiated _fld");
 			if (force)
 				_kv = null;
 			else
@@ -101,17 +101,17 @@ namespace RWEE
 			if (GameData.data != null && _fld != null)
 				raw = _fld.GetValue(GameData.data) as string;
 			else
-				Main.log("RweeData.Init: error getting data");
+				logr.Log("RweeData.Init: error getting data");
 
 			_kv = Parse(raw);
-			Main.log("[RWEE] RweeData.Init: v=" + (_kv.ContainsKey("v") ? _kv["v"] : "?") + " keys=" + _kv.Count + " bytes=" + (raw != null ? raw.Length : 0));
+			logr.Log("[RWEE] RweeData.Init: v=" + (_kv.ContainsKey("v") ? _kv["v"] : "?") + " keys=" + _kv.Count + " bytes=" + (raw != null ? raw.Length : 0));
 
 			if (!_kv.ContainsKey("v")) _kv["v"] = "1"; // version tag
 		}
 
 		public static void Flush() // write back to GameData.data before saving
 		{
-			//Main.log("WreeData.Flush()");
+			//logr.Log("WreeData.Flush()");
 			Init();
 			if (GameData.data == null || _fld == null || _kv == null) return;
 			_fld.SetValue(GameData.data, Serialize(_kv));
@@ -206,7 +206,7 @@ namespace RWEE
 	{
 		static void Postfix()
 		{
-			Main.log($"GameData loaded");
+			logr.Log($"GameData loaded");
 		}
 	*/
 }

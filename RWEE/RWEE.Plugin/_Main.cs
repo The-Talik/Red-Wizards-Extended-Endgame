@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Rendering;
-
+using static RWEE.Logging;
 
 
 namespace RWEE
@@ -38,7 +38,7 @@ namespace RWEE
 
 		private Harmony _harmony;
 
-		public static ManualLogSource Log;
+		/*public static ManualLogSource Log;
 		public static int verbosity = 0;
 		public static void InitLog(ManualLogSource log, int verbosity = 0)
 		{
@@ -52,7 +52,7 @@ namespace RWEE
 		}
 		public static void log_obj(object obj, int level = 1)
 		{
-			Main.log(JsonUtils.ToPrettyJson(obj), level);
+			logr.Log(JsonUtils.ToPrettyJson(obj), level);
 		}
 		public static void warn(string msg, int level = 0)
 		{
@@ -68,38 +68,37 @@ namespace RWEE
 				if (showPopup)
 					SimplePopup.Show(msg);
 			}
-		}
+		}*/
 
 		private void Awake()
 		{
-			InitLog(Logger, 1);
 			_harmony = new Harmony(pluginGuid);
 			_harmony.PatchAll(Assembly.GetExecutingAssembly());
+			Logging.Init(Logger, 1);
 
-
-			Main.log("Harder Endgame Loaded");
+			logr.Log("Harder Endgame Loaded");
 			const string VERSION_URL = "https://mezr.com/star_valor.json.php";
 			var fi = typeof(GameData).GetField("rweePatcherVersion", BindingFlags.Public | BindingFlags.Static);
-			//Main.log("GameDataInfo fields: " + string.Join(", ", fi.Select(f => f.Name + (f.IsStatic ? "[static]" : "[inst]"))));
+			//logr.Log("GameDataInfo fields: " + string.Join(", ", fi.Select(f => f.Name + (f.IsStatic ? "[static]" : "[inst]"))));
 			var patcherVersion = fi.GetValue(null) as string;
 			if(patcherVersion != pluginVersion)
 			{
-				Main.error($"Patcher version does not match plugin version.  Ensure both are up to date.  Patcher={patcherVersion} Plugin={pluginVersion}");
+				logr.Error($"Patcher version does not match plugin version.  Ensure both are up to date.  Patcher={patcherVersion} Plugin={pluginVersion}");
 			}
 
 			if (typeof(GameDataInfo).GetField("rweeJson", BindingFlags.Public | BindingFlags.Instance) == null)
 			{
-				Main.error("Could not find rweeJson.  Did the prepatcher load?");
+				logr.Error("Could not find rweeJson.  Did the prepatcher load?");
 			}
 			else
 			{
-				Main.log("Found rweeJson.");
+				logr.Log("Found rweeJson.");
 			}
-			Main.log("Has GameDataInfo.rweeJson? " + (typeof(GameDataInfo).GetField("rweeJson", BindingFlags.Public | BindingFlags.Instance) != null));
+			logr.Log("Has GameDataInfo.rweeJson? " + (typeof(GameDataInfo).GetField("rweeJson", BindingFlags.Public | BindingFlags.Instance) != null));
 			VersionControl.Check(this, Logger, VERSION_URL, pluginVersion, (msg, link) =>
 			{
 
-				//Main.error(msg + (string.IsNullOrEmpty(link) ? "" : " → " + link));
+				//logr.Error(msg + (string.IsNullOrEmpty(link) ? "" : " → " + link));
 
 				RW.SimplePopup.Show(msg, link);
 				// Or open a page:
@@ -120,6 +119,16 @@ namespace RWEE
 			{
 				//PlayerControl.inst.ReleaseControls(true);
 			}
+		}
+	}
+	public class Logging : BaseUnityPlugin
+	{
+		internal static RW.Logging.Logr logr;
+
+		public static void Init(ManualLogSource log,int verbosity)
+		{
+			logr = new RW.Logging.Logr(log, verbosity);
+			logr.Log("[RWEE] Logging initialized.");
 		}
 	}
 }

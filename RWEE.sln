@@ -11,8 +11,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RWMM", "RWMM", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		RWMM\README.md = RWMM\README.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RWEE", "RWEE", "{4BE9AD48-0B2A-4DCC-A362-D11551230138}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RW.Core", "RWMM\RW.Core\RW.Core.csproj", "{2D2D6D84-D54D-4382-8D7E-D3910E91D849}"
 EndProject
@@ -25,6 +31,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RWMM.Patcher", "RWMM\RWMM.Patcher\RWMM.Patcher.csproj", "{2387EAF3-01F9-41E7-B0B4-E736EADB6C2F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RWMM.Plugin", "RWMM\RWMM.Plugin\RWMM.Plugin.csproj", "{40194B8E-8AFE-4169-927A-C76E72337003}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{D42B4C6D-448C-45DE-A25B-0C4442B25874}"
+	ProjectSection(SolutionItems) = preProject
+		Shared\Log.cs = Shared\Log.cs
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

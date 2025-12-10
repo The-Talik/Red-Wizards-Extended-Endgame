@@ -7,6 +7,7 @@ using BepInEx.Logging;
 using UnityEngine;
 using UnityEngine.Networking;   // UnityWebRequest
 using RW;
+using static RWEE.Logging;
 namespace RWEE
 {
 		[Serializable]
@@ -66,7 +67,7 @@ namespace RWEE
 
 				var json = req.downloadHandler.text;
 				RemoteVersion rv = null;
-				//Main.warn(json);
+				//logr.Warn(json);
 				try { rv = RW.JsonUtils.FromJson<RemoteVersion>(json); }
 				catch (Exception ex)
 				{
@@ -81,7 +82,7 @@ namespace RWEE
 					var msg = !string.IsNullOrEmpty(rv.message)
 						? rv.message.Replace("{local}", localVer).Replace("{remote}", rv.version)
 						: ("A new version " + rv.version + " is available (you have " + localVer + ").");
-					Main.error($"isNewer rv.changelog.Length: {rv.changelog.Length}");
+					logr.Error($"isNewer rv.changelog.Length: {rv.changelog.Length}");
 					for (int i = 0; i < (rv.changelog?.Length ?? 0); i++)
 					{
 						var e = rv.changelog[i];

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Reflection;
-
+using static RWEE.Logging;
 namespace RWEE
 {
 	internal class DataDumps
@@ -46,7 +46,7 @@ namespace RWEE
 			}
 			catch (Exception ex)
 			{
-				Main.error($"[CSV] Failed to ensure header for {fileName}: {ex}");
+				logr.Error($"[CSV] Failed to ensure header for {fileName}: {ex}");
 			}
 		}
 
@@ -60,7 +60,7 @@ namespace RWEE
 			}
 			catch (Exception ex)
 			{
-				Main.error($"[CSV] Failed to append row to {fileName}: {ex}");
+				logr.Error($"[CSV] Failed to append row to {fileName}: {ex}");
 			}
 		}
 
@@ -90,11 +90,11 @@ namespace RWEE
 					var items = ___items;
 					if (items == null || items.Count == 0)
 					{
-						Main.log("[Items] ItemDB.items is null/empty.");
+						logr.Log("[Items] ItemDB.items is null/empty.");
 						return;
 					}
 
-					Main.log($"[Items] Dumping {items.Count} items…");
+					logr.Log($"[Items] Dumping {items.Count} items…");
 
 					// ensure CSV header
 					EnsureCsvHeader(ItemsCsv, "id,name,refName,type,rarity,itemLevel,levelPlus,basePrice,priceVariation,weight,tradeQty,prodLvlReq,flags,tradeChance,craftMats,prodMats");
@@ -104,7 +104,7 @@ namespace RWEE
 						var it = items[i];
 						if (it == null) continue;
 
-						Main.log(FormatItem(it));
+						logr.Log(FormatItem(it));
 
 						// write CSV row
 						try
@@ -158,15 +158,15 @@ namespace RWEE
 						}
 						catch (Exception ex)
 						{
-							Main.error("[CSV Items] Failed to write item row: " + ex);
+							logr.Error("[CSV Items] Failed to write item row: " + ex);
 						}
 					}
 
-					Main.log("[Items] Done.");
+					logr.Log("[Items] Done.");
 				}
 				catch (Exception ex)
 				{
-					Main.log("[Items] Dump failed: " + ex);
+					logr.Log("[Items] Dump failed: " + ex);
 				}
 			}
 
@@ -238,11 +238,11 @@ namespace RWEE
 					var list = GetEquipmentList();
 					if (list == null || list.Count == 0)
 					{
-						Main.log("[Equip] Equipment list is null/empty.");
+						logr.Log("[Equip] Equipment list is null/empty.");
 						return;
 					}
 
-					Main.log($"[Equip] Dumping {list.Count} equipment…");
+					logr.Log($"[Equip] Dumping {list.Count} equipment…");
 
 					// ensure CSV header
 					EnsureCsvHeader(EquipCsv, "id,name,refName,type,primaryEffect,minShipClass,itemLevel,techLevel,sortPower,space,massFlat,massChange,energyCost,energyCostPerShipClass,rarityMod,dropLevel,lootChance,sellChance,flags,reqItem,effects");
@@ -251,7 +251,7 @@ namespace RWEE
 					{
 						var eq = list[i];
 						if (eq == null) continue;
-						Main.log(FormatEquipment(eq));
+						logr.Log(FormatEquipment(eq));
 
 						// write CSV row
 						try
@@ -293,14 +293,14 @@ namespace RWEE
 						}
 						catch (Exception ex)
 						{
-							Main.error("[CSV Equip] Failed to write equipment row: " + ex);
+							logr.Error("[CSV Equip] Failed to write equipment row: " + ex);
 						}
 					}
-					Main.log("[Equip] Done.");
+					logr.Log("[Equip] Done.");
 				}
 				catch (Exception ex)
 				{
-					Main.log("[Equip] Dump failed: " + ex);
+					logr.Log("[Equip] Dump failed: " + ex);
 				}
 			}
 
@@ -378,11 +378,11 @@ namespace RWEE
 					var (list, src) = ResolveWeapons();
 					if (list == null || list.Count == 0)
 					{
-						Main.log("[Weapons] List is null/empty.");
+						logr.Log("[Weapons] List is null/empty.");
 						return;
 					}
 
-					Main.log($"[Weapons] Dumping {list.Count} weapons (source='{src}')…");
+					logr.Log($"[Weapons] Dumping {list.Count} weapons (source='{src}')…");
 
 					// ensure CSV header
 					EnsureCsvHeader(WeaponsCsv, "index,name,type,compType,damageType,space,damage,rateOfFire,burst,range,speed,aoe,proximityDmgMod,fluxDamageMod,heatDamageMod,techLevel,dropLevel,itemLevel,energyShot,energyPerSec,heatShotRaw,heatPerSec,power,flags");
@@ -391,7 +391,7 @@ namespace RWEE
 					{
 						var w = list[i];
 						if (w == null) continue;
-						Main.log(FormatWeapon(w));
+						logr.Log(FormatWeapon(w));
 
 						// write CSV row
 						try
@@ -438,14 +438,14 @@ namespace RWEE
 						}
 						catch (Exception ex)
 						{
-							Main.error("[CSV Weapons] Failed to write weapon row: " + ex);
+							logr.Error("[CSV Weapons] Failed to write weapon row: " + ex);
 						}
 					}
-					Main.log("[Weapons] Done.");
+					logr.Log("[Weapons] Done.");
 				}
 				catch (Exception ex)
 				{
-					Main.error("[Weapons] Dump failed: " + ex);
+					logr.Error("[Weapons] Dump failed: " + ex);
 				}
 			}
 

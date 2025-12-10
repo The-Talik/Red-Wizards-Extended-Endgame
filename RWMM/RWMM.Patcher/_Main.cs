@@ -18,14 +18,14 @@ namespace RWMM.Patcher
 		public static IEnumerable<string> TargetDLLs { get; } = new[] { "Assembly-CSharp.dll" };
 		static RWMMPatcher()
 		{
-			try { _log = Logger.CreateLogSource("RWMM.Preloader"); }
+			try { _log = logr.CreateLogSource("RWMM.Preloader"); }
 			catch { /* fallback will use Console */ }
 		}
 
 		static void Log(string s)
 		{
 			if (_log != null) _log.LogInfo(s);
-			else { try { System.Console.WriteLine(s); } catch { } }
+			else { try { System.logr.WriteLine(s); } catch { } }
 		}
 
 		public static void Patch(AssemblyDefinition asm)

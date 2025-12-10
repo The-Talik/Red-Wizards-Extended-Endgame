@@ -101,7 +101,6 @@
     <Compile Include="ResourceImport.cs" />
     <Compile Include="Resources_IO.cs" />
     <Compile Include="ResourceDump.cs" />
-    <Compile Include="Test.cs" />
     <Compile Include="Wrap.cs" />
     <Compile Include="_Main.cs" />
   </ItemGroup>

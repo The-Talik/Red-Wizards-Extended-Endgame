@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using UnityEngine;
-
+using static RW.Core.Logging;
 namespace RW
 {
 	public static class IconUtils
@@ -48,15 +48,15 @@ namespace RW
 		public static Sprite MakeSprite(string png)
 		{
 			float ppu = 100f;
-			Main.log($"[Icons] Generating sprite from {png}");
+			logr.Log($"[Icons] Generating sprite from {png}");
 			var spr = IconUtils.LoadSpriteFromPng(png, ppu);
 			if (spr == null)
 			{
-				Main.error($"[Icons] Failed to load sprite from {png}");
+				logr.Error($"[Icons] Failed to load sprite from {png}");
 				return null;
 			}
 
-			Main.log($"[Icons] Sprite generated: {spr.name} ({spr.rect.width}x{spr.rect.height})");
+			logr.Log($"[Icons] Sprite generated: {spr.name} ({spr.rect.width}x{spr.rect.height})");
 			return spr;
 		}
 	}

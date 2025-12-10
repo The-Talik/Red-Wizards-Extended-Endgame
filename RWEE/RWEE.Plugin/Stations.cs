@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-
+using static RWEE.Logging;
 namespace RWEE
 {
 	internal class Stations
@@ -21,7 +21,7 @@ namespace RWEE
 			{
 				if (QuestDB.IsQuestCompleted(___quest, ___pc.transform))
 				{
-					Main.log("Quest Complete");
+					logr.Log("Quest Complete");
 					if (PChar.Char.resetSkillsPoints == 0)
 						PChar.Char.resetSkillsPoints++;
 					//int currStationID = -1;
@@ -36,22 +36,22 @@ namespace RWEE
 					else
 					{
 
-						Main.log("Not in station");
+						logr.Log("Not in station");
 					}
 				}
 				else
 				{
-					Main.log("Quest Incomplete");
+					logr.Log("Quest Incomplete");
 				}
 			}
 			static void AttemptToLevelStation(Station station, bool hostile = false)
 			{
 				if(hostile)
-					Main.log($"also considering leveling up a random hostile station {station.stationName(true)} and sector {station.Sector.level}. Shhh...  Nothing to see here.");
+					logr.Log($"also considering leveling up a random hostile station {station.stationName(true)} and sector {station.Sector.level}. Shhh...  Nothing to see here.");
 				else
-					Main.log($"considering leveling up station {station.stationName(true)} and sector {station.Sector.level}.");
+					logr.Log($"considering leveling up station {station.stationName(true)} and sector {station.Sector.level}.");
 				//currStationID = this.inventory.currStation.id;
-				//Main.log($"Char Level: {PChar.Char.level} Station Level:{station.level} Sector Level: {station.Sector.level}");
+				//logr.Log($"Char Level: {PChar.Char.level} Station Level:{station.level} Sector Level: {station.Sector.level}");
 				if (PChar.Char.level > station.level)
 				{
 					float amtOverStation = PChar.Char.level * 2 - station.level;
@@ -61,7 +61,7 @@ namespace RWEE
 					{
 						int origLevel = station.level;
 						station.level++;//not using LevelUp, because I want it to be silent.
-						Main.warn($"Leveling up station: Char:{PChar.Char.level} Station Level:{origLevel}->{station.level} Sector Level: {station.Sector.level}");
+						logr.Warn($"Leveling up station: Char:{PChar.Char.level} Station Level:{origLevel}->{station.level} Sector Level: {station.Sector.level}");
 					}
 				}
 
@@ -74,13 +74,13 @@ namespace RWEE
 					{
 						int origLevel = station.Sector.level;
 						station.Sector.level++;
-						Main.warn($"Leveling up sector. {origLevel}->{station.Sector.level}");
+						logr.Warn($"Leveling up sector. {origLevel}->{station.Sector.level}");
 						Sectors.AdjustNeighboringSectors(station.Sector);
 						station.Sector.UpdateSectorLevels(false);
 					}
 				}
 				
-				//Main.log($"New>Char Level: {PChar.Char.level} Station Level:{station.level} Sector Level: {station.Sector.level}");
+				//logr.Log($"New>Char Level: {PChar.Char.level} Station Level:{station.level} Sector Level: {station.Sector.level}");
 			}
 		}
 		
@@ -92,7 +92,7 @@ namespace RWEE
 		{
 			static void Prefix(int refCode, ref int level, ref float dificulty, ref int rankOverride)
 			{
-				Main.log($"Generating Quest {refCode} Level: {level} Diff: {dificulty} {rankOverride}");
+				logr.Log($"Generating Quest {refCode} Level: {level} Diff: {dificulty} {rankOverride}");
 				if (refCode == 11)
 				{
 					if (PChar.Char.level > level)
@@ -106,8 +106,8 @@ namespace RWEE
 		*/
 			static void Postfix(int refCode, int level, ref float dificulty, ref int rankOverride, ref Quest __result)
 			{
-				Main.log($"Quest generated: {refCode} {__result.kind} L{__result.level} diff: {dificulty} rank: {__result.rank} xprm: {__result.xpRewardMod}");
-				Main.log($"{QuestDB.Name(__result, true)}");
+				logr.Log($"Quest generated: {refCode} {__result.kind} L{__result.level} diff: {dificulty} rank: {__result.rank} xprm: {__result.xpRewardMod}");
+				logr.Log($"{QuestDB.Name(__result, true)}");
 			}
 		}
 		/**
@@ -119,7 +119,7 @@ namespace RWEE
 			static void Prefix(ref int qntToAdd, ref Station ___station, ref List<StationQuest> ___quests, ref QuestChances __state)
 			{
 				int num = ___station.factionIndex;
-				Main.log($"GenerateQuests {qntToAdd} {GameManager.predefinitions.factions[num].questChances.eliminateEasy} {GameManager.predefinitions.factions[num].questChances.eliminateMedium} {GameManager.predefinitions.factions[num].questChances.eliminateHard}");
+				logr.Log($"GenerateQuests {qntToAdd} {GameManager.predefinitions.factions[num].questChances.eliminateEasy} {GameManager.predefinitions.factions[num].questChances.eliminateMedium} {GameManager.predefinitions.factions[num].questChances.eliminateHard}");
 				__state = GameManager.predefinitions.factions[num].questChances;
 				float mod = 0;
 				if (___station.level > 50)
@@ -142,7 +142,7 @@ namespace RWEE
 					qc.eliminateHard += Mathf.RoundToInt((100f - qc.eliminateHard) * mod);
 					//GameManager.predefinitions.factions[num].questChances = qc;
 				}
-				Main.log($"GenerateQuests {qntToAdd} {GameManager.predefinitions.factions[num].questChances.eliminateEasy} {GameManager.predefinitions.factions[num].questChances.eliminateMedium} {GameManager.predefinitions.factions[num].questChances.eliminateHard}");
+				logr.Log($"GenerateQuests {qntToAdd} {GameManager.predefinitions.factions[num].questChances.eliminateEasy} {GameManager.predefinitions.factions[num].questChances.eliminateMedium} {GameManager.predefinitions.factions[num].questChances.eliminateHard}");
 
 			}
 			static void Postfix(ref Station ___station, ref QuestChances __state)

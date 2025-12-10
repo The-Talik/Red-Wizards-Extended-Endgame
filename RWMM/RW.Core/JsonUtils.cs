@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Xml;
+using static RW.Core.Logging;
 namespace RW
 {
 	public static partial class JsonUtils
@@ -121,10 +122,10 @@ namespace RW
 			if (string.IsNullOrWhiteSpace(json))
 				return default;
 			return JsonConvert.DeserializeObject<T>(json, JsonSettings);
-			/*		Main.log("A");
+			/*		logr.Log("A");
 					// create an empty instance of T and let PopulateObject fill it
 					var obj = (T)Activator.CreateInstance(typeof(T));
-					Main.log("B");
+					logr.Log("B");
 					JsonConvert.PopulateObject(json, obj, JsonSettings);
 					return obj;*/
 		}

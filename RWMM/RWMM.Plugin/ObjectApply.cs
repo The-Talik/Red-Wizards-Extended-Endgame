@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
-
+using RW;
+using static RWMM.Logging;
 namespace RWMM
 {
 
@@ -11,15 +12,15 @@ namespace RWMM
 	{
 		public static void Apply<TData, TObject>(TData data, TObject obj) // from, to
 		{
-			Main.log($"[ObjectApply.Apply] Applying object of type {data.GetType()} to {obj.GetType()}", 2);
+			logr.Log($"[ObjectApply.Apply] Applying object of type {data.GetType()} to {obj.GetType()}", 2);
 			if (data == null || obj == null)
 			{
-				Main.warn($"Data or obj was null");
+				logr.Warn($"Data or obj was null");
 				return;
 			}
 
 			ApplyInternal((object)data, (object)obj);
-			Main.log($"[ObjectApply.Apply] Done", 2);
+			logr.Log($"[ObjectApply.Apply] Done", 2);
 		}
 
 		private static void ApplyInternal(object data, object obj)
@@ -32,7 +33,7 @@ namespace RWMM
 
 			// index source members by name
 			var source = new Dictionary<string, Func<object>>(StringComparer.Ordinal);
-			Main.log($"[ObjectApply.ApplyInternal] Indexing source", 2);
+			logr.Log($"[ObjectApply.ApplyInternal] Indexing source", 2);
 			foreach (var f in data_type.GetFields(BindingFlags.Public | BindingFlags.Instance))
 			{
 				var f1 = f;
@@ -41,7 +42,7 @@ namespace RWMM
 
 			// We intentionally ignore properties on the DTO side for now.
 
-			Main.log($"[ObjectApply.ApplyInternal] Setting target fields", 2);
+			logr.Log($"[ObjectApply.ApplyInternal] Setting target fields", 2);
 			// set target fields
 			foreach (var tf in obj_type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
 			{
@@ -77,23 +78,23 @@ namespace RWMM
 			// collections (arrays / lists) are full replace
 			if (IsCollectionType(target_type))
 			{
-				Main.log($"[ObjectApply.ApplyToField] Collection field {tf.Name} of type {target_type.Name}", 2);
+				logr.Log($"[ObjectApply.ApplyToField] Collection field {tf.Name} of type {target_type.Name}", 2);
 
 				if (value == null)
 				{
-					Main.log($"[ObjectApply.ApplyToField] Collection {tf.Name}: setting to null", 2);
+					logr.Log($"[ObjectApply.ApplyToField] Collection {tf.Name}: setting to null", 2);
 					tf.SetValue(target, null);
 					return;
 				}
 
 				if (TryConvertCollection(value, target_type, out var converted))
 				{
-					Main.log($"[ObjectApply.ApplyToField] Collection {tf.Name}: converted and replaced", 2);
+					logr.Log($"[ObjectApply.ApplyToField] Collection {tf.Name}: converted and replaced", 2);
 					tf.SetValue(target, converted);
 				}
 				else
 				{
-					Main.error($"[ObjectApply.ApplyToField] Did not import collection {tf.Name} of type {target_type.Name}");
+					logr.Error($"[ObjectApply.ApplyToField] Did not import collection {tf.Name} of type {target_type.Name}");
 				}
 				return;
 			}
@@ -104,7 +105,7 @@ namespace RWMM
 			// complex nested object (non-simple, non-Unity)
 			if (!is_simple && !is_unity)
 			{
-				Main.log($"[ObjectApply.ApplyToField] Complex object {tf.Name} of type {target_type.Name}", 2);
+				logr.Log($"[ObjectApply.ApplyToField] Complex object {tf.Name} of type {target_type.Name}", 2);
 				var current = tf.GetValue(target);
 
 				if (current == null)
@@ -131,14 +132,14 @@ namespace RWMM
 			if (TryConvert(value, target_type, out var scalar_converted))
 			{
 				if (is_simple)
-					Main.log($"[ObjectApply.ApplyToField] Simple field {tf.Name} of type {target_type.Name}", 2);
+					logr.Log($"[ObjectApply.ApplyToField] Simple field {tf.Name} of type {target_type.Name}", 2);
 				if (is_unity)
-					Main.log($"[ObjectApply.ApplyToField] Unity field {tf.Name} of type {target_type.Name}", 2);
+					logr.Log($"[ObjectApply.ApplyToField] Unity field {tf.Name} of type {target_type.Name}", 2);
 				tf.SetValue(target, scalar_converted);
 				return;
 			}
 
-			Main.error($"Did not import {tf.Name} of type {target_type.Name}");
+			logr.Error($"Did not import {tf.Name} of type {target_type.Name}");
 		}
 
 		private static void ApplyToProperty(object target, PropertyInfo tp, object value)
@@ -160,7 +161,7 @@ namespace RWMM
 				}
 				else
 				{
-					Main.error($"Did not import collection property {tp.Name} of type {target_type.Name}");
+					logr.Error($"Did not import collection property {tp.Name} of type {target_type.Name}");
 				}
 				return;
 			}
@@ -367,7 +368,7 @@ namespace RWMM
 						}
 						catch (Exception ex)
 						{
-							Main.error($"ConvertElement: cannot create instance of {element_type.Name}: {ex.Message}");
+							logr.Error($"ConvertElement: cannot create instance of {element_type.Name}: {ex.Message}");
 							return false;
 						}
 					}

@@ -11,11 +11,12 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using UnityEngine;
 using static RWMM.ResourceDump;
-
+using static RWMM.Logging;
 namespace RWMM
 {
 	internal class Resources_IO
 	{
+		public static int done_count = 0;
 		public static int dump_data = 1;
 		private static List<string> _loaded_files = new List<string>();
 		/*private static string _rwmm_plugin_dir;
@@ -24,7 +25,7 @@ namespace RWMM
 		{
 			_rwmm_plugin_dir = rwmm_plugin_dir;
 			_plugins_dir = plugins_dir;
-			Main.log("Resource_json initialized.");
+			logr.Log("Resource_json initialized.");
 		}*/
 
 		[HarmonyPatch(typeof(ItemDB), "LoadDatabaseForce")]
@@ -37,10 +38,11 @@ namespace RWMM
 					return;
 				Apply<Item, _Item>(ref ___items);
 
-			//	Item it = ListUtils.GetByRef(___items,"Ancient Relic");
-			//	Main.log_obj(it);
-			//	it = ListUtils.GetByRef(___items, "Ancient Relic 6969");
-			//	Main.log_obj(it);
+				//	Item it = ListUtils.GetByRef(___items,"Ancient Relic");
+				//	logr.LogObj(it);
+				//	it = ListUtils.GetByRef(___items, "Ancient Relic 6969");
+				//	logr.LogObj(it);
+				done();
 			}
 		}
 
@@ -53,6 +55,7 @@ namespace RWMM
 				if (HasRun("Equipment"))
 					return;
 				Apply<Equipment, _Equipment>(ref ___equipments);
+				done();
 			}
 		}
 		[HarmonyPatch(typeof(ShipDB), "LoadDatabaseForce")]
@@ -76,7 +79,7 @@ namespace RWMM
 				ResourceDump.DumpListToJson(dumpList);
 			//	ResourceDump.DumpListToJson(___shipModels);
 				ResourceImport.ImportType<ShipModelData, _ShipModelData>(ref ___shipModels);
-				Main.log("Done with ship models");
+				done();
 			}
 		}
 		[HarmonyPatch(typeof(QuestDB), "Validate")]
@@ -88,6 +91,7 @@ namespace RWMM
 				if (HasRun("Quest"))
 					return;
 				Apply<Quest, _Quest>(ref ___questReference);
+				done();
 			}
 		}
 /*		[HarmonyPatch(typeof(PerkDB), "LoadPerks")]
@@ -121,11 +125,11 @@ namespace RWMM
 				}
 				Apply<CrewMember, _CrewMember>(ref ___predefinitions.crewMembers);
 
-
 				//Apply<Faction, _Faction>(ref ___predefinitions.factions, true, false);
 				//public ShipClassDefinition[] shipClassDefinitions = new ShipClassDefinition[7];
 				//public ShipRoleDefinition[] shipRoleDefinitions;
 				//public AICharacter[] Characters = new AICharacter[1];
+				done();
 			}
 		}
 		public static void Apply<T, TData>(ref T[] array, string comments = "")
@@ -156,7 +160,15 @@ namespace RWMM
 			_loaded_files.Add(type);
 			return false;
 		}
-
+		private static void done()
+		{
+			done_count++;
+			logr.Log($"Done with {done_count}");
+			if (done_count == 4)
+			{
+				logr.PopupErrors("Red Wizard's Mod Manager","There were errors during load:");
+			}
+		}
 	}
 }
 

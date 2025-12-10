@@ -7,65 +7,28 @@ using System.Text;
 using System.Threading.Tasks;
 using BepInEx;
 using BepInEx.Logging;
+using RW.Logging;
 using UnityEngine;
 
 
-namespace RW
+namespace RW.Core
 {
-	/**
-	 * Verbosity 3: Most RW.Core log items
-	 * Verbosity 2: shows extra detailed info from the app.  RW.Core does not use this
-	 * Verbosity 1: shows standard logs, warnings, and errors
-	 * Verbosity 0 (default): shows warnings and errors
-	 * Verbosity -1: shows errors
-	 * Verbosity -2: show nothing
-	 */
 	public static class Main
 	{
-		public static ManualLogSource Log;
-		public static int verbosity = 0;
-		public static void Init(ManualLogSource log, int verbosity = 0)
-		{
-			Main.Log = log;
-			Main.verbosity = verbosity;
-		}
-		public static void log(string msg, int level = 1, ManualLogSource log = null)
-		{
-			if (log == null)
-				log = Main.Log;
-			if (Main.verbosity >= level)
-				log?.LogInfo(msg);
-		}
-		public static void log_obj(object obj, int level = 1)
-		{
-			log(JsonUtils.ToPrettyJson(obj), level);
-		}
-		public static void warn(string msg, int level = 0)
-		{
-			if (Main.verbosity >= level)
-				Main.Log?.LogWarning(msg);
-		}
+	}
+	public class Logging : BaseUnityPlugin
+	{
+		internal static RW.Logging.Logr logr;
 
-		public static void error(string msg, bool showPopup = false, int level = -1)
+		public static void Init(Logr _logr)
 		{
-			if (Main.verbosity >= level)
-			{
-				Main.Log?.LogError(msg);
-				if (showPopup)
-					SimplePopup.Show(msg);
-			}
+			logr = _logr;
+			logr.Log("RW.Core Loaded");
 		}
-		public static void log_line_obj(object obj, int level = 1)
+		public static void Init(ManualLogSource log, int verbosity)
 		{
-			log($"{obj.GetType()} {ObjUtils.GetField<int>(obj,"id")} {ObjUtils.GetField<string>(obj, "refName")}", level);
-		}
-		public static void log_line_list(List<object> obj, int level = 1)
-		{
-			for (int i = 0; i < obj.Count; i++)
-			{
-				log_line_obj(obj[i], level);
-			}
+			logr = new RW.Logging.Logr(BepInEx.Logging.Logger.CreateLogSource(log.SourceName+".RW"), verbosity);
+			logr.Log("RW.Core Loaded");
 		}
 	}
-
 }

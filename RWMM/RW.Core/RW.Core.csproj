@@ -69,12 +69,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Shared\Log.cs">
+      <Link>Log.cs</Link>
+    </Compile>
     <Compile Include="DirUtils.cs" />
     <Compile Include="IconUtils.cs" />
     <Compile Include="JsonUtils.cs" />
     <Compile Include="JsonUtils_prototypes.cs" />
     <Compile Include="ListUtils.cs" />
     <Compile Include="ObjUtils.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="SimplePopup.cs" />
     <Compile Include="_Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

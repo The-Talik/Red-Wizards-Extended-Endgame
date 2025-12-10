@@ -272,6 +272,7 @@ RWMM includes a small utility library you can reference from your own BepInEx pl
 ---
 
 ## Roadmap (high-level)
-- Support creating brand-new objects without cloning.
+- Support creating brand-new objects without cloning. (maybe)
 - Deterministic load order + dependencies (Factorio-style manifest, eventual `package.json`).
-- Better collection/array patching semantics.
+- Actual "mod-manger" features, like enabling/disabling mods, storing which mods were used in a save, etc.
+- Support more object types (as I need them for my own mods, or as requested).

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 using static UnityEngine.Random;
-
+using static RWEE.Logging;
 namespace RWEE
 {
 	internal class Ships
@@ -43,7 +43,7 @@ namespace RWEE
 						}
 					}
 					disabled_fi.SetValue(installedEquipment, disabledCount);
-					Main.log($"Equipment: {equipment.name} x{installedEquipment.qnt}. disabled: {disabled_fi.GetValue(installedEquipment)}");
+					logr.Log($"Equipment: {equipment.name} x{installedEquipment.qnt}. disabled: {disabled_fi.GetValue(installedEquipment)}");
 				}
 
 				if (hangarDroneSpace > 0f && totalDroneSpace > 0f)
@@ -58,7 +58,7 @@ namespace RWEE
 				}
 
 				__result = totalEquipmentSpace;
-				Main.log($"Equipment Space: {totalEquipmentSpace}/{___equipmentSpace}");
+				logr.Log($"Equipment Space: {totalEquipmentSpace}/{___equipmentSpace}");
 				if (___isPlayerCharacter)
 					PlayerControl.inst.calculateShipASAP = true;
 				return false;
@@ -170,7 +170,7 @@ namespace RWEE
 					return;
 				//___shipData.CheckEquipmentSpaceOcupied(___stats.modelData);
 				
-				Main.warn($"Calculating ship stats - removing disabled equipment");
+				logr.Warn($"Calculating ship stats - removing disabled equipment");
 				__state = ___shipData.equipments;
 				___shipData.equipments = filterInstalledEquipment(___shipData.equipments);
 			}

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using RW;
+using static RWEE.Logging;
 /**
  * AIType 0: Normal, 1: Marauder, 2: Mercenary, 3: Sentinel, 4: Boss, 5: Guardian, 6: NPC, 7: Special Char
  * /* 0: this.Flee(); 1: this.TacticStrafeFire(); 2: this.TacticHitAndRun(); 3: this.TacticMelee();
@@ -34,7 +36,7 @@ namespace RWEE
 					float origAcceleration = ___acceleration;
 					float origDamageBonus = ___ss.dmgBonus;
 
-					//Main.log($"Applying AI bonus. lev: {aiChar.level} hp: {___baseHP} shield: {___baseShield} energy: {___baseEnergy} regen: {___hpRegen} regen shield-recharge: {___shieldRecharge} dam bonus: {___ss.dmgBonus}");
+					//logr.Log($"Applying AI bonus. lev: {aiChar.level} hp: {___baseHP} shield: {___baseShield} energy: {___baseEnergy} regen: {___hpRegen} regen shield-recharge: {___shieldRecharge} dam bonus: {___ss.dmgBonus}");
 					//float mod = aiChar.level / 50;  //1x at L50, 2x at L100, 3x at L150, etc
 
 					float mod = levelToMod(aiChar.level * (aiChar.AIType == 4 || aiChar.AIType == 3 ? 1.3f : 1f)); //bosses are harder, but give better loot.
@@ -50,7 +52,7 @@ namespace RWEE
 					___acceleration *= (1 + mod / 10);
 
 					___ss.dmgBonus += mod;
-					Main.log($"Boosting AI {aiChar.Name()} {(1 + mod)}x. lev: {aiChar.level} hp: {origBaseHP}→{___baseHP} shield: {origBaseShield}→{___baseShield}" +
+					logr.Log($"Boosting AI {aiChar.Name()} {(1 + mod)}x. lev: {aiChar.level} hp: {origBaseHP}→{___baseHP} shield: {origBaseShield}→{___baseShield}" +
 						$"energy: {origBaseEnergy}→{___baseEnergy} regen: {origHpRegen}→{___hpRegen} shield-recharge: {origShieldRecharge}→{___shieldRecharge} dam bonus: origDamageBonus→{___ss.dmgBonus}");
 				}
 			}
@@ -58,7 +60,7 @@ namespace RWEE
 		static public float levelToMod(float level)
 		{
 			float mod = (float)(Math.Pow(level - 49, 1.5) - 1) / 100;
-			//Main.log($"level: {level} mod: {mod}");
+			//logr.Log($"level: {level} mod: {mod}");
 			return Mathf.Max(mod, 0);
 		}
 		/**
@@ -80,7 +82,7 @@ namespace RWEE
 					if (___aiChars[i].rank > 2)
 						___aiChars[i].rank = 2;
 					___aiChars[i].shipData = null;
-					Main.log($"Rank: {___aiChars[i].rank}");
+					logr.Log($"Rank: {___aiChars[i].rank}");
 					___aiChars[i].DefineShipModel(new ShipType());
 				}
 			}
@@ -95,7 +97,7 @@ namespace RWEE
 		{
 			static void Postfix(ref AIControl __instance, SpaceShip ___ss)
 			{
-				//Main.log($"AIControl_SetNewTarget: {__instance.Char.name}");
+				//logr.Log($"AIControl_SetNewTarget: {__instance.Char.name}");
 				if (__instance.Char.level > 50)
 				{
 					float newReaction = 2f / (__instance.Char.level / 25);
@@ -144,13 +146,13 @@ namespace RWEE
 			if (__instance.Char.level < 50)
 				return;
 			float hpPerc = 1f * ___ss.currHP / ___ss.stats.baseHP;
-			//Main.log($"hp: {hpPerc}");
+			//logr.Log($"hp: {hpPerc}");
 			if (hpPerc < .2)
 			{
 				__instance.Char.currTactic = 0; //flee
 				__instance.target = null;
 				__instance.targetEntity = null;
-				//Main.log("Fleeing");
+				//logr.Log("Fleeing");
 				return;
 			}
 			if (__instance.targetEntity == null)
@@ -159,14 +161,14 @@ namespace RWEE
 			{
 				SpaceShip targetShip = __instance.targetEntity as SpaceShip;
 				//Tactic: 0 == Alternate, 1 == Strafe and Fire, 2 == Hit and Run, 3 == Melee
-				//Main.log($"Ship: [{__instance.Char.Name()} L{__instance.Char.level}] maxSpd:{getMaxSpeed(___ss)} acc:{getAcceleration(___ss)} mass:{___ss.stats.mass} turn:{getTurnSpeed(___ss)} tactic:curr:{__instance.Char.currTactic} fav:{__instance.Char.behavior.favTactic} max:{__instance.Char.maxTactic} warp{__instance.Char.behavior.emergencyWarpHPThreshold}");
-				//Main.log($"Target: [{targetShip.name}] maxSpd:{getMaxSpeed(targetShip)} acc:{getAcceleration(targetShip)} mass:{targetShip.stats.mass} turn:{getTurnSpeed(targetShip)}");
+				//logr.Log($"Ship: [{__instance.Char.Name()} L{__instance.Char.level}] maxSpd:{getMaxSpeed(___ss)} acc:{getAcceleration(___ss)} mass:{___ss.stats.mass} turn:{getTurnSpeed(___ss)} tactic:curr:{__instance.Char.currTactic} fav:{__instance.Char.behavior.favTactic} max:{__instance.Char.maxTactic} warp{__instance.Char.behavior.emergencyWarpHPThreshold}");
+				//logr.Log($"Target: [{targetShip.name}] maxSpd:{getMaxSpeed(targetShip)} acc:{getAcceleration(targetShip)} mass:{targetShip.stats.mass} turn:{getTurnSpeed(targetShip)}");
 
 				if (getAcceleration(___ss) > getAcceleration(targetShip) * 2 && getTurnSpeed(___ss) > getTurnSpeed(targetShip) * 2)
 				{
 
 					//we are more maneuverable than our target.
-					//Main.log("We qualify for tactic upgrade");
+					//logr.Log("We qualify for tactic upgrade");
 					__instance.Char.currTactic = 2;
 					__instance.Char.behavior.favTactic = 2;
 					__instance.Char.maxTactic = 2;
@@ -203,7 +205,7 @@ namespace RWEE
 						{
 							___scanDistance = orig * (1 + levelToMod(aic.Char.level));
 						}
-						//Main.log($"Updating Scan Distance [{aic.Char.Name()} {aic.Char.level} {aic.Char.AIType}] {orig}->{___scanDistance}");
+						//logr.Log($"Updating Scan Distance [{aic.Char.Name()} {aic.Char.level} {aic.Char.AIType}] {orig}->{___scanDistance}");
 						break;
 				}
 			}
@@ -250,7 +252,7 @@ namespace RWEE
 						if (___ss.loots[i].rarity > 6)
 							___ss.loots[i].rarity = 6;
 
-					Main.log($"AIControl Improving Loot: Char  [{___Char.Name()} L{___Char.level}] {___Char.AIType} itemType:{___ss.loots[i].itemType} itemID:{___ss.loots[i].itemID} rarity:{oldRarity}->{itemLog}->{___ss.loots[i].rarity} rarityEnabled:{___ss.loots[i].rarityEnabled}");
+					logr.Log($"AIControl Improving Loot: Char  [{___Char.Name()} L{___Char.level}] {___Char.AIType} itemType:{___ss.loots[i].itemType} itemID:{___ss.loots[i].itemID} rarity:{oldRarity}->{itemLog}->{___ss.loots[i].rarity} rarityEnabled:{___ss.loots[i].rarityEnabled}");
 				}
 			}
 		}
@@ -262,22 +264,22 @@ namespace RWEE
 	int effectType, ShipClassLevel maxShipClass, int faction,
 	bool enableNoRarity, DropLevel maxDropLevel, int factionExtraChance, System.Random rand, ref Equipment __result)
 			{
-				Main.log(
-					$"GetRandomEquipment(" +
-					$"minSpace={minSpace:0.##}, maxSpace={maxSpace:0.##}, " +
-					$"minPower={minPower}, maxPower={maxPower}, " +
-					$"effectType={effectType}, maxShipClass={maxShipClass}({(int)maxShipClass}), " +
-					$"faction={faction}, enableNoRarity={enableNoRarity}, " +
-					$"maxDropLevel={maxDropLevel}({(int)maxDropLevel}), factionExtraChance={factionExtraChance}, " +
-					$"rand={(rand == null ? "null" : rand.GetHashCode().ToString())}" +
-					$")");
+				//logr.Log(
+				//	$"GetRandomEquipment(" +
+				//	$"minSpace={minSpace:0.##}, maxSpace={maxSpace:0.##}, " +
+				//	$"minPower={minPower}, maxPower={maxPower}, " +
+				//	$"effectType={effectType}, maxShipClass={maxShipClass}({(int)maxShipClass}), " +
+				//	$"faction={faction}, enableNoRarity={enableNoRarity}, " +
+				//	$"maxDropLevel={maxDropLevel}({(int)maxDropLevel}), factionExtraChance={factionExtraChance}, " +
+				//	$"rand={(rand == null ? "null" : rand.GetHashCode().ToString())}" +
+				//	$")");
 				if (effectType >= 0)
 					return true;
 				if (minPower < 50 +UnityEngine.Random.Range(0,100))  //L50 = always return;  L 150 = never
 					return true;
 				bool flag = GameData.data.gameMode == 1;
 				//int type = rand.Next(0, EquipmentType.GetNames(typeof(EquipmentType)).Count());
-				//Main.log($"Looking for type {(EquipmentType)type}");
+				//logr.Log($"Looking for type {(EquipmentType)type}");
 				List<int> list;
 				//Cherry pick end-game gear
 				//switch ((EquipmentType)type)
@@ -342,18 +344,18 @@ namespace RWEE
 				
 				while (num < 100)
 				{
-					Main.log($"loop {num}");
+					logr.Log($"loop {num}");
 					int id = list[UnityEngine.Random.Range(0, list.Count)];
 					Equipment equipment = ___equipments.FirstOrDefault(i => i != null && i.id == id);
 					if (equipment == null)
 					{
-						Main.warn($"equipment null id: {id}");
+						logr.Warn($"equipment null id: {id}");
 					}
 					else {
 						int lootChance = equipment.lootChance;
 						if (factionExtraChance > 0 && equipment.repReq.factionIndex > 0)
 							lootChance *= factionExtraChance;
-						Main.log("looking");
+						logr.Log("looking");
 						if (equipment != null
 							&& equipment.space >= minSpace
 												&& equipment.space <= maxSpace
@@ -364,7 +366,7 @@ namespace RWEE
 												&& equipment.minShipClass <= maxShipClass
 												&& (equipment.repReq.factionIndex == 0 || equipment.repReq.factionIndex == faction))
 						{
-							Main.log($"found {equipment.equipName}");
+							logr.Log($"found {equipment.equipName}");
 							__result = equipment;
 							return false;
 						}
@@ -378,7 +380,7 @@ namespace RWEE
 					}
 					num++;
 				}
-				Main.warn("Could not find item.  Returning to default method.");
+				logr.Warn("Could not find item.  Returning to default method.");
 				return true;
 			}
 			/*
@@ -387,7 +389,7 @@ namespace RWEE
 			int effectType, ShipClassLevel maxShipClass, int faction,
 			bool enableNoRarity, DropLevel maxDropLevel, int factionExtraChance, System.Random rand, ref Equipment __result)
 		{
-			/*Main.log(
+			/*logr.Log(
 				$"GetRandomEquipment(" +
 				$"minSpace={minSpace:0.##}, maxSpace={maxSpace:0.##}, " +
 				$"minPower={minPower}, maxPower={maxPower}, " +
@@ -415,7 +417,7 @@ namespace RWEE
 			var fi = AccessTools.Field(typeof(EquipmentDB), "equipments");
 			var equipments = fi?.GetValue(null) as List<Equipment>;
 			int type = rand.Next(0, EquipmentType.GetNames(typeof(EquipmentType)).Count());
-			Main.log($"Looking for type {(EquipmentType)type}");
+			logr.Log($"Looking for type {(EquipmentType)type}");
 							int count = 5;
 							switch((EquipmentType)type)
 							{
@@ -455,7 +457,7 @@ namespace RWEE
 							}
 							while (list.Count < 5)
 							{
-								Main.log($"loop {num} Power: {minPower}-{maxPower} Space: {minSpace}-{maxSpace}");
+								logr.Log($"loop {num} Power: {minPower}-{maxPower} Space: {minSpace}-{maxSpace}");
 								for (int i = 0; i < equipments.Count; i++)
 								{
 									Equipment equipment = equipments[i];
@@ -471,7 +473,7 @@ namespace RWEE
 										&& equipment.minShipClass <= maxShipClass
 										&& (equipment.repReq.factionIndex == 0 || equipment.repReq.factionIndex == faction))
 									{
-										Main.log($"Adding loot contender: {equipment.equipName}");
+										logr.Log($"Adding loot contender: {equipment.equipName}");
 										list.Add(equipment);
 										if (factionExtraChance > 0 && equipment.repReq.factionIndex > 0)
 										{
@@ -497,13 +499,13 @@ namespace RWEE
 									list.Clear();
 								}
 							}
-							Main.log($"Contenders: {list.Count}");	
+							logr.Log($"Contenders: {list.Count}");	
 							__result = list[rand.Next(0, list.Count)];
 							return false;
 						}*/
 			static void Postfix(ref Equipment __result)
 			{
-				//Main.log($"Found {__result.name}");
+				//logr.Log($"Found {__result.name}");
 			}
 		}
 	}
