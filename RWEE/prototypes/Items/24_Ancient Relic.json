@@ -1,0 +1,9 @@
+{
+	"_comment": "refName uses and overwrites obj.refName",
+	"type": "Item",
+	"refName": "Ancient Relic",
+	"cloneFrom": null,
+	"obj": {
+		"rarity": 4
+	}
+}

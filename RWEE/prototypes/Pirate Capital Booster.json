@@ -1,0 +1,26 @@
+{
+	"_comment": "",
+	"type": "Equipment",
+	"refName": "Pirate Capital Booster",
+	"cloneFrom": "Pirate Heavy Booster",
+	"obj": {
+
+		"energyCost": 32,
+		"equipName": "Pirate Capital Booster",
+		"minShipClass": 6,
+		"rarityMod": 1,
+		"space": 6,
+		"techLevel": 58,
+		"expansion": 0,
+		"type": 4,
+		"effects": [
+			{
+				"description": "",
+				"mod": 1,
+				"type": 5,
+				"uniqueLevel": 0,
+				"value": 92
+			}
+		]
+	}
+}
