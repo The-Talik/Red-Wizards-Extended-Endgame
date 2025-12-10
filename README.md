@@ -1,5 +1,5 @@
 What is it?
-  Red Wizards Extended Endgame is an end-game overhaul mod.  It attempt at extending the gameplay in a number of ways intended to feel balanced with the core game.  Most features of this mod do not come into play until the player or sectors are L50+.  Increase player level cap to 100, sector level cap to 200, adds endgame upgrades, improves enemy AI, core gameplay improvements, and a bunch of other tweaks.
+  Red Wizard's Extended Endgame is an end-game overhaul mod.  It attempt at extending the gameplay in a number of ways intended to feel balanced with the core game.  Most features of this mod do not come into play until the player or sectors are L50+.  Increase player level cap to 100, sector level cap to 200, adds endgame upgrades, improves enemy AI, core gameplay improvements, and a bunch of other tweaks.
 
 Highlights:
  - Player levels are capped at 100.

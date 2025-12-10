@@ -1,4 +1,4 @@
-# RWMM (Red Wizard Mod Manager)
+# RWMM (Red Wizard's Mod Manager)
 
 RWMM is a lightweight mod framework for **Star Valor** (BepInEx) focused on **resource management via JSON “prototypes”**.
 
