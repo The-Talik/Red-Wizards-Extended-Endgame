@@ -87,6 +87,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Shared\Versions.cs">
+      <Link>Versions.cs</Link>
+    </Compile>
     <Compile Include="Generated\Dto\_Perk.g.cs" />
     <Compile Include="ObjectApply.cs" />
     <Compile Include="Generated\Dto\_CrewMember.g.cs" />

@@ -55,6 +55,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Shared\Versions.cs">
+      <Link>Versions.cs</Link>
+    </Compile>
     <Compile Include="DataMemberOrder.cs" />
     <Compile Include="IgnoreDataMember.cs" />
     <Compile Include="_Main.cs" />

@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using System; 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 using static UnityEngine.Random;
 using static RWEE.Logging;
+using RW;
 namespace RWEE
 {
 	internal class Ships
@@ -21,14 +22,14 @@ namespace RWEE
 			{
 				if (___equipments == null)
 					return true;
+				logr.Log("Checking Equipment Space Occupied {___isPlayerCharacter}");
 				float totalEquipmentSpace = 0f;
 				float totalDroneSpace = 0f;
 				float hangarDroneSpace = (float)modelData.hangarDroneSpace;
-				List <InstalledEquipment> disabledEquipment = new List<InstalledEquipment>();
 				foreach (InstalledEquipment installedEquipment in ___equipments)
 				{
 					Equipment equipment = EquipmentDB.GetEquipment(installedEquipment.equipmentID);
-					
+
 					int disabledCount = 0;
 					for (int i = 1; i <= installedEquipment.qnt; i++)
 					{
@@ -43,7 +44,7 @@ namespace RWEE
 						}
 					}
 					disabled_fi.SetValue(installedEquipment, disabledCount);
-					logr.Log($"Equipment: {equipment.name} x{installedEquipment.qnt}. disabled: {disabled_fi.GetValue(installedEquipment)}");
+					//logr.Log($"Equipment: {equipment.name} x{installedEquipment.qnt}. Setting disabled to: {disabled_fi.GetValue(installedEquipment)}");
 				}
 
 				if (hangarDroneSpace > 0f && totalDroneSpace > 0f)
@@ -58,7 +59,7 @@ namespace RWEE
 				}
 
 				__result = totalEquipmentSpace;
-				logr.Log($"Equipment Space: {totalEquipmentSpace}/{___equipmentSpace}");
+				logr.Log($"Done.  Equipment Space: {totalEquipmentSpace}/{___equipmentSpace}");
 				if (___isPlayerCharacter)
 					PlayerControl.inst.calculateShipASAP = true;
 				return false;
@@ -68,25 +69,30 @@ namespace RWEE
 		/**
 		 * Disables effects for disabled equipment
 		 */
-		[HarmonyPatch(typeof(EquipmentDB), "GetEffect")]
+		/*[HarmonyPatch]
 		static class EquipmentDB_GetEffect
 		{
-			static void Prefix(List<InstalledEquipment> equipments)
+			[HarmonyPrefix]
+			[HarmonyPatch(typeof(EquipmentDB), "GetEffect")]
+			[HarmonyPatch(typeof(EquipmentDB), "GetEnergyExpend")]
+			static void Prefix(ref List<InstalledEquipment> equipments)
 			{
 				equipments = filterInstalledEquipment(equipments);
 			}
 		}
-		[HarmonyPatch(typeof(EquipmentDB), "GetEnergyExpend")]
-		static class EquipmentDB_GetEnergyExpend
+		[HarmonyPatch]
+		static class EquipmentDB_GetEffect2
 		{
-			static void Prefix(List<InstalledEquipment> equipments)
+			[HarmonyPrefix]
+			[HarmonyPatch(typeof(SpaceShip), "ApplyPreShipBonus")]
+			static void Prefix(ref List<InstalledEquipment> equips)
 			{
-				equipments = filterInstalledEquipment(equipments);
+				equips = filterInstalledEquipment(equips);
 			}
-		}
+		}*/
 		static List<InstalledEquipment> filterInstalledEquipment(List<InstalledEquipment> equipments)
 		{
-			if (equipments == null || equipments.Count == 0 || disabled_fi==null)
+			if (equipments == null || equipments.Count == 0 || disabled_fi == null)
 				return equipments;
 			var filtered = new List<InstalledEquipment>(equipments.Count);
 
@@ -100,7 +106,6 @@ namespace RWEE
 					equipments[i].qnt = inst.qnt - (int)disabled_fi.GetValue(inst);
 					filtered.Add(inst);
 				}
-
 			}
 			return filtered;
 		}
@@ -151,36 +156,43 @@ namespace RWEE
 					// avoid double-tagging if LoadData gets called multiple times
 					if (text.text.Contains("disabled]"))
 						continue;
-					if(inst.qnt>1)
+					if (inst.qnt > 1)
 						text.text += $" <color=#888888>[{disabledCount} disabled]</color>";
 					else
 						text.text += " <color=#888888>[disabled]</color>";
 				}
 			}
-
-
 		}
 
 		[HarmonyPatch(typeof(SpaceShip), "CalculateShipStats")]
 		static class SpaceShip_CalculateShipStats
 		{
-			static void Prefix(SpaceShip __instance,ref SpaceShipData ___shipData, ref List<InstalledEquipment> __state)
+			static void Prefix(SpaceShip __instance, ref ShipStats ___stats, ref SpaceShipData ___shipData, ref List<InstalledEquipment> __state)
 			{
-				if(!__instance.IsPlayer)
+				logr.Open("SpaceShip_CalculateShipStats");
+				//logr.Log($"Calculating ship stats - temporarily removing disabled equipment is player:{__instance.IsPlayer}");
+				if (!__instance.IsPlayer)
 					return;
 				//___shipData.CheckEquipmentSpaceOcupied(___stats.modelData);
-				
-				logr.Warn($"Calculating ship stats - removing disabled equipment");
-				__state = ___shipData.equipments;
+
+				__state = ListUtils.Clone<InstalledEquipment>(___shipData.equipments);
+
 				___shipData.equipments = filterInstalledEquipment(___shipData.equipments);
+
 			}
-			static void Postfix(ref SpaceShipData ___shipData, ref List<InstalledEquipment> __state)
+			static void Postfix(SpaceShip __instance, ref SpaceShipData ___shipData, ref List<InstalledEquipment> __state)
 			{
+				logr.Close("SpaceShip_CalculateShipStats");
+				//logr.Log($"Restoring full equipment list after ship stats calculation  is player:{__instance.IsPlayer}");
+				if (!__instance.IsPlayer)
+					return;
+
 				if (__state == null || __state.Count == 0)
 					return;
 				___shipData.equipments = __state;
 
 			}
 		}
+
 	}
 }

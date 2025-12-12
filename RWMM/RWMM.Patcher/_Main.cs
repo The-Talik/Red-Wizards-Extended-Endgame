@@ -30,7 +30,7 @@ namespace RWMM.Patcher
 
 		public static void Patch(AssemblyDefinition asm)
 		{
-			string modVersion = "0.0.1";
+			string modVersion = RW.Versions.RWMM;
 			Log("Patch() entered");
 
 			var mod = asm.MainModule;

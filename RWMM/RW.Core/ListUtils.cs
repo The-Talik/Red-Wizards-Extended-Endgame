@@ -161,5 +161,16 @@ namespace RW
 			logr.Log($"[ListUtils.NextFreeId] returning {candidate} after scanning {used_ids.Count} used ids.", 3);
 			return candidate;
 		}
+		public static List<T> Clone<T>(List<T> list)
+		{
+			if (list == null)
+				return null;
+			var clone = new List<T>(list.Count);
+			for (int i = 0; i < list.Count; i++)
+			{
+				clone.Add(ObjUtils.Clone(list[i]));
+			}
+			return clone;
+		}
 	}
 }

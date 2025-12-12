@@ -186,7 +186,25 @@ namespace RWEE
 				return true;
 			}
 		}
-
-
+		/*
+		 * This didn't seem to do anything????
+		 * [HarmonyPatch(typeof(GalaxyMap), "GetSectorInfo")]
+		static class GalaxyMap_GetSectorInfo
+		{
+			static void Postfix(TSector sector, ref string __result)
+			{
+				logr.Log("GalaxyMap_GetSectorInfo");
+				__result += $"\nLarge Asteroids: {sector.bigAsteroids.Count}";
+			}
+		}*/
+		[HarmonyPatch(typeof(TSector), "GetString")]
+		static class TSector_GetString
+		{
+			static void Postfix(bool ___discovered, List<BigAsteroid> ___bigAsteroids, ref string __result)
+			{
+				if(___discovered)
+					__result += $"\nLarge Asteroids: {___bigAsteroids.Count}";
+			}
+		}
 	}
 }

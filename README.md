@@ -71,6 +71,7 @@ RWEE can also be **removed safely**, with these expected behaviors:
   - Reason: encourages flexibility without allowing spam.
 - Tech + Construction caps increased to **200** (to match sector limits)  
   - Other knowledges remain capped at **50** for balance.
+- Space Pilot bonuses are applied when no fleet members are present (even if you control a fleet)
 
 ### Items / Loot
 - Added endgame tiers:
@@ -100,12 +101,13 @@ RWEE can also be **removed safely**, with these expected behaviors:
 - Hunter quests tend to send you slightly outward into tougher space when you outlevel a station
   - Reason: keeps progression moving into harder sectors even if you “follow quests”.
 
-### Bugfixes / Core Tweaks
+### Bugfixes / Core Tweaks / QOL
 - Fleet ships properly use scanner power when looking for asteroids to mine
 - Ancient artifacts are purple (instead of blue)
-- Too many installed equipments will **disable** them instead of removing them (useful for fleets)
+- Too many installed equipments will disable them instead of removing them (useful for fleets)
 - Inventory shows quantity needed for quests (ie. "(1/3) Iron")
 - Hephaestus set to Epic
+- Number of large asteroids in a sector shown on sector map
 
 ---
 
@@ -117,8 +119,13 @@ RWEE can also be **removed safely**, with these expected behaviors:
 
 ## Changelog
 
+### 1.1.4
+- Number of large asteroids in a sector shown on sector map
+- Space Pilot bonuses are applied when no fleet members are present (even if you control a fleet)
+- Fixed a bug where disabled equipment would poof out of existence.
+
 ### 1.1.3
-- Too many installed equipments will disable them rather than remove them
+- Too many installed equipments will disable them rather than remove them (buggy)
 - Inventory shows quantity needed for quests
 - Split project into RWEE + RWMM (resource injection framework)
 - Hephaestus set to Epic
@@ -174,16 +181,13 @@ RWEE can also be **removed safely**, with these expected behaviors:
 ## Roadmap
 
 ### 1) Near-term
-- Crew evolution beyond Legendary (primarily via escape pods from high-level sectors)
+- Crew allowed to evolve up to tier 7.
 - Ravager re-spawning
-- Space Pilot benefit when no fleet members are present (even if you control a fleet)
 - Swap/Launch systems:
   - Swap with fleet captain
   - Swap with a derelict (leaving your ship derelict or FO-piloted)
   - Launch from inventory into a stored ship
 - Unlock Lacewing (possibly as a derelict) after completing the appropriate perk
-
-### 2) After mod framework expansion
 - Late-game questline to obtain **Thoth**
 - Higher MK levels of QoL items (scanners/warp/collector beams/etc.)
   - More advanced sensors (detect stations in sector before visiting)
@@ -215,12 +219,14 @@ RWEE can also be **removed safely**, with these expected behaviors:
 - Balance for ultra-late-game sectors L150+
   - Tiers 8 (Celestial) and 9(Transcendent)
   - allow very high level enemies to drop ship blueprints, possibly including unique faction ships
+- Make Hephaestus harder to get, but better.
 - UI improvements:
   - Controls active with map open.
   - Speed boosters as a toggle, rather than hold.
   - Map UI updates (Maybe a separate mod?)
   - Crafting UI updates (maybe a separate mod?)
   - Button to hide/forget a recipe from the crafting list.
+  - name of item spotted on minimap
 - Autopilot
   - Maybe as an equipment module.
   - Auto fly to area highlighted on local map.

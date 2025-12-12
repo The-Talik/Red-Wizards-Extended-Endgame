@@ -35,6 +35,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{D42B4C6D-448C-45DE-A25B-0C4442B25874}"
 	ProjectSection(SolutionItems) = preProject
 		Shared\Log.cs = Shared\Log.cs
+		Shared\Versions.cs = Shared\Versions.cs
 	EndProjectSection
 EndProject
 Global

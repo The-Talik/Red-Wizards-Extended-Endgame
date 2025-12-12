@@ -25,6 +25,7 @@ namespace RW.Logging
 		public static int verbosity = 0;
 		public static int errorCount = 0;
 		public static List<string> errors = new List<string>();
+		public static int indent = 0;
 		public Logr(ManualLogSource _log, int _verbosity = 0)
 		{
 			log = _log;
@@ -32,6 +33,8 @@ namespace RW.Logging
 		}
 		public void Log(string msg, int level = 1)
 		{
+			if(indent > 0)
+				msg = new string(' ', indent) + msg;
 			if (verbosity >= level)
 				log?.LogInfo(msg);
 		}
@@ -52,11 +55,15 @@ namespace RW.Logging
 		}
 		public void Warn(string msg, int level = 0)
 		{
+			if (indent > 0)
+				msg = new string(' ', indent) + msg;
 			if (verbosity >= level)
 				log?.LogWarning(msg);
 		}
 		public void Error(string msg, bool stash = true, int level = -1)
 		{
+			if (indent > 0)
+				msg = new string(' ', indent) + msg;
 			if (verbosity >= level)
 			{
 				log?.LogError(msg);
@@ -87,6 +94,20 @@ namespace RW.Logging
 				errorCount = 0;
 				errors.Clear();
 			}
+		}
+		public void Open(string text = "")
+		{
+			
+			Log(text);
+			Log("{");
+			indent++;
+		}
+		public void Close(string text = "")
+		{
+			indent--;
+			text = "} " + text;
+			Log(text);
+			
 		}
 	}
 }

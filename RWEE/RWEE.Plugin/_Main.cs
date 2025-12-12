@@ -24,7 +24,7 @@ namespace RWEE
 	{
 		public const string pluginGuid = "mc.starvalor.extendedendgame";
 		public const string pluginName = "RWEE";//"Red Wizard's Extended Endgame";
-		public const string pluginVersion = "1.1.3";
+		public const string pluginVersion = Versions.RWEE;
 
 		//public System.Reflection.Assembly asm = typeof(Main).Assembly;
 		//public const string pluginVersion = asm.GetName().Version?.ToString()

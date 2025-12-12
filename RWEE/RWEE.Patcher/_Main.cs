@@ -29,7 +29,7 @@ public static class RWEEPatcher
 
 	public static void Patch(AssemblyDefinition asm)
 	{
-		string modVersion = "1.1.3";
+		string modVersion = RW.Versions.RWEE;
 		Log("Patch() entered");
 
 		var mod = asm.MainModule;

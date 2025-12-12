@@ -6,7 +6,7 @@ Right now RWMM’s scope is intentionally narrow:
 - Dump the game’s “base” definitions to JSON (`base_prototypes/`) so you can use them as templates.
 - Load JSON prototypes from mods and apply them to in-game databases at startup.
 - Support **patching existing objects** (by `refName`) and **creating new objects by cloning** (via `cloneFrom`).
-- Supports object types: `Item`, `Equipment`, `Quest`, `Perk`, `TWeapon`, `CrewMember`, `ShipModelData`.
+- Supports object types: `Item`, `Equipment`, `Quest`, `TWeapon`, `CrewMember`, `ShipModelData`.
 - Allows importing PNG icons for items/equipment.
 - Auto-manage numeric IDs behind the scenes (so mods should not fight over IDs).
 
@@ -34,6 +34,8 @@ Star Valor\
   BepInEx\
     plugins\
       YourMod.plugin\
+        package.json (not yet implemented)
+        yourplugin.dll
         prototypes\
           items\
             some_file.json
@@ -48,6 +50,7 @@ Notes:
 - RWMM scans for **any folder named `prototypes` anywhere under `BepInEx\plugins\`**.
 - **Folder structure and filenames under `prototypes\` are ignored** (they’re only for your organization).
 - The only things that matter are the JSON contents (`type`, `refName`, etc.).
+- Asset paths in `image` fields are resolved relative to the **parent folder of `prototypes`** (i.e. usually your mod root).
 
 ---
 
@@ -164,11 +167,11 @@ So:
 RWMM currently dumps/imports prototypes for:
 - `Item`
 - `Equipment`
-- `Quest`
-- `Perk`
-- `TWeapon`
-- `CrewMember`
 - `ShipModelData`
+- `Quest` (Untested, but should be ok)
+- `TWeapon` (Untested, but should be ok)
+- `CrewMember` (Untested, but should be ok)
+
 
 ---
 
@@ -273,6 +276,11 @@ RWMM includes a small utility library you can reference from your own BepInEx pl
 
 ## Roadmap (high-level)
 - Support creating brand-new objects without cloning. (maybe)
-- Deterministic load order + dependencies (Factorio-style manifest, eventual `package.json`).
-- Actual "mod-manger" features, like enabling/disabling mods, storing which mods were used in a save, etc.
-- Support more object types (as I need them for my own mods, or as requested).
+- Deterministic load order + dependencies (Factorio-style manifest, `package.json`).
+- Actual "mod-manger" features
+  - Eenabling/disabling mods
+  - Auto-version check from Github repo
+  - Storing which mods were used in a save
+- Support for settings.json file.
+- Ingame UI for settings.
+- Support more object types (I'll add more object types as I need them for my own mod, or as requested).

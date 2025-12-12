@@ -131,6 +131,20 @@ namespace RWEE
 							}*
 					}
 			}*/
+			[HarmonyPatch(typeof(CrewMember), "GainXP")]
+			static class CrewMember_GainXP
+			{
+				static void Postfix(ref CrewMember __instance, ref int ___rarity, ref int ___nextRarityCount)
+				{
+					logr.Log($"Crew GainXP Rarity: {___rarity} NextRarityCount: {___nextRarityCount}");
+					/*					int mult = ___rarity - 3;
+										if (___nextRarityCount >= 1000*Math.Pow(mult,1.5f) && ___rarity >= 5 && ___rarity < Main.MAX_RARITY)	
+										{
+											__instance.LevelUpRarity();
+											___nextRarityCount = 0;
+										}*/
+				}
+			}
 		}
 	}
 }

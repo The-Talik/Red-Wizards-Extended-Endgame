@@ -21,7 +21,7 @@ namespace RWMM
 	{
 		public const string pluginGuid = "mc.starvalor.RWMM";
 		public const string pluginName = "RWMM";//"Red Wizard's Mod Manager";
-		public const string pluginVersion = "0.0.1";
+		public const string pluginVersion = Versions.RWMM;
 		internal static int errorCount = 0;
 
 

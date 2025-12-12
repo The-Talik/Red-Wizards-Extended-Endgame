@@ -1,14 +1,15 @@
 ﻿using HarmonyLib;
+using RW.Logging;
 using System; 
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-
+using static RWEE.Logging;
 namespace RWEE
 {
-	internal class Player
+	internal static class Player
 	{
 		/**
 		 * give less experience the higher above CL50 you are.
@@ -102,7 +103,7 @@ namespace RWEE
 				return true;
 			}
 		}
-		
+
 		[HarmonyPatch(typeof(PChar), "UpdateChar")]
 		static class PChar_UpdateChar
 		{
@@ -128,6 +129,94 @@ namespace RWEE
 				{
 					PChar.Char.explorer = Main.OLD_PCHAR_MAXLEVEL;
 				}
+			}
+		}
+		public static class SpacePilotBonusOverride
+		{
+			public static bool fleet_override = false;
+			
+			[HarmonyPatch]
+			static class PChar_ApplySoloFlyingBonuses
+			{
+				[HarmonyPrefix]
+				[HarmonyPatch(typeof(PChar), "ApplySoloFlyingBonuses")]
+				[HarmonyPatch(typeof(PChar), "GetSpacePilotBonus")]
+				static void Prefix()
+				{
+					logr.Open("ApplySoloFlyingBonuses");
+					fleet_override = true;
+				}
+				[HarmonyPostfix]
+				[HarmonyPatch(typeof(PChar), "ApplySoloFlyingBonuses")]
+				[HarmonyPatch(typeof(PChar), "GetSpacePilotBonus")]
+				static void Postfix()
+				{
+					logr.Close("ApplySoloFlyingBonuses");
+					fleet_override = false;
+				}
+			}
+			[HarmonyPatch(typeof(PlayerCharacter), "get_GetFleetSize")]
+			static class PlayerCharacter_get_GetFleetSize
+			{
+				
+				static bool Prefix(List<AIMercenaryCharacter> ___mercenaries,ref int __result)
+				{
+					logr.Log("GetFleetSize Prefix");
+					if (!fleet_override)
+						return true ;
+						
+					logr.Log($"GetFleetSize original: {___mercenaries.Count}");
+					__result = 0;
+					for(int i = 0; i < ___mercenaries.Count; i++)
+					{
+						if (___mercenaries[i].IsActive())
+						{
+							__result++;
+						}
+					}
+					logr.Log($"GetFleetSize active: {__result}");
+					return false;
+				}
+			}
+			[HarmonyPatch]
+			static class AIMercenary_recalculateShipASAP
+			{
+				[HarmonyPostfix]
+				[HarmonyPatch(typeof(AIMercenary), nameof(AIMercenary.Die))]
+				[HarmonyPatch(typeof(AIMercenary), nameof(AIMercenary.DockAtCarrier))]
+				[HarmonyPatch(typeof(AIMercenary), nameof(AIMercenary.EmergencyWarp))]
+				[HarmonyPatch(typeof(AIMercenary), nameof(AIMercenary.Vanish))]
+//				[HarmonyPatch(typeof(AIMercenary), nameof(AIMercenary.StationDockingReached))]
+				[HarmonyPatch(typeof(AIMercenary), nameof(AIMercenary.DockAtStation))]
+				[HarmonyPatch(typeof(GameManager), nameof(GameManager.LaunchPlayerFleetMember))]
+				static void Postfix(System.Reflection.MethodBase __originalMethod)
+				{
+					logr.Warn($"{__originalMethod} Recalculating ship ASAP due to mercenary change.");
+					if (PlayerControl.inst != null)
+					{
+logr.Log($"Is Player.");
+						
+						PlayerControl.inst.CalculateShip(false);
+						PlayerControl.inst.GetSpaceShip.VerifyShipCargoAndEquipment();
+
+						Inventory.instance.RefreshIfOpen(null, true, true);
+						//						PlayerControl.inst.calculateShipASAP = true;
+					}
+					else
+						logr.Log($"No Player Found.");
+				}
+			}
+		}
+		[HarmonyPatch(typeof(PlayerControl), "CalculateShip")]
+		static class PlayerControl_CalculateShip
+		{
+			static void Prefix()
+			{
+				logr.Open($"CalculateShip");
+			}
+			static void Postfix()
+			{
+				logr.Close($"CalculateShip");
 			}
 		}
 	}

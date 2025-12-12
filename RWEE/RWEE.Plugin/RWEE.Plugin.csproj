@@ -83,6 +83,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Shared\Versions.cs">
+      <Link>Versions.cs</Link>
+    </Compile>
     <Compile Include="Crew.cs" />
     <Compile Include="DataDumps.cs" />
     <Compile Include="Enemies.cs" />
