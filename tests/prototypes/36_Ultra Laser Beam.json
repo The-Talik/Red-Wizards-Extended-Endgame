@@ -1,0 +1,9 @@
+{
+	"_comment": "Top level 'refName' uses and overwrites 'obj.refName'.",
+	"type": "TWeapon",
+	"refName": "Ultra Laser Beam",
+	"cloneFrom": null,
+	"obj": {
+		"index": 1500
+	}
+}

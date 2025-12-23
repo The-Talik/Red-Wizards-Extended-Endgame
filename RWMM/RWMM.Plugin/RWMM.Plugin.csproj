@@ -91,7 +91,6 @@
       <Link>Versions.cs</Link>
     </Compile>
     <Compile Include="Generated\Dto\_Perk.g.cs" />
-    <Compile Include="ObjectApply.cs" />
     <Compile Include="Generated\Dto\_CrewMember.g.cs" />
     <Compile Include="Generated\Dto\_Equipment.g.cs" />
     <Compile Include="Generated\Dto\_Item.g.cs" />
@@ -99,6 +98,8 @@
     <Compile Include="Generated\Dto\_ShipModelData.g.cs" />
     <Compile Include="Generated\Dto\_TWeapon.g.cs" />
     <Compile Include="IDRefMap.cs" />
+    <Compile Include="IDRefMap.Load.cs" />
+    <Compile Include="IDRefMap.Save.cs" />
     <Compile Include="ObjectCopy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceImport.cs" />

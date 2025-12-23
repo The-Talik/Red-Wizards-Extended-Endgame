@@ -56,22 +56,23 @@ RWEE can also be **removed safely**, with these expected behaviors:
 - Enemy stats are buffed after **L50**, scaling **exponentially** beyond normal progression. Good luck!
 - Higher-level Marauder Hideouts can spawn **elite ships**  
   - Reason: Marauder quests are extremely profitable due to repeatability.  Let's make them harder!
-- Hideouts can **occasionally respawn** their marauders.
+- Hideouts can **occasionally respawn** their marauders when sectors level up.
 - Enemies over **L50** adjust tactics more intelligently:
   - Flee when health is low
   - Adjust tactics based on target (e.g., switch to hit-and-run if more maneuverable)
-  - Ravagers and Marauders attack from further away to reduce long-range cheese
+  - Ravagers and Marauders attack from further away to reduce long-range cheese.
 - Loot tuning:
   - Enemy drops adjusted to give endgame equipment, even when enemy levels exceed vanilla formula assumptions.
 
 ### Players
-- Player level cap increased to **100**
-- XP gain slows progressively after **level 50**
-- A new skill reset is added whenever you complete a quest **and you’re out of skill resets**
+- Player level cap increased to **100**.
+- XP gain slows progressively after **level 50**.
+- A new skill reset is added whenever you complete a quest and you’re out of skill resets.
   - Reason: encourages flexibility without allowing spam.
-- Tech + Construction caps increased to **200** (to match sector limits)  
+- Tech + Construction caps increased to **200** (to match sector limits)
   - Other knowledges remain capped at **50** for balance.
 - Space Pilot bonuses are applied when no fleet members are present (even if you control a fleet)
+  - Warping in your fleet will disable the bonus, and your equipment will be disabled. 
 
 ### Items / Loot
 - Added endgame tiers:
@@ -80,16 +81,17 @@ RWEE can also be **removed safely**, with these expected behaviors:
 - Scrapping mechanics:
   - Scrapping **Legendary or Mythic equipment** (not weapons, not Ascended) can drop **cores** (~10%)
   - Cores combine into the familiar upgrade item for that equipment type
-  - Results are seeded (sorry savescummers 😉)
+  - Results are seeded (sorry savescummers ;-)
 - Added: **Pirate Capital Booster**
-- Legendary+ weapons buffed roughly **1.5×** to compete better with endgame crafted weapons.
+- Legendary+ weapons buffed roughly **1.5×** making them competitive with player made weapons.
 
 ### Crew
 - Escape Pod crew always start at **level 1**
   - High-level sectors instead have a chance to spawn **higher tier crew** (not higher level)
   - Reason: high-level found crew is often *worse* due to reduced evolution runway.
-- Unique crew spawn rate increased (may be adjusted later).
-- Sam can be found in an escape pod after unlocking the scoundrel path and sending him away.
+- Unique crew spawn rate increased.
+  - Goal is to be able to get all of the unique crew by Level ~60 without savescumming.
+- Sam and High Tinker Steve can be found in escape pods after completing their quest lines (or starting with Lone Wolf or Scoundrel).
 
 ### Stations
 - Completing missions for a station can level it up
@@ -101,13 +103,20 @@ RWEE can also be **removed safely**, with these expected behaviors:
 - Hunter quests tend to send you slightly outward into tougher space when you outlevel a station
   - Reason: keeps progression moving into harder sectors even if you “follow quests”.
 
+### Ships
+- Geraki is findable (with all equipment and crew) as a debris field (L50+) derelict after acquiring Lone Wolf (5% if you complete the questline or 2% if you start with the background).
+- Lacewing is findable as a debris field (L50+) derelict after acquiring Battleship Raid perk (2%).
+
+### UI Improvements
+- Crew list shows level and skills.
+- Number of large asteroids in a sector shown on sector map.
+
 ### Bugfixes / Core Tweaks / QOL
-- Fleet ships properly use scanner power when looking for asteroids to mine
-- Ancient artifacts are purple (instead of blue)
-- Too many installed equipments will disable them instead of removing them (useful for fleets)
-- Inventory shows quantity needed for quests (ie. "(1/3) Iron")
-- Hephaestus set to Epic
-- Number of large asteroids in a sector shown on sector map
+- Fleet ships properly use scanner power when looking for asteroids to mine.
+- Ancient artifacts are purple (instead of blue).
+- Too many installed equipments will disable them instead of removing them (useful for fleets).
+- Inventory shows quantity needed for quests (ie. "(1/3) Iron").
+- Hephaestus set to Epic.
 
 ---
 
@@ -118,6 +127,15 @@ RWEE can also be **removed safely**, with these expected behaviors:
 ---
 
 ## Changelog
+### 1.1.5
+- Debris fields now have a chance to level up when sectors do.
+- Crew list shows level and skills.
+- Crew can level up to Tier 7.
+- Geraki is findable (with all equipment and crew) as a debris field (L50+) derelict after acquiring Lone Wolf (5% if you complete the questline or 1% if you started the game with Lone Wolf or Scoundrel).
+- Lacewing is findable as a debris field (L50+) derelict after acquiring Battleship Raid perk (1%).
+- Sam and High Tinker Steve can be found in escape pods after completing their quest lines (or starting with Lone Wolf or Scoundrel).
+- Fixed a drone hanger space issue.
+- Several changes and cleanups to RWMM (Red Wizards Mod Manager).
 
 ### 1.1.4
 - Number of large asteroids in a sector shown on sector map
@@ -180,14 +198,12 @@ RWEE can also be **removed safely**, with these expected behaviors:
 
 ## Roadmap
 
-### 1) Near-term
-- Crew allowed to evolve up to tier 7.
+### Near-term
 - Ravager re-spawning
 - Swap/Launch systems:
   - Swap with fleet captain
-  - Swap with a derelict (leaving your ship derelict or FO-piloted)
+  - Swap with a derelict (leaving your ship derelict or maybe co-pilot takes over if you have enough fleet room)
   - Launch from inventory into a stored ship
-- Unlock Lacewing (possibly as a derelict) after completing the appropriate perk
 - Late-game questline to obtain **Thoth**
 - Higher MK levels of QoL items (scanners/warp/collector beams/etc.)
   - More advanced sensors (detect stations in sector before visiting)
@@ -219,7 +235,18 @@ RWEE can also be **removed safely**, with these expected behaviors:
 - Balance for ultra-late-game sectors L150+
   - Tiers 8 (Celestial) and 9(Transcendent)
   - allow very high level enemies to drop ship blueprints, possibly including unique faction ships
-- Make Hephaestus harder to get, but better.
+- group aggro for maurader hideouts.
+- Ship movement should always effect projectile movement because... physics.
+- Auto-rotate save log (to ensure more backups in case someone needs to restore).
+- Show hidden debris fields if your level is high enough (or maybe if you have a good enough scanner)
+- MK2 versions of unique ships (Geraki, Lacewing, etc) that require the original ship as an ingredient.
+- Limit player station count to construction level.
+- scrapping items returns some resources
+- Stations
+  - stations give back some resources when dismantled.
+  - Some sort of limit to the number of stations that can be built in a sector to force you to optimize.  Maybe one miner per resource type per asteroid?
+  - mining is progressively slower the less resource is left.
+  - 
 - UI improvements:
   - Controls active with map open.
   - Speed boosters as a toggle, rather than hold.

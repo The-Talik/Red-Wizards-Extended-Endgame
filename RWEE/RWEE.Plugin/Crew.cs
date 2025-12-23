@@ -26,7 +26,7 @@ namespace RWEE
 		{
 			static bool Prefix(ref int level, ref int minRarity, ref int maxRarity, int factionIndex, bool allowSpecial, SM_Academy academy, System.Random rand, ref bool ___loaded, ref CrewMember __result)
 			{
-				
+
 				logr.Log($"Crew Orig: Level: {level} minRarity: {minRarity} maxRarity: {maxRarity} academy: {academy}");
 				if (academy != null)
 				{
@@ -78,18 +78,30 @@ namespace RWEE
 		[HarmonyPatch(typeof(PerkDB), "AcquirePerk")]
 		static class PerkDB_AcquirePerk
 		{
-			static void Prefix(int id)
+			static void Postfix(int id)
 			{
-				logr.Log($"Getting perk: {id}");
-				//if (id == 8)
+				logr.Log($"Acquiring perk: {id}");
+				if (id == 8)  //scoundrel
 				{
-					logr.Log("Unlocking Sam");
-					CrewMember cm = CrewDB.GetPredefinedCrewMember(11);
-					logr.Log($"cm: {cm.aiChar.name}");
-					cm.hidden = false;
-					cm = CrewDB.GetPredefinedCrewMember(11);
+					UnlockSam();
+					UnlockTinkerSteve();
+				}
+				if (id == 4) //lone wolf
+				{
 				}
 			}
+		}
+		private static void UnlockSam()
+		{
+			logr.Log("Unlocking Sam Holo");
+			CrewMember cm = CrewDB.GetPredefinedCrewMember(11);
+			cm.hidden = false;
+		}
+		private static void UnlockTinkerSteve()
+		{
+			logr.Log("Unlocking High Tinker Steve");
+			CrewMember cm = CrewDB.GetPredefinedCrewMember(14);
+			cm.hidden = false;
 		}
 		/**
 		* Makes Sam Holo Spawnable in an escape pod after you steal his ship.
@@ -99,50 +111,84 @@ namespace RWEE
 		{
 			static void Prefix(ref CrewMember[] ___crewList)
 			{
-				if (PChar.HasPerk(8))
+				if (PChar.HasPerk(8) || PChar.HasPerk(4))  //scoundrel or Lone Wolf
 				{
-					logr.Log("has Scoundrel perk");
-					for (int i = 0; i < GameManager.predefinitions.crewMembers.Length; i++)
-					{
-						if (GameManager.predefinitions.crewMembers[i].id == 11)
-						{
-							GameManager.predefinitions.crewMembers[i].hidden = false;
-							logr.Log("Unlocking Sam");
-						}
-						logr.Log($"Crew: {GameManager.predefinitions.crewMembers[i].id} {GameManager.predefinitions.crewMembers[i].aiChar.name}");
-					}
+					UnlockSam();
+					UnlockTinkerSteve();
+				}
+				//if (PChar.HasPerk(8) || )
+				//{
+
+				for (int i = 0; i < GameManager.predefinitions.crewMembers.Length; i++)
+				{
+					logr.Log($"Crew: {GameManager.predefinitions.crewMembers[i].id} {GameManager.predefinitions.crewMembers[i].aiChar.name} Hidden: {GameManager.predefinitions.crewMembers[i].hidden}");
+				}
+				//List<Quest> quests = QuestDB.;
+				//for (int i = 0; i < 
+				//}
+			}
+
+/**
+ * Unlocking a special crew member also adds them to findable crew list  (High Tinker Steve)
+ */
+			[HarmonyPatch(typeof(GenData), "UnlockCrewMember")]
+			static class GenData_UnlockCrewMember
+			{
+				static void Postfix(int crewMemberID)
+				{
+					logr.Log($"Unlocking Crew Member ID: {crewMemberID}");
+					CrewMember cm = CrewDB.GetPredefinedCrewMember(crewMemberID);
+					cm.hidden = false;
 				}
 			}
-			/*static void Postfix(ref CrewMember[] ___crewList)
-			{
-					if (PChar.HasPerk(8))
-					{
-							logr.Log("has Scoundrel perk -- Unlocking Sam");
-							CrewMember cm = CrewDB.GetPredefinedCrewMember(11);
-							cm.hidden = false;
-
-							/*for (int i = 0; i < ___crewList.Length; i++)
-							{
-									//logr.Log($"Crew: {___crewList[i].id}");
-									/*if (CrewDB.predefCrew[i].id == 11)
-									{
-											CrewDB.predefCrew[i].hidden = false;
-									}*
-							}*
-					}
-			}*/
 			[HarmonyPatch(typeof(CrewMember), "GainXP")]
 			static class CrewMember_GainXP
 			{
 				static void Postfix(ref CrewMember __instance, ref int ___rarity, ref int ___nextRarityCount)
 				{
-					logr.Log($"Crew GainXP Rarity: {___rarity} NextRarityCount: {___nextRarityCount}");
-					/*					int mult = ___rarity - 3;
-										if (___nextRarityCount >= 1000*Math.Pow(mult,1.5f) && ___rarity >= 5 && ___rarity < Main.MAX_RARITY)	
-										{
-											__instance.LevelUpRarity();
-											___nextRarityCount = 0;
-										}*/
+					//logr.Log($"Crew GainXP Rarity: {___rarity} NextRarityCount: {___nextRarityCount}");
+					int mult = ___rarity - 3;
+					if (___nextRarityCount >= 1000 * Math.Pow(mult, 1.5f) && ___rarity >= 5 && ___rarity < Main.MAX_RARITY)
+					{
+						__instance.LevelUpRarity();
+						___nextRarityCount = 0;
+					}
+				}
+			}
+
+			[HarmonyPatch(typeof(CrewMember), "GetNameModified", new Type[] { typeof(int), typeof(bool), typeof(bool) })]
+			static class CrewMember_GetNameModified
+			{
+				static void Postfix(AICharacter ___aiChar, List<CrewSkill> ___skills, ref string __result)
+				{
+					if (___aiChar == null)
+						return;
+					__result += $" ({___aiChar.level})";
+					if (___skills == null || ___skills.Count == 0)
+						return;
+
+					var abbrev_list = new List<string>(___skills.Count);
+
+					for (int i = 0; i < ___skills.Count; i++)
+					{
+						var skill = ___skills[i];
+						if (skill == null)
+							continue;
+
+						var skill_name = Lang.Get(23, 10 + ((int)skill.ID * (int)CrewPosition.Navigator));
+						if (string.IsNullOrEmpty(skill_name))
+							continue;
+
+						skill_name = skill_name.Trim();
+						var len = skill_name.Length < 3 ? skill_name.Length : 3;
+
+						abbrev_list.Add(skill_name.Substring(0, len));
+					}
+
+					if (abbrev_list.Count == 0)
+						return;
+
+					__result = (__result ?? "") + " [" + string.Join(", ", abbrev_list) + "]";
 				}
 			}
 		}

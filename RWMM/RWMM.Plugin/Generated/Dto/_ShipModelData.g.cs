@@ -10,85 +10,101 @@ namespace RWMM.Dto
 	[DataContract]
 	public class _ShipModelData
 	{
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string refName;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int id;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string shipModelName;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int manufacturer;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int shipClass;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int shipRole;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int expansion;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _manufacturer = "-1:Any, 0:Independent, 1:Miners, 2:Traders, 3:Pirates, 4:Venghi, 5:Rebels, 6:Tecnomancers";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public TFaction manufacturer;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _shipClass = "1:Shuttle, 2:Yacht, 3:Corvette, 4:Frigate, 5:Cruiser, 6:Dreadnought, 7:Kraken";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public ShipClassLevel shipClass;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _shipRole = "0:None, 1:Interceptor, 2:Fighter, 3:Gunship, 4:Destroyer, 5:Battleship, 6:Carrier, 7:Corsair, 8:Mining, 9:Freighter, 10:Passenger, 11:Engineer, 12:Racing, 13:Ranger, 14:Gladiator, 15:Firebrand";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public ShipRole shipRole;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _expansion = "0:None, 1:BaseBuilding";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public Expansion expansion;
 	[DataContract]
 	public class _ShipBonus
 	{
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int field;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _field = "-1:None, 0:Engineer, 1:Pilot, 2:Navigator, 3:Supervisor, 4:Gunner, 5:Instructor, 6:Tactician, 7:Steward, 8:Adviser, 9:RelationsOfficer, 10:other1, 11:other2, 12:other3, 13:other4, 14:other5, 15:Co_Pilot, 16:FirstOfficer, 17:Primary, 18:Staff, 19:Captain";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public CrewPosition field;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int minSkillRank;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int shipEnhancementRank;
 	}
 
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public _ShipBonus[] modelBonus;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int sellChance;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int level;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int hullPoints;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int weaponSpace;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int equipSpace;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int cargoSpace;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int hangarDroneSpace;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int hangarShipSpace;
 	[DataContract]
 	public class _CrewSeat
 	{
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int position;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _position = "-1:None, 0:Engineer, 1:Pilot, 2:Navigator, 3:Supervisor, 4:Gunner, 5:Instructor, 6:Tactician, 7:Steward, 8:Adviser, 9:RelationsOfficer, 10:other1, 11:other2, 12:other3, 13:other4, 14:other5, 15:Co_Pilot, 16:FirstOfficer, 17:Primary, 18:Staff, 19:Captain";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public CrewPosition position;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int minRequired;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int space;
 	}
 
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public _CrewSeat[] crewSpace;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int passengers;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int speed;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int agility;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int mass;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float sizeScale;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int sortPower;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float drawScale;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int rarity;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public _ReputationRequisite repReq;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int[] factions;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _factions = "-1:Any, 0:Independent, 1:Miners, 2:Traders, 3:Pirates, 4:Venghi, 5:Rebels, 6:Tecnomancers";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public TFaction[] factions;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public List<_CraftMaterial> craftingMaterials;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public global::UnityEngine.Vector3 extraSurFXScale;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int extraLinesOnShiftInfo;
 	}
 

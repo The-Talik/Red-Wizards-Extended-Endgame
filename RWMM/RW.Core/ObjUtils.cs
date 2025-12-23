@@ -24,11 +24,10 @@ namespace RW
 				return default;
 			}
 			string field = RefField(obj.GetType().Name);
-			if(field == null)
+			if (field == null)
 				return default;
 
 			return GetRefWithErrors(obj, field, silent);
-
 		}
 		public static string RefField(string typeName)
 		{
@@ -40,13 +39,55 @@ namespace RW
 				case "TWeapon":
 				case "CrewMember":
 				case "Perk":
+				case "ShipModelData":
 					return "refName";
 				case "Quest":
 					return "nameRef";
-				case "ShipModelData":
-					return "shipModelName";
+				case "Pair":
+					return "Name";
+				case "InstalledEquipment":
+					return null;
 				default:
-					logr.Error($"ObjUtils.refField<{typeName}> not implemented.");
+					logr.Error($"ObjUtils.refField({typeName}) not implemented.");
+					return null;
+			}
+		}
+		public static int GetId(object obj, bool silent = false)
+		{
+			if (obj == null)
+			{
+				if (!silent)
+					logr.Warn("ObjUtils.GetId called with null object.");
+				return default;
+			}
+			string field = IdField(obj.GetType().Name);
+			if (field == null)
+				return default;
+
+			return GetField<int>(obj, field);
+		}
+		public static string IdField(string typeName)
+		{
+			typeName = typeName.TrimStart('_');
+			switch (typeName)
+			{
+				case "TWeapon":
+					return "index";
+				case "Quest":
+					return "refCode";
+				case "Item":
+				case "Equipment":
+
+				case "CrewMember":
+				case "Perk":
+				case "ShipModelData":
+					return "id";
+				case "Pair":
+					return "Id";
+				case "InstalledEquipment":
+					return "equipmentID";
+				default:
+					logr.Error($"ObjUtils.IdField<{typeName}> not implemented.");
 					return null;
 			}
 		}
@@ -59,7 +100,7 @@ namespace RW
 				case "Equipment":
 					return "sprite";
 
-				
+
 				/*case "TWeapon":
 				case "CrewMember":
 				case "Perk":
@@ -94,12 +135,53 @@ namespace RW
 				return;
 			}
 
-			logr.Log($"ObjUtils.SetRef: targetType={obj.GetType().FullName} field=refName value='{value}'", 3);
+			logr.Log($"ObjUtils.SetRef: targetType={obj.GetType().FullName} field={RefField(obj.GetType().Name)} value='{value}'", 3);
 			string field = RefField(obj.GetType().Name);
 			if (field == null)
 				return;
 
 			SetField<string>(obj, field, value);
+		}
+		public static void SetId(object obj, int value)
+		{
+			if (obj == null)
+			{
+				logr.Warn("ObjUtils.SetId called with null object.");
+				return;
+			}
+
+			logr.Log($"ObjUtils.SetRef: targetType={obj.GetType().FullName} field={IdField(obj.GetType().Name)} value='{value}'", 3);
+			string field = IdField(obj.GetType().Name);
+			if (field == null)
+				return;
+
+			SetField<int>(obj, field, value);
+		}
+		private static string IdReferenceField(string typeName)
+		{
+			switch (typeName)
+			{
+				case "CargoItem":
+				case "ItemStockData":
+				case "MarketItem":
+					return "itemID";
+
+				case "InstalledEquipment":
+				case "BuiltInEquipmentData":
+					return "equipmentID";
+				case "EquipedWeapon":
+					return "weaponIndex";
+				case "AssignedCrewMember":
+					return "crewMemberID";
+				case "TWeapon":
+					return "index";
+				case "ShipModelData":
+					return "id";
+				default:
+					logr.Error($"[ObjUtils.IdReferenceField]<{typeName}> not implemented.");
+					return null;
+					break;
+			}
 		}
 		public static int GetIdReference(object obj, bool silent = false)
 		{
@@ -109,20 +191,10 @@ namespace RW
 					logr.Warn("[ObjUtils.GetRef] called with null object.");
 				return -1;
 			}
-			switch (obj.GetType().Name)
-			{
-				case "CargoItem":
-				case "ItemStockData":
-				case "MarketItem":
-					return ObjUtils.GetField<int>(obj, "itemID",silent);
-
-				case "InstalledEquipment":
-					return ObjUtils.GetField<int>(obj, "equipmentID",silent);
-				default:
-					logr.Error($"[ObjUtils.GetIdReference]<{obj.GetType().Name}> not implemented.");
-					break;
-			}
-			return -1;
+			var field = IdReferenceField(obj.GetType().Name);
+			if (field == null)
+				return -1;
+			return ObjUtils.GetField<int>(obj, field, silent);
 		}
 		public static void SetIdReference(object obj, int id)
 		{
@@ -130,27 +202,18 @@ namespace RW
 			{
 				logr.Warn("[ObjUtils.SetRef] called with null object.");
 			}
-			switch (obj.GetType().Name)
-			{
-				case "CargoItem":
-				case "ItemStockData":
-				case "MarketItem":
-					ObjUtils.SetField<int>(obj, "itemID", id);
-					break;
+			var field = IdReferenceField(obj.GetType().Name);
+			if (field == null)
+				return;
 
-				case "InstalledEquipment":
-					ObjUtils.SetField<int>(obj, "equipmentID", id);
-					break;
-				default:
-					logr.Error($"[ObjUtils.GetIdReference]<{obj.GetType().Name}> not implemented.");
-					break;
-			}
+			ObjUtils.SetField<int>(obj, field, id);
+			
 		}
 		public static T GetField<T>(object obj, string field, bool silent = false)
 		{
 			if (obj == null || string.IsNullOrEmpty(field))
 			{
-				if(!silent)
+				if (!silent)
 					logr.Warn($"[ObjUtils.GetField]<{typeof(T).Name}> called with null object or empty field name.");
 				return default;
 			}
@@ -331,6 +394,23 @@ namespace RW
 			// - structs are already copied by value
 			// - null stays null
 			return obj;
+		}
+		public static T CreateInstance<T>()
+		{
+			var type = typeof(T);
+
+			// Unity ScriptableObject types
+			if (typeof(UnityEngine.ScriptableObject).IsAssignableFrom(type))
+				return (T)(object)UnityEngine.ScriptableObject.CreateInstance(type);
+
+			// Normal class with parameterless ctor
+			var ctor = type.GetConstructor(Type.EmptyTypes);
+			if (ctor != null)
+				return (T)ctor.Invoke(null);
+
+			// Last-resort fallback for pure data containers
+			return (T)System.Runtime.Serialization.FormatterServices
+				.GetUninitializedObject(type);
 		}
 	}
 }

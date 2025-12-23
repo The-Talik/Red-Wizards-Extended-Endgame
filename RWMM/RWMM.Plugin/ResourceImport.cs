@@ -9,14 +9,28 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using UnityEngine;
+using static RWMM.Logging;
 using static RWMM.ResourceDump;
 using static RWMM.Resources_IO;
-using static RWMM.Logging;
 namespace RWMM
 {
 	internal class ResourceImport
 	{
+		public static void ImportType<T, TData>(ref T[] array)
+		{
+			if (array == null)
+			{
+				array = Array.Empty<T>();
+			}
+
+			var list = new List<T>(array);
+
+			ImportType<T, TData>(ref list);
+
+			array = list.ToArray();
+		}
 		public static void ImportType<T, TData>(ref List<T> list)
 		{
 			string type_name = typeof(T).Name;
@@ -55,7 +69,7 @@ namespace RWMM
 			logr.Log("importing object json "+base_folder);
 			var wrap = JsonUtils.FromJson<Wrap<TData>>(json);
 			wrap.base_folder = base_folder;
-			logr.LogObj(wrap);
+			logr.Log(json);
 
 
 			logr.Log($"    Importing {typeof(T).Name} ref: \"{wrap.refName}\" file: {json_file}");
@@ -73,10 +87,10 @@ namespace RWMM
 			logr.Error($"    Creating new prototypes not yet supported.  Clone an existing one instead for: {wrap.refName}");
 			return;
 
-			//obj = new T();
-			//logr.Log($"    Creating new {typeof(T).Name} ref: {refName}");
-			//addNewProto<T, TData>(obj,ref list, wrap, refName);
-			//return;
+			/*
+			if (TryCreateNew<T, TData>(list, wrap, json))
+				return;
+			return;*/
 		}
 		private static void TryUpdateImages<T, TData>(T obj, Wrap<TData> wrap)
 		{
@@ -96,16 +110,16 @@ namespace RWMM
 			var gameObj = ListUtils.GetByRef(list, wrap.refName);
 			if (gameObj == null)
 				return false;
-			logr.Log($"    Found existing {typeof(T).Name} ref: {wrap.refName}, updating.");
+			logr.Log($"Found existing {typeof(T).Name} ref: {wrap.refName}, updating.");
 
 			var clonedObj = ObjUtils.Clone<T>(gameObj);
 
 
 			Wrap<T> gameObjWrap = new Wrap<T>(gameObj.GetType().Name, gameObj);
 
-			JsonConvert.PopulateObject(json, gameObjWrap);
+			PopulateObject<T, TData>(json, gameObjWrap, wrap);
 			//restore stuff from original
-			if (ObjUtils.GetField<int>(gameObj, "expansion") == 0 && ObjUtils.GetField<int>(clonedObj, "expansion") != 0)
+			if (ObjUtils.GetField<int>(gameObj, "expansion", true) == 0 && ObjUtils.GetField<int>(clonedObj, "expansion",true) != 0)
 			{
 				ObjUtils.SetField<int>(gameObj, "expansion", ObjUtils.GetField<int>(clonedObj, "expansion"));
 				logr.Error($"Disabling expansion is not allowed");
@@ -123,23 +137,23 @@ namespace RWMM
 			var gameObj = ListUtils.GetByRef(list, wrap.cloneFrom);
 			if (gameObj == null)
 				return false;
-			logr.Log($"    Found {typeof(T).Name} to clone from: {wrap.cloneFrom} for new object {wrap.refName} ");
+			logr.Log($"Found {typeof(T).Name} to clone from: {wrap.cloneFrom} for new object {wrap.refName} ");
 
 			var clonedObj = ObjUtils.Clone<T>(gameObj);
 
 			Wrap<T> clonedbjWrap = new Wrap<T>(clonedObj.GetType().Name, clonedObj);
 
 
-			JsonConvert.PopulateObject(json, clonedbjWrap);
+			PopulateObject<T, TData>(json, clonedbjWrap, wrap);
 			//Fix stuff from original
-			if (ObjUtils.GetField<int>(gameObj, "id") == ObjUtils.GetField<int>(clonedObj, "id"))
+			if (ObjUtils.GetId(gameObj) == ObjUtils.GetId(clonedObj))
 			{
 				int newID = ListUtils.NextFreeId<T>(list);
-				ObjUtils.SetField<int>(clonedObj, "id", newID);
+				ObjUtils.SetId(clonedObj, newID);
 			}
-			if (ListUtils.GetBy<T>(list, "id", ObjUtils.GetField<int>(clonedObj, "id")) != null)
+			if (ListUtils.GetById<T>(list, ObjUtils.GetId(clonedObj)) != null)
 			{
-				logr.Error($"    ID conflict with {typeof(T).Name} ref: {wrap.refName} ID {ObjUtils.GetField<int>(clonedObj, "id")} is already in use. Skipping");
+				logr.Error($"    ID conflict with {typeof(T).Name} ref: {wrap.refName} ID {ObjUtils.GetId(clonedObj)} is already in use. Skipping");
 				return true;
 			}
 			ObjUtils.SetRef(clonedObj,wrap.refName);
@@ -147,6 +161,40 @@ namespace RWMM
 			showChangedFields<T>(gameObj, clonedObj);
 			list .Add(clonedObj);
 			return true;
+		}
+		private static bool TryCreateNew<T, TData>(List<T> list, Wrap<TData> wrap, string json)
+		{
+			logr.Log($"Creating a new object {typeof(T).Name}");
+
+
+			T newObj = ObjUtils.CreateInstance<T>();
+
+			Wrap<T> newObjWrap = new Wrap<T>(newObj.GetType().Name, newObj);
+			PopulateObject<T, TData>(json, newObjWrap, wrap);
+			if (ObjUtils.GetId(newObj) == 0)
+			{
+				int newID = ListUtils.NextFreeId<T>(list);
+				ObjUtils.SetId(newObj, newID);
+			}
+			if (ListUtils.GetById<T>(list, ObjUtils.GetId(newObj)) != null)
+			{
+				logr.Error($"    ID conflict with {typeof(T).Name} ref: {wrap.refName} ID {ObjUtils.GetId(newObj)} is already in use. Skipping");
+				return true;
+			}
+			ObjUtils.SetRef(newObj, wrap.refName);
+			TryUpdateImages(newObj, wrap);
+			list.Add(newObj);
+			return true;
+		}
+		private static void PopulateObject<T, TData>(string json, Wrap<T> obj, Wrap<TData> wrap)
+		{
+			JsonConvert.PopulateObject(json, obj);
+			switch (wrap.type)
+			{
+				case "Perk":
+					ObjectApply.Apply<TData, T>(wrap.obj, obj.obj, "replacePerks");
+					break;
+			}
 		}
 		private static void showChangedFields<T>(T original, T updated)
 		{
@@ -158,7 +206,7 @@ namespace RWMM
 				var updatedValue = field.GetValue(updated);
 				if (!object.Equals(originalValue, updatedValue))
 				{
-					logr.Log($"{field.Name}: '{originalValue}' -> '{updatedValue}'");
+					logr.Log($"Updated {field.Name}: '{originalValue}' -> '{updatedValue}'");
 				}
 }
 		}

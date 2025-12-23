@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using UnityEngine;
 using static RWMM.Dto._Item;
 
 namespace RWMM.Dto
@@ -9,93 +10,103 @@ namespace RWMM.Dto
 	[DataContract]
 	public class _Equipment
 	{
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int id;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string refName;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int expansion;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int minShipClass;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _expansion = "0:None, 1:BaseBuilding";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public Expansion expansion;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _minShipClass = "1:Shuttle, 2:Yacht, 3:Corvette, 4:Frigate, 5:Cruiser, 6:Dreadnought, 7:Kraken";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public ShipClassLevel minShipClass;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool activated;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool enableChangeKey;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float space;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float energyCost;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool energyCostPerShipClass;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float rarityCostMod;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int techLevel;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int sortPower;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float massFlat;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float massChange;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int type;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _type = "0:Generator, 1:Battery, 2:Engine, 3:Booster, 4:Maneuverability, 5:Armor, 6:Shield, 7:Sensor, 8:Computer, 9:Device, 10:Utility";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public EquipmentType type;
 	[DataContract]
 	public class _Effect
 	{
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int type;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string description;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float value;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float mod;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int uniqueLevel;
 	}
 
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public List<_Effect> effects;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool uniqueReplacement;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool permanent;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float rarityMod;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int sellChance;
 	[DataContract]
 	public class _ReputationRequisite
 	{
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int factionIndex;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int repNeeded;
 	}
 
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public _ReputationRequisite repReq;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int dropLevel;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _dropLevel = "0:Normal, 1:Elite, 2:Boss, 3:Legendary, 4:DontDrop";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public DropLevel dropLevel;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int lootChance;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool spawnInArena;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int activeEquipmentIndex;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int defaultKey;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _defaultKey = "0:None, 8:Backspace, 127:Delete, 9:Tab, 12:Clear, 13:Return, 19:Pause, 27:Escape, 32:Space, 256:Keypad0, 257:Keypad1, 258:Keypad2, 259:Keypad3, 260:Keypad4, 261:Keypad5, 262:Keypad6, 263:Keypad7, 264:Keypad8, 265:Keypad9, 266:KeypadPeriod, 267:KeypadDivide, 268:KeypadMultiply, 269:KeypadMinus, 270:KeypadPlus, 271:KeypadEnter, 272:KeypadEquals, 273:UpArrow, 274:DownArrow, 275:RightArrow, 276:LeftArrow, 277:Insert, 278:Home, 279:End, 280:PageUp, 281:PageDown, 282:F1, 283:F2, 284:F3, 285:F4, 286:F5, 287:F6, 288:F7, 289:F8, 290:F9, 291:F10, 292:F11, 293:F12, 294:F13, 295:F14, 296:F15, 48:Alpha0, 49:Alpha1, 50:Alpha2, 51:Alpha3, 52:Alpha4, 53:Alpha5, 54:Alpha6, 55:Alpha7, 56:Alpha8, 57:Alpha9, 33:Exclaim, 34:DoubleQuote, 35:Hash, 36:Dollar, 37:Percent, 38:Ampersand, 39:Quote, 40:LeftParen, 41:RightParen, 42:Asterisk, 43:Plus, 44:Comma, 45:Minus, 46:Period, 47:Slash, 58:Colon, 59:Semicolon, 60:Less, 61:Equals, 62:Greater, 63:Question, 64:At, 91:LeftBracket, 92:Backslash, 93:RightBracket, 94:Caret, 95:Underscore, 96:BackQuote, 97:A, 98:B, 99:C, 100:D, 101:E, 102:F, 103:G, 104:H, 105:I, 106:J, 107:K, 108:L, 109:M, 110:N, 111:O, 112:P, 113:Q, 114:R, 115:S, 116:T, 117:U, 118:V, 119:W, 120:X, 121:Y, 122:Z, 123:LeftCurlyBracket, 124:Pipe, 125:RightCurlyBracket, 126:Tilde, 300:Numlock, 301:CapsLock, 302:ScrollLock, 303:RightShift, 304:LeftShift, 305:RightControl, 306:LeftControl, 307:RightAlt, 308:LeftAlt, 310:LeftCommand, 310:LeftApple, 311:LeftWindows, 309:RightCommand, 309:RightApple, 312:RightWindows, 313:AltGr, 315:Help, 316:Print, 317:SysReq, 318:Break, 319:Menu, 323:Mouse0, 324:Mouse1, 325:Mouse2, 326:Mouse3, 327:Mouse4, 328:Mouse5, 329:Mouse6, 330:JoystickButton0, 331:JoystickButton1, 332:JoystickButton2, 333:JoystickButton3, 334:JoystickButton4, 335:JoystickButton5, 336:JoystickButton6, 337:JoystickButton7, 338:JoystickButton8, 339:JoystickButton9, 340:JoystickButton10, 341:JoystickButton11, 342:JoystickButton12, 343:JoystickButton13, 344:JoystickButton14, 345:JoystickButton15, 346:JoystickButton16, 347:JoystickButton17, 348:JoystickButton18, 349:JoystickButton19, 350:Joystick1Button0, 351:Joystick1Button1, 352:Joystick1Button2, 353:Joystick1Button3, 354:Joystick1Button4, 355:Joystick1Button5, 356:Joystick1Button6, 357:Joystick1Button7, 358:Joystick1Button8, 359:Joystick1Button9, 360:Joystick1Button10, 361:Joystick1Button11, 362:Joystick1Button12, 363:Joystick1Button13, 364:Joystick1Button14, 365:Joystick1Button15, 366:Joystick1Button16, 367:Joystick1Button17, 368:Joystick1Button18, 369:Joystick1Button19, 370:Joystick2Button0, 371:Joystick2Button1, 372:Joystick2Button2, 373:Joystick2Button3, 374:Joystick2Button4, 375:Joystick2Button5, 376:Joystick2Button6, 377:Joystick2Button7, 378:Joystick2Button8, 379:Joystick2Button9, 380:Joystick2Button10, 381:Joystick2Button11, 382:Joystick2Button12, 383:Joystick2Button13, 384:Joystick2Button14, 385:Joystick2Button15, 386:Joystick2Button16, 387:Joystick2Button17, 388:Joystick2Button18, 389:Joystick2Button19, 390:Joystick3Button0, 391:Joystick3Button1, 392:Joystick3Button2, 393:Joystick3Button3, 394:Joystick3Button4, 395:Joystick3Button5, 396:Joystick3Button6, 397:Joystick3Button7, 398:Joystick3Button8, 399:Joystick3Button9, 400:Joystick3Button10, 401:Joystick3Button11, 402:Joystick3Button12, 403:Joystick3Button13, 404:Joystick3Button14, 405:Joystick3Button15, 406:Joystick3Button16, 407:Joystick3Button17, 408:Joystick3Button18, 409:Joystick3Button19, 410:Joystick4Button0, 411:Joystick4Button1, 412:Joystick4Button2, 413:Joystick4Button3, 414:Joystick4Button4, 415:Joystick4Button5, 416:Joystick4Button6, 417:Joystick4Button7, 418:Joystick4Button8, 419:Joystick4Button9, 420:Joystick4Button10, 421:Joystick4Button11, 422:Joystick4Button12, 423:Joystick4Button13, 424:Joystick4Button14, 425:Joystick4Button15, 426:Joystick4Button16, 427:Joystick4Button17, 428:Joystick4Button18, 429:Joystick4Button19, 430:Joystick5Button0, 431:Joystick5Button1, 432:Joystick5Button2, 433:Joystick5Button3, 434:Joystick5Button4, 435:Joystick5Button5, 436:Joystick5Button6, 437:Joystick5Button7, 438:Joystick5Button8, 439:Joystick5Button9, 440:Joystick5Button10, 441:Joystick5Button11, 442:Joystick5Button12, 443:Joystick5Button13, 444:Joystick5Button14, 445:Joystick5Button15, 446:Joystick5Button16, 447:Joystick5Button17, 448:Joystick5Button18, 449:Joystick5Button19, 450:Joystick6Button0, 451:Joystick6Button1, 452:Joystick6Button2, 453:Joystick6Button3, 454:Joystick6Button4, 455:Joystick6Button5, 456:Joystick6Button6, 457:Joystick6Button7, 458:Joystick6Button8, 459:Joystick6Button9, 460:Joystick6Button10, 461:Joystick6Button11, 462:Joystick6Button12, 463:Joystick6Button13, 464:Joystick6Button14, 465:Joystick6Button15, 466:Joystick6Button16, 467:Joystick6Button17, 468:Joystick6Button18, 469:Joystick6Button19, 470:Joystick7Button0, 471:Joystick7Button1, 472:Joystick7Button2, 473:Joystick7Button3, 474:Joystick7Button4, 475:Joystick7Button5, 476:Joystick7Button6, 477:Joystick7Button7, 478:Joystick7Button8, 479:Joystick7Button9, 480:Joystick7Button10, 481:Joystick7Button11, 482:Joystick7Button12, 483:Joystick7Button13, 484:Joystick7Button14, 485:Joystick7Button15, 486:Joystick7Button16, 487:Joystick7Button17, 488:Joystick7Button18, 489:Joystick7Button19, 490:Joystick8Button0, 491:Joystick8Button1, 492:Joystick8Button2, 493:Joystick8Button3, 494:Joystick8Button4, 495:Joystick8Button5, 496:Joystick8Button6, 497:Joystick8Button7, 498:Joystick8Button8, 499:Joystick8Button9, 500:Joystick8Button10, 501:Joystick8Button11, 502:Joystick8Button12, 503:Joystick8Button13, 504:Joystick8Button14, 505:Joystick8Button15, 506:Joystick8Button16, 507:Joystick8Button17, 508:Joystick8Button18, 509:Joystick8Button19";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public KeyCode defaultKey;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int requiredItemID;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int requiredQnt;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float addCargoSpaceForReqItem;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string equipName;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string description;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public List<_CraftMaterial> craftingMaterials;
 	}
 

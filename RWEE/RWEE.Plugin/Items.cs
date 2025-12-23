@@ -697,7 +697,6 @@ namespace RWEE
 			if (itemsNeeded > 0)
 			{
 				__result = Regex.Replace(__result, @"^\(\d+\)\s*", "");
-				String color;
 				if (__instance.qnt >= itemsNeeded)
 					__result = $"({__instance.qnt}/{itemsNeeded})" + __result;
 

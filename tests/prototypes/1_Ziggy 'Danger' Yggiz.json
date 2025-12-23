@@ -1,0 +1,9 @@
+{
+	"_comment": "Top level 'refName' uses and overwrites 'obj.refName'.",
+	"type": "CrewMember",
+	"refName": "Ziggy 'Danger' Yggiz",
+	"cloneFrom": null,
+	"obj": {
+		"id": 1500
+	}
+}

@@ -8,138 +8,152 @@ namespace RWMM.Dto
 	[DataContract]
 	public class _Quest
 	{
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int id;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int status;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int refCode;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int type;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int kind;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int faction;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _type = "0:StoryQuest, 1:LocalQuest, 2:SpecialQuest";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public QuestType type;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _kind = "0:General, 1:Combat, 2:Freighter, 3:Taxi, 4:Exploration, 5:Mining, 6:Signal, 7:Crafting, 8:Construction";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public QuestKind kind;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _faction = "-1:Any, 0:Independent, 1:Miners, 2:Traders, 3:Pirates, 4:Venghi, 5:Rebels, 6:Tecnomancers";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public TFaction faction;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string nameRef;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool showAcceptLog;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool closeOnAccept;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int level;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool autoAccept;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool autoComplete;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool loudCompletion;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool blockKeyboard;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int startNPC;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string spriteOverride1;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int finishNPC;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string spriteOverride2;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int rank;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int par1;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int textIndex;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int fontIndex;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string textPar1;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string textPar2;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string textPar3;
 	[DataContract]
 	public class _QuestObjective
 	{
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int type;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _type = "-1:Generate, 0:GoToCoordenates, 1:GoToSector, 2:GoToStation, 3:ObtainItem, 4:ReachLevel, 5:Clear_Eliminate, 6:ReachReputation, 7:ScrapItemToImproveTechLevel, 8:NoObjective, 9:PilotSpaceship, 10:VisitSectors, 11:DefeatNPC, 12:LevelXTimes, 13:TextOnly, 14:LoadPackage, 15:ScavengeDebrisField, 16:CraftAnItem, 17:UpgradeAnItem, 18:EquipAnItem, 19:Special, 20:ReachKnowledge, 21:ObtainCredits, 22:BuildStation, 23:BuildStationModule, 24:MineResourceFromStation, 25:RefineOreFromStation, 26:DefeatAssaultFleet, 27:FabricateItem, 28:ComingSoon, 29:BoostStationModule, 30:AssignTraitToStationModule, 31:CaptureStation";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public QuestObjectiveType type;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int par1;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int par2;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int par3;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int par4;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool condition;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool completed;
 	}
 
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public _QuestObjective[] objectives;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float deliveryTime;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float deadline;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int timeoutAction;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float xpRewardMod;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float creditsRewardMod;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float repRewardMod;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool reflectReputationChange;
 	[DataContract]
 	public class _QuestReward
 	{
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int type;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _type = "0:Credits, 1:Weapon, 2:Equipment, 3:Item, 4:Spaceship, 5:Generate, 6:Knowledge, 7:Perk";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public QuestRewardType type;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int par1;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int par2;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int par3;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int par4;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int followUpQuestRefCode;
 	}
 
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public _QuestReward[] rewards;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int[] nextQuests;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int[] chainQuests;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int questOnDecline;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int[] deleteQuests;
 	[DataContract]
 	public class _GameEvent
 	{
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int type;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _type = "0:SpawnAlly, 1:SpawnEnemy, 2:StartSpecialQuest, 3:Other, 4:UnlockSpecialCrewman, 5:CompleteSpecialQuest, 6:SpawnEnemyGroup, 7:StartQuestDelayed, 8:LoadCutscene, 9:SpawnAssaultFleet";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public GameEventType type;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int par1;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int par2;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int triggerMode;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _triggerMode = "0:OnComplete, 1:OnDecline, 2:OnAbandon";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public GameEventTriggerMode triggerMode;
 	}
 
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public _GameEvent[] generateEvents;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int acceptedTutorial;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int completedTutorial;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int acquirePerkID;
 	}
 

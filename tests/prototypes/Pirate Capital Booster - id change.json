@@ -1,0 +1,9 @@
+{
+	"_comment": "",
+	"type": "Equipment",
+	"refName": "Pirate Capital Booster",
+	"cloneFrom": "Pirate Heavy Booster",
+	"obj": {
+		"id":1500
+	}
+}

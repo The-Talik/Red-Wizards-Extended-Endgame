@@ -8,77 +8,83 @@ namespace RWMM.Dto
 	[DataContract]
 	public class _Item
 	{
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int id;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int expansion;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _expansion = "0:None, 1:BaseBuilding";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public Expansion expansion;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string refName;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int rarity;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int levelPlus;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float weight;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float basePrice;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float priceVariation;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int[] tradeChance;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int tradeQuantity;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int type;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _type = "0:Data, 1:Crystal, 2:Metal, 3:Food, 4:Electronic, 5:Ammunition, 6:Chemical, 7:Utility, 8:Other, 9:Package, 10:Container, 11:Organic, 12:Component, 13:CraftingComponent";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public ItemType type;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool askedInQuests;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool canBeStashed;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool canBeTraded;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool randomDrop;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string itemName;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string description;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int canUpgradeToTier;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _canUpgradeToTier = "0:Poor_0, 1:Common_1, 2:Uncommon_2, 3:Rare_3, 4:Epic_4, 5:Legendary_5";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public ItemRarity canUpgradeToTier;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int geologyRequired;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool craftable;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool craftingLevelAffectsYield;
 	[DataContract]
 	public class _CraftMaterial
 	{
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int itemID;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int quantity;
 	}
 
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public List<_CraftMaterial> craftingMaterials;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int craftingYield;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int defaultFabricatorID;
 	[DataContract]
 	public class _ItemResource
 	{
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int itemID;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int quantity;
 	}
 
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public List<_ItemResource> productionMaterials;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int productionYield;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int[] teachItemBlueprints;
 	}
 

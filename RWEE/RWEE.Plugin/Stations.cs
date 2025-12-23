@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
-using System; 
+using RW;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using static RWEE.Logging;
+using static System.Collections.Specialized.BitVector32;
 namespace RWEE
 {
 	internal class Stations
@@ -17,11 +19,18 @@ namespace RWEE
 		[HarmonyPatch(typeof(QuestControl), "CompleteQuest")]
 		static class QuestControl_CompleteQuest
 		{
+			static void Postfix(int rewardChosen, ref Quest ___quest, ref Inventory ___inventory, ref PlayerControl ___pc)
+			{
+				if (QuestDB.IsQuestCompleted(___quest, ___pc.transform))
+				{
+					logr.Log($"Quest Complete postfix {___quest.refCode} {ObjUtils.GetRef(GameData.data.spaceShipData.ShipModel)}");
+				}
+			}
 			static void Prefix(int rewardChosen, ref Quest ___quest, ref Inventory ___inventory, ref PlayerControl ___pc)
 			{
 				if (QuestDB.IsQuestCompleted(___quest, ___pc.transform))
 				{
-					logr.Log("Quest Complete");
+					//logr.Log($"Quest Complete prefix {___quest.refCode} {ObjUtils.GetRef(GameData.data.spaceShipData.ShipModel)}");
 					if (PChar.Char.resetSkillsPoints == 0)
 						PChar.Char.resetSkillsPoints++;
 					//int currStationID = -1;
@@ -30,8 +39,8 @@ namespace RWEE
 						AttemptToLevelStation(___inventory.currStation);
 
 						int hostileFaction = FactionDB.GetHostileFactionForQuest(___inventory.currStation.factionIndex);
-						Station hostileStation = GameData.GetRandomStation(hostileFaction, ___inventory.currStation.level, 0, 10, 0 , ___inventory.currStation.Sector, false, 1, false);
-						AttemptToLevelStation(hostileStation,true);
+						Station hostileStation = GameData.GetRandomStation(hostileFaction, ___inventory.currStation.level, 0, 10, 0, ___inventory.currStation.Sector, false, 1, false);
+						AttemptToLevelStation(hostileStation, true);
 					}
 					else
 					{
@@ -46,7 +55,7 @@ namespace RWEE
 			}
 			static void AttemptToLevelStation(Station station, bool hostile = false)
 			{
-				if(hostile)
+				if (hostile)
 					logr.Log($"also considering leveling up a random hostile station {station.stationName(true)} and sector {station.Sector.level}. Shhh...  Nothing to see here.");
 				else
 					logr.Log($"considering leveling up station {station.stationName(true)} and sector {station.Sector.level}.");
@@ -67,23 +76,20 @@ namespace RWEE
 
 				if (station.level > station.Sector.level)
 				{
-					float amtOverSector = station.level - station.Sector.level;
-					if (amtOverSector < 1)
-						amtOverSector = 1;
-					if (UnityEngine.Random.Range(0, 20) < amtOverSector || (Main.DEBUG && 20 < amtOverSector))
+					if (station.Sector.level < UnityEngine.Random.Range(station.level - 10, station.level) || (Main.DEBUG && station.Sector.level < station.level - 10))
 					{
 						int origLevel = station.Sector.level;
 						station.Sector.level++;
 						logr.Warn($"Leveling up sector. {origLevel}->{station.Sector.level}");
-						Sectors.AdjustNeighboringSectors(station.Sector);
+						//Sectors.AdjustNeighboringSectors(station.Sector);
 						station.Sector.UpdateSectorLevels(false);
 					}
 				}
-				
+
 				//logr.Log($"New>Char Level: {PChar.Char.level} Station Level:{station.level} Sector Level: {station.Sector.level}");
 			}
 		}
-		
+
 		/**
 		* Stations above L50 have more gold star quests
 		*/

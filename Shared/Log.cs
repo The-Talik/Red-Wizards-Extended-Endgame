@@ -38,7 +38,7 @@ namespace RW.Logging
 			if (verbosity >= level)
 				log?.LogInfo(msg);
 		}
-		public void LogObj(object obj, int level = 1)
+		public void Log(object obj, int level = 1)
 		{
 			Log(JsonUtils.ToPrettyJson(obj), level);
 		}
@@ -51,7 +51,13 @@ namespace RW.Logging
 		}
 		public void LogLineObj(object obj, int level = 1)
 		{
-			Log($"{obj.GetType()} {ObjUtils.GetField<int>(obj, "id", true)} {ObjUtils.GetRef(obj)}", level);
+			Log($"{obj.GetType()} {ObjUtils.GetId(obj,true)} {ObjUtils.GetRef(obj)}", level);
+		}
+		public void LogTruncate(string msg, int maxLength = 128, int level = 1)
+		{
+			if (msg.Length > maxLength)
+				msg = msg.Substring(0, maxLength) + "...(truncated)";
+			Log(msg, level);
 		}
 		public void Warn(string msg, int level = 0)
 		{
@@ -97,7 +103,6 @@ namespace RW.Logging
 		}
 		public void Open(string text = "")
 		{
-			
 			Log(text);
 			Log("{");
 			indent++;

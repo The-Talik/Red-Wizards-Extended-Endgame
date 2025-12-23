@@ -1,16 +1,17 @@
-﻿using System;
+﻿using RW;
+using RW.Logging;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
-using RW;
-using static RWMM.Logging;
-namespace RWMM
+using static RW.Core.Logging;
+namespace RW
 {
 
 	public static class ObjectApply
 	{
-		public static void Apply<TData, TObject>(TData data, TObject obj) // from, to
+		public static void Apply<TData, TObject>(TData data, TObject obj, string field = null) // from, to
 		{
 			logr.Log($"[ObjectApply.Apply] Applying object of type {data.GetType()} to {obj.GetType()}", 2);
 			if (data == null || obj == null)
@@ -19,11 +20,11 @@ namespace RWMM
 				return;
 			}
 
-			ApplyInternal((object)data, (object)obj);
+			ApplyInternal((object)data, (object)obj, field);
 			logr.Log($"[ObjectApply.Apply] Done", 2);
 		}
 
-		private static void ApplyInternal(object data, object obj)
+		private static void ApplyInternal(object data, object obj, string field = null)
 		{
 			if (data == null || obj == null)
 				return;
@@ -46,29 +47,69 @@ namespace RWMM
 			// set target fields
 			foreach (var tf in obj_type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
 			{
-				if (tf.IsInitOnly) continue;
-
-				if (!source.TryGetValue(tf.Name, out var get_value))
+				if(field != null && tf.Name != field)
 					continue;
+				if (tf.IsInitOnly) continue;
+				if (tf.Name == "replacePerksRef")
+				{
+					//logr.Log("replacePerksRef");
+					if (!source.TryGetValue("replacePerks", out var get_value))
+						continue;
+					var value = get_value();
+					if (value is IEnumerable<Perk> perks)
+					{
+						var stringValues = ListUtils.ToStrings(perks); // infers <Perk>
+						ApplyToField(obj, tf, stringValues);
+					}
+					continue;
+				}
+				if (tf.Name == "replacePerks")
+				{
+					logr.Log("replacePerks");
+					if (!source.TryGetValue("replacePerksRef", out var get_value))
+						continue;
+					var value = get_value();
+					if (value is IEnumerable<String> strings)
+					{
+						List<Perk> perks = new List<Perk>();
+						foreach (var s in strings)
+						{
+							logr.Log($"Perk ref: {s}");
+							var all_perk = PerkDB.GetAllPerks();
+							Perk perk = ListUtils.GetByRef<Perk>(all_perk, s);
+							if (perk != null)
+							{
+								perks.Add(perk);
+							}
+						}
+						ApplyToField(obj, tf, perks);
+					}
+				}
+				else
+				{
+					if (!source.TryGetValue(tf.Name, out var get_value))
+						continue;
 
-				var value = get_value();
-				ApplyToField(obj, tf, value);
+
+					var value = get_value();
+					ApplyToField(obj, tf, value);
+				}
 			}
 
 			// Properties on the target are currently unused, but keeping this for symmetry if we ever turn it back on.
-			/*
-			foreach (var tp in obj_type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-			{
-				if (!tp.CanWrite) continue;
-				if (tp.GetIndexParameters().Length != 0) continue;
+				/*
+				foreach (var tp in obj_type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+				{
+					if (!tp.CanWrite) continue;
+					if (tp.GetIndexParameters().Length != 0) continue;
 
-				if (!source.TryGetValue(tp.Name, out var get_value))
-					continue;
+					if (!source.TryGetValue(tp.Name, out var get_value))
+						continue;
 
-				var value = get_value();
-				ApplyToProperty(obj, tp, value);
-			}
-			*/
+					var value = get_value();
+					ApplyToProperty(obj, tp, value);
+				}
+				*/
 		}
 
 		private static void ApplyToField(object target, FieldInfo tf, object value)
@@ -110,13 +151,47 @@ namespace RWMM
 
 				if (current == null)
 				{
+					// first: let TryConvert handle direct-assignable cases (DTO -> DTO, etc.)
 					if (TryConvert(value, target_type, out var converted))
 					{
 						tf.SetValue(target, converted);
 					}
+					else if (value != null)
+					{
+						// otherwise, create a new instance and Apply into it
+						object instance;
+						if (target_type.IsValueType)
+						{
+							instance = Activator.CreateInstance(target_type);
+						}
+						else
+						{
+							var ctor = target_type.GetConstructor(Type.EmptyTypes);
+							if (ctor != null)
+							{
+								instance = ctor.Invoke(null);
+							}
+							else
+							{
+								try
+								{
+									instance = FormatterServices.GetUninitializedObject(target_type);
+								}
+								catch (Exception ex)
+								{
+									logr.Error($"ObjectApply: cannot create instance of {target_type.Name} for field {tf.Name}: {ex.Message}");
+									return;
+								}
+							}
+						}
+
+						ApplyNestedInternal(value, instance, target_type);
+						tf.SetValue(target, instance);
+					}
 				}
 				else
 				{
+					// mutate existing instance
 					ApplyNestedInternal(value, current, target_type);
 
 					// structs need to be written back after modification

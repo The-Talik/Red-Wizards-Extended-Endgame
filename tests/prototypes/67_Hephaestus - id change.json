@@ -1,0 +1,9 @@
+{
+	"_comment": "",
+	"type": "ShipModelData",
+	"refName": "Hephaestus",
+	"cloneFrom": null,
+	"obj": {
+		"id": 1500
+	}
+}

@@ -38,8 +38,9 @@
     <Reference Include="BepInEx">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Star Valor\BepInEx\core\BepInEx.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\libs\Newtonsoft.Json130r4\Bin\netstandard2.0\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\libs\export\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -75,10 +76,10 @@
     <Compile Include="DirUtils.cs" />
     <Compile Include="IconUtils.cs" />
     <Compile Include="JsonUtils.cs" />
-    <Compile Include="JsonUtils_prototypes.cs" />
     <Compile Include="ListUtils.cs" />
+    <Compile Include="ObjectApply.cs" />
     <Compile Include="ObjUtils.cs" />
-    <Compile Include="Settings.cs" />
+    <Compile Include="SettingsUtils.cs" />
     <Compile Include="SimplePopup.cs" />
     <Compile Include="_Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,8 +1,9 @@
 ﻿using Mono.Cecil;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace RWMM.DTOGen
 {
@@ -51,15 +52,30 @@ namespace RWMM.DTOGen
 			sb.AppendLine("\t{");
 
 			var used_names = new HashSet<string>(StringComparer.Ordinal);
-
-			// Only public instance fields – properties are ignored on purpose
-			foreach (var f in type.Fields)
+			switch(type.Name)
 			{
-				if (!f.IsPublic || f.IsStatic)
+				case "TWeapon":
+				case "ShipModelData":
+				case "CrewMember":
+					sb.AppendLine("\t\t[DataMember(IsRequired = false, EmitDefaultValue = true)]");
+					sb.AppendLine("\t\tpublic string refName;");
+					break;
+			}
+			// Only public instance fields – properties are ignored on purpose
+			foreach (var f in GetAllFields(type))
+			{
+				if (f.IsStatic)
 					continue;
 
 				if (f.IsInitOnly)
 					continue;
+
+				if (f.IsNotSerialized)
+					continue;
+
+				if (!IsSerializableField(f))
+					continue;
+
 
 				if (f.IsNotSerialized)
 					continue;
@@ -74,9 +90,20 @@ namespace RWMM.DTOGen
 
 				used_names.Add(member_name);
 				var safe_name = ToSafeName(member_name);
-
-				// All fields optional for JSON: IsRequired = false, EmitDefaultValue = false
-				sb.AppendLine("\t\t[DataMember(IsRequired = false, EmitDefaultValue = false)]");
+				if (cs_type == dto_name+"[]")
+				{//self referencing loops
+					sb.AppendLine("\t\t[DataMember(IsRequired = false, EmitDefaultValue = true)]");
+					sb.AppendLine("\t\tpublic string[] " + safe_name + "Ref;");
+					continue;
+				}
+				var def = f.FieldType.Resolve();
+				if (def.IsEnum)
+				{
+					sb.AppendLine("\t\t[DataMember(IsRequired = false, EmitDefaultValue = true)]");
+					sb.AppendLine("\t\tpublic string _" + safe_name + " = \"" + GetEnumMapString(f.FieldType) + "\";");
+				}
+					// All fields optional for JSON: IsRequired = false, EmitDefaultValue = true
+					sb.AppendLine("\t\t[DataMember(IsRequired = false, EmitDefaultValue = true)]");
 				sb.AppendLine("\t\tpublic " + cs_type + " " + safe_name + ";");
 			}
 
@@ -149,7 +176,8 @@ namespace RWMM.DTOGen
 			// Enums → int to keep DTOs independent of game enums
 			if (def != null && def.IsEnum)
 			{
-				cs_type = "int";
+				
+				cs_type = def.Name;
 				return true;
 			}
 
@@ -323,5 +351,79 @@ namespace RWMM.DTOGen
 
 			return name;
 		}
+		private static string GetEnumMapString(TypeReference enum_type_ref)
+		{
+			if (enum_type_ref == null)
+				return string.Empty;
+
+			var def = enum_type_ref.Resolve();
+			if (def == null || !def.IsEnum)
+				return string.Empty;
+
+			var sb = new StringBuilder();
+			bool first = true;
+
+			foreach (var field in def.Fields)
+			{
+				// In Cecil enums, static fields are the named values
+				// and the non-static 'value__' is the underlying storage.
+				if (!field.IsStatic)
+					continue;
+
+				var constant = field.Constant;
+				if (constant == null)
+					continue;
+
+				if (!first)
+					sb.Append(", ");
+				first = false;
+
+				sb.Append(constant);      // numeric value
+				sb.Append(":");
+				sb.Append(field.Name);    // enum name
+			}
+
+			return sb.ToString();
+		}
+		private static IEnumerable<FieldDefinition> GetAllFields(TypeDefinition type)
+		{
+			// derived-first so derived members “win” if there’s a name collision
+			var current_type = type;
+
+			while (current_type != null)
+			{
+				foreach (var f in current_type.Fields)
+					yield return f;
+
+				var base_ref = current_type.BaseType;
+				if (base_ref == null)
+					yield break;
+
+				var base_def = base_ref.Resolve();
+				if (base_def == null)
+					yield break;
+
+				if (base_def.FullName == "System.Object")
+					yield break;
+
+				current_type = base_def;
+			}
+		}
+
+		private static bool IsSerializableField(FieldDefinition f)
+		{
+			// Unity serializes public fields OR non-public fields with [SerializeField]
+			if (f.IsPublic)
+				return true;
+
+			foreach (var a in f.CustomAttributes)
+			{
+				if (a.AttributeType != null && a.AttributeType.FullName == "UnityEngine.SerializeField")
+					return true;
+			}
+
+			return false;
+		}
+
 	}
 }

@@ -9,66 +9,72 @@ namespace RWMM.Dto
 	[DataContract]
 	public class _Perk
 	{
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int id;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string refName;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int textIndex;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int type;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int expansion;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _type = "0:Background, 1:Experience, 2:Feat, 3:Karma, 4:Volatile";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public PerkType type;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _expansion = "0:None, 1:BaseBuilding";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public Expansion expansion;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float duration;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public _ShipBonus[] shipBonus;
 	[DataContract]
 	public class _ReputationChange
 	{
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public int faction;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string _faction = "-1:Any, 0:Independent, 1:Miners, 2:Traders, 3:Pirates, 4:Venghi, 5:Rebels, 6:Tecnomancers";
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public TFaction faction;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool setToRank;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int setRankValue;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int modifier;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool setMaxRank;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int maxRankValue;
 	}
 
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public _ReputationChange[] repChanges;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool startOnly;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int startingPoints;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float startingCredits;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public _Equipment[] startingEquipment;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool locked;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool unlockOnRelaxedMode;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int statMode;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool showLockState;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string unlockTextRef;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool isAchievement;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int showLevel;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string text;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
-		public _Perk[] replacePerks;
-		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public string[] replacePerksRef;
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int[] removeQuests;
 	}
 

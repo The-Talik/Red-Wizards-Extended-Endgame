@@ -15,6 +15,7 @@ namespace RW.Core
 {
 	public static class Main
 	{
+
 	}
 	public class Logging : BaseUnityPlugin
 	{
@@ -24,6 +25,7 @@ namespace RW.Core
 		{
 			logr = _logr;
 			logr.Log("RW.Core Loaded");
+			//SettingsUtils.Init(Settings.Type,"RWMM_Settings.cfg");
 		}
 		public static void Init(ManualLogSource log, int verbosity)
 		{

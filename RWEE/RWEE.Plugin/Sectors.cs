@@ -90,48 +90,30 @@ namespace RWEE
 				AdjustNeighboringSectors(__instance);  //This seems to get caught in a loop.  Might be ok, though.
 			}
 		}*/
-		/*[HarmonyPatch(typeof(TSector), "UpdateSectorLevels")]
+		[HarmonyPatch(typeof(TSector), "UpdateSectorLevels")]
 		static class TSector_UpdateSectorLevels
 		{
-			static void Postfix(List<Station> ___smallBases, int ___level, int ___x, int ___y, ref List<Hideout> ___hideouts)
+			static void Postfix(TSector __instance, int ___level)
 			{
 				logr.Log($"UpdateSectorLevels Postfix New Level: {___level}");
-				for (int i = 0; i < GameData.data.sectors.Count; i++)
-				{
-					int cX = GameData.data.sectors[i].x;
-					int cY = GameData.data.sectors[i].y;
-					int staticLevel = (int)Vector2.Distance(new Vector2((float)___x, (float)___y), new Vector2((float)cX, (float)cY));
-					if (___level - staticLevel > GameData.data.sectors[i].level)
-						logr.Log($"Comparing to Sector Level: i:{i} curr: {___level} remote:{GameData.data.sectors[i].level} Distance: {staticLevel} Want: {___level - staticLevel}");
+				AdjustDebrisFields(__instance);
+				AdjustNeighboringSectors(__instance);
+				RespawnMarauders(__instance);
+			}
+		}
+		public static void AdjustDebrisFields(TSector sector)
+		{
+			logr.Log($"AdjustDebrisFields Comparing to: {sector.level}");
+			for (int i=0; i < sector.debrisFields.Count; i++)
+			{
 
-					if (___level - staticLevel*4 > GameData.data.sectors[i].level + UnityEngine.Random.Range(1,10))
-					{
-						logr.Warn("Leveling up sector");
-						GameData.data.sectors[i].level++;
-//						GameData.data.sectors[i].AdjustLevel(GameData.data.sectors[i].level+1, false, false, false);
-					}
-				}
-//				List<Station> hideouts = __instance.GetHideouts(HideoutType.Marauder, false);
-				for (int i = 0; i < ___smallBases.Count; i++)
+				while(sector.debrisFields[i].level < UnityEngine.Random.Range(sector.level-4, sector.level+4))
 				{
-					HideoutStation hideoutStation;
-					if ((hideoutStation = (___smallBases[i] as HideoutStation)) != null && hideoutStation.type== HideoutType.Marauder)
-					{
-						//logr.Log($"Hideout Station chars: {hideoutStation.aiChars} {hideoutStation.aiChars.Count}");
-						for(int j=0;j< hideoutStation.aiChars.Count;j++)
-						{
-							//logr.Log($"char: {hideoutStation.aiChars[j]} {hideoutStation.aiChars[j].level}");
-						}
-						if (hideoutStation.aiChars.Count < 2 && UnityEngine.Random.Range(0, 100) < 10)
-						{
-
-							logr.Log("regenerating Mauraders");
-							hideoutStation.GenerateShips();
-						}
-					}
+					logr.Log($"Leveling up debris field {sector.debrisFields[i].level}->{sector.debrisFields[i].level+1}");
+					sector.debrisFields[i].level++;
 				}
 			}
-		}*/
+		}
 		public static void AdjustNeighboringSectors(TSector sector)
 		{
 			logr.Log($"AdjustNeighboringSectors Comparing to: {sector.level}");
@@ -150,7 +132,11 @@ namespace RWEE
 					//						GameData.data.sectors[i].AdjustLevel(GameData.data.sectors[i].level+1, false, false, false);
 				}
 			}
-			//				List<Station> hideouts = __instance.GetHideouts(HideoutType.Marauder, false);
+
+		}
+		public static void RespawnMarauders(TSector sector)
+		{
+			logr.Log("Checking Marauder Respawn");
 			for (int i = 0; i < sector.smallBases.Count; i++)
 			{
 				HideoutStation hideoutStation;
@@ -163,7 +149,6 @@ namespace RWEE
 					}
 					if (hideoutStation.aiChars.Count < 2 && UnityEngine.Random.Range(0, 100) < 10)
 					{
-
 						logr.Log("regenerating Mauraders");
 						hideoutStation.GenerateShips();
 					}

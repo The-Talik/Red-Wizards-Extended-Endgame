@@ -6,7 +6,7 @@ Right now RWMM’s scope is intentionally narrow:
 - Dump the game’s “base” definitions to JSON (`base_prototypes/`) so you can use them as templates.
 - Load JSON prototypes from mods and apply them to in-game databases at startup.
 - Support **patching existing objects** (by `refName`) and **creating new objects by cloning** (via `cloneFrom`).
-- Supports object types: `Item`, `Equipment`, `Quest`, `TWeapon`, `CrewMember`, `ShipModelData`.
+- Supports object types: `Item`, `Equipment`, `Quest`, `TWeapon`, `CrewMember`, `ShipModelData`, `Perk`.
 - Allows importing PNG icons for items/equipment.
 - Auto-manage numeric IDs behind the scenes (so mods should not fight over IDs).
 
@@ -85,7 +85,7 @@ Every prototype file is a wrapper object:
 ```
 
 ### Required fields
-- **`type`** (string): the object type being targeted. Must match what RWMM expects, e.g. `Item`, `Equipment`, `Quest`, `Perk`, `TWeapon`, `CrewMember`, `ShipModelData`.
+- **`type`** (string): the object type being targeted. Must match what RWMM expects, e.g. `Item`, `Equipment`, `Quest`, `Perk`, `TWeapon`, `CrewMember`, `ShipModelData`, `Perk`.
 - **`refName`** (string): your *universal key* for the object. RWMM uses this to find an existing object to update, or to assign identity to a cloned object.
 - **`obj`** (object): the fields you want to set/change.
 
@@ -167,10 +167,11 @@ So:
 RWMM currently dumps/imports prototypes for:
 - `Item`
 - `Equipment`
-- `ShipModelData`
-- `Quest` (Untested, but should be ok)
-- `TWeapon` (Untested, but should be ok)
-- `CrewMember` (Untested, but should be ok)
+- `CrewMember`
+- `ShipModelData` (ID management not yet fully supported)
+- `Quest` (ID management not yet fully supported)
+- `TWeapon` (ID management not yet fully supported)
+- `Perk` (ID management not yet fully supported)
 
 
 ---
@@ -274,13 +275,34 @@ RWMM includes a small utility library you can reference from your own BepInEx pl
 
 ---
 
+## Changelog
+
+### 0.0.2
+- Prototype injection set to run last, after other mods.
+- Added Perks to supported dump/import types.
+- Enum fields are exported as strings.
+- Enum fields can import as strings or integers.
+- Added _fields to base_prototypes giving the list of enum values.
+- IDRefMap support for all types (many untested, though).
+
+### 0.0.1
+- Initial release.
+
+## Roadmap (next up)
+- create copy of save file.
+
 ## Roadmap (high-level)
 - Support creating brand-new objects without cloning. (maybe)
-- Deterministic load order + dependencies (Factorio-style manifest, `package.json`).
+- Full support for ship models
+  - 3d models
+  - turret locations.
+- `package.json` manifest support.
+  - Deterministic load order + dependencies.
 - Actual "mod-manger" features
   - Eenabling/disabling mods
   - Auto-version check from Github repo
   - Storing which mods were used in a save
-- Support for settings.json file.
-- Ingame UI for settings.
+- Settings
 - Support more object types (I'll add more object types as I need them for my own mod, or as requested).
+- Version mismatch error between patcher and plugin.
+- A clean way of changing prototype refNames.

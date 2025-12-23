@@ -48,7 +48,7 @@ namespace RW
 		public static Sprite MakeSprite(string png)
 		{
 			float ppu = 100f;
-			logr.Log($"[Icons] Generating sprite from {png}");
+//			logr.Log($"[Icons] Generating sprite from {png}");
 			var spr = IconUtils.LoadSpriteFromPng(png, ppu);
 			if (spr == null)
 			{

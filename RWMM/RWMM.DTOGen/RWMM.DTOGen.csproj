@@ -55,9 +55,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"$(SolutionDir)RWMM.DTOGen\bin\Debug\RWMM.DTOGen.exe" ^
+    <PostBuildEvent>"$(SolutionDir)RWMM\RWMM.DTOGen\bin\Debug\RWMM.DTOGen.exe" ^
   --assembly "$(GamePath)\Star Valor_Data\Managed\Assembly-CSharp.dll" ^
-  --output   "$(SolutionDir)RWMM.Plugin\Generated\Dto" ^
+  --output   "$(SolutionDir)RWMM\RWMM.Plugin\Generated\Dto" ^
   --types    "Item,Equipment,ShipModelData,Quest,TWeapon,CrewMember,Perk" ^
   --namespace "RWMM.Dto"</PostBuildEvent>
   </PropertyGroup>

@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
+using RW.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,33 +15,8 @@ namespace RW
 {
 	public static partial class JsonUtils
 	{
-		/*		public static string ToJson<T>(T obj) => ToJson((object)obj, typeof(T));
 
-				public static T FromJson<T>(string json)
-				{
-					var obj = FromJson(json, typeof(T));
-					return obj == null ? default : (T)obj;
-				}
-
-				public static string ToJson(object obj, Type type)
-				{
-					if (obj == null || type == null)
-						return string.Empty;
-
-					var serializer = new DataContractJsonSerializer(type,
-						new DataContractJsonSerializerSettings
-						{
-							UseSimpleDictionaryFormat = true
-						});
-
-					using (var ms = new MemoryStream())
-					{
-						serializer.WriteObject(ms, obj);
-						return Encoding.UTF8.GetString(ms.ToArray());
-					}
-				}
-		*/
-		public static object AlternativeFromJson<T>(string json)
+/*		public static object AlternativeFromJson<T>(string json)
 		{
 			if (string.IsNullOrEmpty(json) || typeof(T) == null)
 				return null;
@@ -54,20 +31,52 @@ namespace RW
 			{
 				return serializer.ReadObject(ms);
 			}
-		}
-		public static void Populate(object obj, string json)
+		}*/
+/*		public static void Populate(object obj, string json)
 		{
 			JsonConvert.PopulateObject(json, obj);
-		}
-		public static T PopulateClone<T>(T obj, string json)
+		}*/
+/*		public static T PopulateClone<T>(T obj, string json)
 		{
 			var clone = ObjUtils.Clone(obj);
 			JsonConvert.PopulateObject(json, clone);
 			return clone;
-		}
+		}*/
 
+		static readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings
+		{
+			Formatting = Newtonsoft.Json.Formatting.Indented,
+			TypeNameHandling = TypeNameHandling.None,
+			MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+			ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+			NullValueHandling = NullValueHandling.Include,
+			// Enums as strings, but still allow numeric values on read
+			Converters =
+			{
+				new StringEnumConverter
+				{
+					AllowIntegerValues = true
+				}
+			}
+		};
 
 		public static string ToJson<T>(T obj)
+		{
+			if (obj == null)
+				return string.Empty;
+
+			try
+			{
+				return JsonConvert.SerializeObject(obj, JsonSettings);
+			}
+			catch (System.Exception ex)
+			{
+				logr.Warn($"JsonUtils.ToJson<{typeof(T).Name}> failed: {ex.Message}");
+				throw;
+			}
+		}
+
+/*		public static string ToJsonOld<T>(T obj)
 		{
 			if (obj == null)
 				return string.Empty;
@@ -99,7 +108,7 @@ namespace RW
 			{
 				KnownTypes = known_types,
 				EmitTypeInformation = EmitTypeInformation.Never
-				// UseSimpleDictionaryFormat = true,  // if you were using this before
+				// UseSimpleDictionaryFormat = true,
 			};
 			var serializer = new DataContractJsonSerializer(typeof(List<T>), settings);
 			using (var ms = new MemoryStream())
@@ -107,15 +116,9 @@ namespace RW
 				serializer.WriteObject(ms, obj);
 				return Encoding.UTF8.GetString(ms.ToArray());
 			}
-		}
+		}*/
 
 
-		static readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings
-		{
-			TypeNameHandling = TypeNameHandling.None,
-			MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-			NullValueHandling = NullValueHandling.Include
-		};
 
 		public static T FromJson<T>(string json)
 		{
