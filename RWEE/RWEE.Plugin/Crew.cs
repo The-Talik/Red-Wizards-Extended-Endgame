@@ -127,70 +127,34 @@ namespace RWEE
 				//for (int i = 0; i < 
 				//}
 			}
-
-/**
- * Unlocking a special crew member also adds them to findable crew list  (High Tinker Steve)
- */
-			[HarmonyPatch(typeof(GenData), "UnlockCrewMember")]
-			static class GenData_UnlockCrewMember
+		}
+		/**
+		 * Unlocking a special crew member also adds them to findable crew list  (High Tinker Steve)
+		 */
+		[HarmonyPatch(typeof(GenData), "UnlockCrewMember")]
+		static class GenData_UnlockCrewMember
+		{
+			static void Postfix(int crewMemberID)
 			{
-				static void Postfix(int crewMemberID)
-				{
-					logr.Log($"Unlocking Crew Member ID: {crewMemberID}");
-					CrewMember cm = CrewDB.GetPredefinedCrewMember(crewMemberID);
-					cm.hidden = false;
-				}
+				logr.Log($"Unlocking Crew Member ID: {crewMemberID}");
+				CrewMember cm = CrewDB.GetPredefinedCrewMember(crewMemberID);
+				cm.hidden = false;
 			}
-			[HarmonyPatch(typeof(CrewMember), "GainXP")]
-			static class CrewMember_GainXP
+		}
+		[HarmonyPatch(typeof(CrewMember), "GainXP")]
+		static class CrewMember_GainXP
+		{
+			static void Postfix(ref CrewMember __instance, ref int ___rarity, ref int ___nextRarityCount)
 			{
-				static void Postfix(ref CrewMember __instance, ref int ___rarity, ref int ___nextRarityCount)
+				//logr.Log($"Crew GainXP Rarity: {___rarity} NextRarityCount: {___nextRarityCount}");
+				int mult = ___rarity - 3;
+				if (___nextRarityCount >= 1000 * Math.Pow(mult, 1.5f) && ___rarity >= 5 && ___rarity < Main.MAX_RARITY)
 				{
-					//logr.Log($"Crew GainXP Rarity: {___rarity} NextRarityCount: {___nextRarityCount}");
-					int mult = ___rarity - 3;
-					if (___nextRarityCount >= 1000 * Math.Pow(mult, 1.5f) && ___rarity >= 5 && ___rarity < Main.MAX_RARITY)
-					{
-						__instance.LevelUpRarity();
-						___nextRarityCount = 0;
-					}
-				}
-			}
-
-			[HarmonyPatch(typeof(CrewMember), "GetNameModified", new Type[] { typeof(int), typeof(bool), typeof(bool) })]
-			static class CrewMember_GetNameModified
-			{
-				static void Postfix(AICharacter ___aiChar, List<CrewSkill> ___skills, ref string __result)
-				{
-					if (___aiChar == null)
-						return;
-					__result += $" ({___aiChar.level})";
-					if (___skills == null || ___skills.Count == 0)
-						return;
-
-					var abbrev_list = new List<string>(___skills.Count);
-
-					for (int i = 0; i < ___skills.Count; i++)
-					{
-						var skill = ___skills[i];
-						if (skill == null)
-							continue;
-
-						var skill_name = Lang.Get(23, 10 + ((int)skill.ID * (int)CrewPosition.Navigator));
-						if (string.IsNullOrEmpty(skill_name))
-							continue;
-
-						skill_name = skill_name.Trim();
-						var len = skill_name.Length < 3 ? skill_name.Length : 3;
-
-						abbrev_list.Add(skill_name.Substring(0, len));
-					}
-
-					if (abbrev_list.Count == 0)
-						return;
-
-					__result = (__result ?? "") + " [" + string.Join(", ", abbrev_list) + "]";
+					__instance.LevelUpRarity();
+					___nextRarityCount = 0;
 				}
 			}
 		}
+
 	}
 }

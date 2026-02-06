@@ -110,6 +110,7 @@ RWEE can also be **removed safely**, with these expected behaviors:
 ### UI Improvements
 - Crew list shows level and skills.
 - Number of large asteroids in a sector shown on sector map.
+- Perks list now shows all perks, including ones you have not yet acquired.
 
 ### Bugfixes / Core Tweaks / QOL
 - Fleet ships properly use scanner power when looking for asteroids to mine.
@@ -127,6 +128,13 @@ RWEE can also be **removed safely**, with these expected behaviors:
 ---
 
 ## Changelog
+### 1.1.6
+- Perks list now shows all perks, including ones you have not yet acquired.
+- Moved UI elements to their own dll (RWUI) so they could be used without RWEE.
+- Fix for skill passives being incorrectly calculated past L50.
+- Fix for sector threat not increasing.
+- Added a config file (still in progress, and not tested).
+
 ### 1.1.5
 - Debris fields now have a chance to level up when sectors do.
 - Crew list shows level and skills.
@@ -242,6 +250,8 @@ RWEE can also be **removed safely**, with these expected behaviors:
 - MK2 versions of unique ships (Geraki, Lacewing, etc) that require the original ship as an ingredient.
 - Limit player station count to construction level.
 - scrapping items returns some resources
+- Pirate Signature Transponder.  - An installed device that is tied a new identity.  Resets your background to Outis, and any reputation changes are tied to this identity.	Can be removed, returning you to your original identity and reputation.
+- Crew gain experience
 - Stations
   - stations give back some resources when dismantled.
   - Some sort of limit to the number of stations that can be built in a sector to force you to optimize.  Maybe one miner per resource type per asteroid?
@@ -259,3 +269,11 @@ RWEE can also be **removed safely**, with these expected behaviors:
   - Auto fly to area highlighted on local map.
 
 ---
+
+SHORT TERM TODO / reported bugs:
+test cloning a ship (language error.  use Aurora test) (conversation was in Discord Mods channel)
+
+effects being added, not edited (https://www.nexusmods.com/starvalor/mods/56?tab=posts)
+
+Cloning ships does not work.
+

@@ -35,7 +35,7 @@ namespace RWEE
 	}
 	internal class Items
 	{
-		public static bool debugUpgrades = false;  //always upgrade items from high level bosses.  Always return mythic relics when scrapping.
+		public static bool debugUpgrades = false;  //always upgrade items from high level bosses.  Always return mythic relics when scrapping.  Give one of everything
 																							 //List<Item> relics;
 		static int[][] typeMap;
 
@@ -596,7 +596,7 @@ namespace RWEE
 				if (__result.index == 0 && __result.itemLevel >= minPower)
 					return;
 				minPower -= 10;
-				logr.Log($"↪ Fixing ERROR. Increasing power range to {origMinPower}->{minPower} to {maxPower} and searching again.");
+				logr.Log($"-> Fixing ERROR. Increasing power range to {origMinPower}->{minPower} to {maxPower} and searching again.");
 
 				__result = GameData.data.GetRandomWeapon(maxSpace, minPower, maxPower, ignoreType, maxDropLevel, faction, factionExtraChance, rand);
 			}

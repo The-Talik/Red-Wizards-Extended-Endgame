@@ -21,11 +21,11 @@ namespace RW.Logging
 	 */
 	public class Logr
 	{
-		public static ManualLogSource log;
-		public static int verbosity = 0;
-		public static int errorCount = 0;
-		public static List<string> errors = new List<string>();
-		public static int indent = 0;
+		public ManualLogSource log;
+		public int verbosity = 0;
+		public int errorCount = 0;
+		public List<string> errors = new List<string>();
+		public int indent = 0;
 		public Logr(ManualLogSource _log, int _verbosity = 0)
 		{
 			log = _log;

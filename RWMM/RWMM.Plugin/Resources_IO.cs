@@ -195,7 +195,7 @@ namespace RWMM
 				if (HasRun("Perk2"))
 					return;
 				ResourceImport.ImportType<Perk, _Perk>(ref ___perks);
-
+				
 				//Perk perk = ListUtils.GetByRef<Perk>(___perks, "Miner");
 				//logr.LogObj(perk);
 				done();

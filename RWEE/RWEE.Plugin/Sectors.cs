@@ -18,6 +18,8 @@ namespace RWEE
 		{
 			static bool Prefix(GameDataInfo __instance, int cX, int cY, int desiredFactionControl, ref int __result)
 			{
+				if(!RweeConfig.increase_sector_cap.Value)
+					return true;
 				int num = -1;
 				foreach (TSector tsector in __instance.sectors)
 				{
@@ -66,6 +68,8 @@ namespace RWEE
 		{
 			static bool Prefix(float distanceFromCenter, int bonus, ref TSector ___currSector, ref int __result)
 			{
+				if (!RweeConfig.increase_sector_cap.Value)
+					return true;
 				int num = (int)(distanceFromCenter / 1000f);
 				int min = ___currSector.level - 1 + num / 2 + bonus;
 				int max = ___currSector.level + 2 + num + bonus;
@@ -82,54 +86,52 @@ namespace RWEE
 		/**
 		 * Update nearby sectors on level up.
 		 */
-		/*[HarmonyPatch(typeof(TSector), "LevelUp")]
-		static class TSector_LevelUp
-		{
-			static void Postfix(TSector __instance)
-			{
-				AdjustNeighboringSectors(__instance);  //This seems to get caught in a loop.  Might be ok, though.
-			}
-		}*/
 		[HarmonyPatch(typeof(TSector), "UpdateSectorLevels")]
 		static class TSector_UpdateSectorLevels
 		{
-			static void Postfix(TSector __instance, int ___level)
+			static void Postfix(TSector __instance, bool ___generated, int ___level)
 			{
+				if (!RweeConfig.sectors_level_up.Value)
+					return ;
 				logr.Log($"UpdateSectorLevels Postfix New Level: {___level}");
-				AdjustDebrisFields(__instance);
+				if (___generated)
+					AdjustDebrisFields(__instance);
+				if (___generated)
+					RespawnMarauders(__instance);
 				AdjustNeighboringSectors(__instance);
-				RespawnMarauders(__instance);
 			}
 		}
 		public static void AdjustDebrisFields(TSector sector)
 		{
-			logr.Log($"AdjustDebrisFields Comparing to: {sector.level}");
+			logr.Log($"AdjustDebrisFields Comparing {sector.debrisFields.Count} fields to sector level: {sector.level}");
 			for (int i=0; i < sector.debrisFields.Count; i++)
 			{
-
-				while(sector.debrisFields[i].level < UnityEngine.Random.Range(sector.level-4, sector.level+4))
+				int oldLevel = sector.debrisFields[i].level;
+				while (sector.debrisFields[i].level < UnityEngine.Random.Range(sector.level-4, sector.level+4))
 				{
 					logr.Log($"Leveling up debris field {sector.debrisFields[i].level}->{sector.debrisFields[i].level+1}");
 					sector.debrisFields[i].level++;
 				}
+				logr.Log($"DebrisField {i} level: {oldLevel}->{sector.debrisFields[i].level}");
 			}
 		}
 		public static void AdjustNeighboringSectors(TSector sector)
 		{
 			logr.Log($"AdjustNeighboringSectors Comparing to: {sector.level}");
+			int count = 0;
 			for (int i = 0; i < GameData.data.sectors.Count; i++)
 			{
 				int cX = GameData.data.sectors[i].x;
 				int cY = GameData.data.sectors[i].y;
 				int staticLevel = (int)Vector2.Distance(new Vector2((float)sector.x, (float)sector.y), new Vector2((float)cX, (float)cY));
-				if (sector.level - staticLevel > GameData.data.sectors[i].level)
-					logr.Log($"Comparing to Sector Level: i:{i} curr: {sector.level} remote:{GameData.data.sectors[i].level} Distance: {staticLevel} Want: {sector.level - staticLevel}");
+				//if (sector.level - staticLevel > GameData.data.sectors[i].level)
+				//	logr.Log($"Comparing to Sector Level: i:{i} curr: {sector.level} remote:{GameData.data.sectors[i].level} Distance: {staticLevel} Want: {sector.level - staticLevel}");
 
 				if (sector.level - staticLevel * 4 > GameData.data.sectors[i].level)
 				{
 					logr.Warn("Leveling up sector");
 					GameData.data.sectors[i].level++;
-					//						GameData.data.sectors[i].AdjustLevel(GameData.data.sectors[i].level+1, false, false, false);
+//					GameData.data.sectors[i].AdjustLevel(GameData.data.sectors[i].level+1, false, false, false);
 				}
 			}
 
@@ -163,32 +165,14 @@ namespace RWEE
 		{
 			static bool Prefix(int newLevel, bool ___generated, ref int ___level)
 			{
+				if (!RweeConfig.sectors_level_up.Value)
+					return true;
 				if (!___generated)
 				{
 					___level = newLevel;
 					return false;
 				}
 				return true;
-			}
-		}
-		/*
-		 * This didn't seem to do anything????
-		 * [HarmonyPatch(typeof(GalaxyMap), "GetSectorInfo")]
-		static class GalaxyMap_GetSectorInfo
-		{
-			static void Postfix(TSector sector, ref string __result)
-			{
-				logr.Log("GalaxyMap_GetSectorInfo");
-				__result += $"\nLarge Asteroids: {sector.bigAsteroids.Count}";
-			}
-		}*/
-		[HarmonyPatch(typeof(TSector), "GetString")]
-		static class TSector_GetString
-		{
-			static void Postfix(bool ___discovered, List<BigAsteroid> ___bigAsteroids, ref string __result)
-			{
-				if(___discovered)
-					__result += $"\nLarge Asteroids: {___bigAsteroids.Count}";
 			}
 		}
 	}

@@ -69,6 +69,7 @@ namespace RWEE
 					}
 				}
 			}
+			PChar.Char.UpdatePassives();
 		}
 	}
 

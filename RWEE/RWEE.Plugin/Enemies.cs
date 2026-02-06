@@ -53,7 +53,7 @@ namespace RWEE
 
 					___ss.dmgBonus += mod;
 					logr.Log($"Boosting AI {aiChar.Name()} {(1 + mod)}x. lev: {aiChar.level} hp: {origBaseHP}→{___baseHP} shield: {origBaseShield}→{___baseShield}" +
-						$"energy: {origBaseEnergy}→{___baseEnergy} regen: {origHpRegen}→{___hpRegen} shield-recharge: {origShieldRecharge}→{___shieldRecharge} dam bonus: origDamageBonus→{___ss.dmgBonus}");
+						$"energy: {origBaseEnergy}→{___baseEnergy} regen: {origHpRegen}→{___hpRegen} shield-recharge: {origShieldRecharge}→{___shieldRecharge} dam bonus: {origDamageBonus}→{___ss.dmgBonus}");
 				}
 			}
 		}
@@ -220,14 +220,16 @@ namespace RWEE
 			static void Postfix(AICharacter ___Char, SpaceShip ___ss)
 			{
 				
-				if (___Char.rank < 1)
+				if (___Char.rank < 1)  //no star
+					return;
+				if(___Char.level <= 50)
 					return;
 				for (int i = 0; i < ___ss.loots.Count; i++)
 				{
 					if (___ss.loots[i].itemType > 2)
 						continue;
 					int tmpLev = ___Char.level;
-					if (___Char.rank == 1)
+					if (___Char.rank == 1)  //yellow star
 						tmpLev -= 50;
 					int oldRarity = ___ss.loots[i].rarity;
 					string itemLog = "";

@@ -209,6 +209,7 @@ namespace RWEE
 					return;
 				if (!__instance.debrisField.special && __instance.debrisField.level >= PChar.TechLevel() + 7)
 					return;
+				logr.Log("scanning debris field");
 				var pos = __instance.transform.position;
 				LootSystem ls = GameManager.instance.GetComponent<LootSystem>();
 				if (PChar.HasPerk(4) || PChar.HasPerk(8))  //Lone Wolf or scoundrel
@@ -219,6 +220,7 @@ namespace RWEE
 						int chance = 1;
 						if (GerekiLoadout >= 0)
 							chance = 5;
+						logr.Log($"Geraki chance: {chance}%");
 						if (UnityEngine.Random.Range(1, 101) <= chance)
 						{
 							Vector3 normalized = UnityEngine.Random.rotation.eulerAngles.normalized;
@@ -234,6 +236,7 @@ namespace RWEE
 				{
 					if (GameData.data.GetDeedCount("Found-Lacewing") == 0)
 					{
+						logr.Log($"Lacewing chance: 1%");
 						if (UnityEngine.Random.Range(1, 101) <= 1)
 						{
 							Vector3 normalized = UnityEngine.Random.rotation.eulerAngles.normalized;

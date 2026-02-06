@@ -1,0 +1,122 @@
+{
+	"_comment": "Top level 'refName' uses and overwrites 'obj.refName'.",
+	"type": "ShipModelData",
+	"refName": "Arbalestro",
+	"cloneFrom": "Aurora",
+	"obj": {
+		"refName": "Arbalestro",
+		"id": 102,
+		"shipModelName": "Aurora",
+		"_manufacturer": "-1:Any, 0:Independent, 1:Miners, 2:Traders, 3:Pirates, 4:Venghi, 5:Rebels, 6:Tecnomancers",
+		"manufacturer": "Miners",
+		"_shipClass": "1:Shuttle, 2:Yacht, 3:Corvette, 4:Frigate, 5:Cruiser, 6:Dreadnought, 7:Kraken",
+		"shipClass": "Frigate",
+		"_shipRole": "0:None, 1:Interceptor, 2:Fighter, 3:Gunship, 4:Destroyer, 5:Battleship, 6:Carrier, 7:Corsair, 8:Mining, 9:Freighter, 10:Passenger, 11:Engineer, 12:Racing, 13:Ranger, 14:Gladiator, 15:Firebrand",
+		"shipRole": "Mining",
+		"_expansion": "0:None, 1:BaseBuilding",
+		"expansion": "None",
+		"modelBonus": [ ],
+		"sellChance": 100,
+		"level": 1,
+		"hullPoints": 1235,
+		"weaponSpace": 26,
+		"equipSpace": 215,
+		"cargoSpace": 425,
+		"hangarDroneSpace": 20,
+		"hangarShipSpace": 3,
+		"crewSpace": [
+			{
+				"_position": "-1:None, 0:Engineer, 1:Pilot, 2:Navigator, 3:Supervisor, 4:Gunner, 5:Instructor, 6:Tactician, 7:Steward, 8:Adviser, 9:RelationsOfficer, 10:other1, 11:other2, 12:other3, 13:other4, 14:other5, 15:Co_Pilot, 16:FirstOfficer, 17:Primary, 18:Staff, 19:Captain",
+				"position": "FirstOfficer",
+				"minRequired": 0,
+				"space": 1
+			},
+			{
+				"_position": "-1:None, 0:Engineer, 1:Pilot, 2:Navigator, 3:Supervisor, 4:Gunner, 5:Instructor, 6:Tactician, 7:Steward, 8:Adviser, 9:RelationsOfficer, 10:other1, 11:other2, 12:other3, 13:other4, 14:other5, 15:Co_Pilot, 16:FirstOfficer, 17:Primary, 18:Staff, 19:Captain",
+				"position": "Co_Pilot",
+				"minRequired": 1,
+				"space": 2
+			},
+			{
+				"_position": "-1:None, 0:Engineer, 1:Pilot, 2:Navigator, 3:Supervisor, 4:Gunner, 5:Instructor, 6:Tactician, 7:Steward, 8:Adviser, 9:RelationsOfficer, 10:other1, 11:other2, 12:other3, 13:other4, 14:other5, 15:Co_Pilot, 16:FirstOfficer, 17:Primary, 18:Staff, 19:Captain",
+				"position": "Instructor",
+				"minRequired": 1,
+				"space": 2
+			},
+			{
+				"_position": "-1:None, 0:Engineer, 1:Pilot, 2:Navigator, 3:Supervisor, 4:Gunner, 5:Instructor, 6:Tactician, 7:Steward, 8:Adviser, 9:RelationsOfficer, 10:other1, 11:other2, 12:other3, 13:other4, 14:other5, 15:Co_Pilot, 16:FirstOfficer, 17:Primary, 18:Staff, 19:Captain",
+				"position": "Tactician",
+				"minRequired": 1,
+				"space": 2
+			},
+			{
+				"_position": "-1:None, 0:Engineer, 1:Pilot, 2:Navigator, 3:Supervisor, 4:Gunner, 5:Instructor, 6:Tactician, 7:Steward, 8:Adviser, 9:RelationsOfficer, 10:other1, 11:other2, 12:other3, 13:other4, 14:other5, 15:Co_Pilot, 16:FirstOfficer, 17:Primary, 18:Staff, 19:Captain",
+				"position": "Engineer",
+				"minRequired": 1,
+				"space": 2
+			},
+			{
+				"_position": "-1:None, 0:Engineer, 1:Pilot, 2:Navigator, 3:Supervisor, 4:Gunner, 5:Instructor, 6:Tactician, 7:Steward, 8:Adviser, 9:RelationsOfficer, 10:other1, 11:other2, 12:other3, 13:other4, 14:other5, 15:Co_Pilot, 16:FirstOfficer, 17:Primary, 18:Staff, 19:Captain",
+				"position": "Pilot",
+				"minRequired": 1,
+				"space": 2
+			},
+			{
+				"_position": "-1:None, 0:Engineer, 1:Pilot, 2:Navigator, 3:Supervisor, 4:Gunner, 5:Instructor, 6:Tactician, 7:Steward, 8:Adviser, 9:RelationsOfficer, 10:other1, 11:other2, 12:other3, 13:other4, 14:other5, 15:Co_Pilot, 16:FirstOfficer, 17:Primary, 18:Staff, 19:Captain",
+				"position": "Navigator",
+				"minRequired": 1,
+				"space": 2
+			},
+			{
+				"_position": "-1:None, 0:Engineer, 1:Pilot, 2:Navigator, 3:Supervisor, 4:Gunner, 5:Instructor, 6:Tactician, 7:Steward, 8:Adviser, 9:RelationsOfficer, 10:other1, 11:other2, 12:other3, 13:other4, 14:other5, 15:Co_Pilot, 16:FirstOfficer, 17:Primary, 18:Staff, 19:Captain",
+				"position": "Supervisor",
+				"minRequired": 1,
+				"space": 2
+			},
+			{
+				"_position": "-1:None, 0:Engineer, 1:Pilot, 2:Navigator, 3:Supervisor, 4:Gunner, 5:Instructor, 6:Tactician, 7:Steward, 8:Adviser, 9:RelationsOfficer, 10:other1, 11:other2, 12:other3, 13:other4, 14:other5, 15:Co_Pilot, 16:FirstOfficer, 17:Primary, 18:Staff, 19:Captain",
+				"position": "Staff",
+				"minRequired": 0,
+				"space": 4
+			},
+			{
+				"_position": "-1:None, 0:Engineer, 1:Pilot, 2:Navigator, 3:Supervisor, 4:Gunner, 5:Instructor, 6:Tactician, 7:Steward, 8:Adviser, 9:RelationsOfficer, 10:other1, 11:other2, 12:other3, 13:other4, 14:other5, 15:Co_Pilot, 16:FirstOfficer, 17:Primary, 18:Staff, 19:Captain",
+				"position": "Gunner",
+				"minRequired": 0,
+				"space": 7
+			}
+		],
+		"passengers": 45,
+		"speed": 8,
+		"agility": 8,
+		"mass": 900,
+		"sizeScale": 7.0,
+		"sortPower": 22,
+		"drawScale": 36.0,
+		"rarity": 3,
+		"repReq": {
+			"factionIndex": 0,
+			"repNeeded": 0
+		},
+		"_factions": "-1:Any, 0:Independent, 1:Miners, 2:Traders, 3:Pirates, 4:Venghi, 5:Rebels, 6:Tecnomancers",
+		"factions": [
+			"Miners"
+		],
+		"craftingMaterials": [ ],
+		"extraSurFXScale": {
+			"x": 1.0,
+			"y": 1.0,
+			"z": 1.0,
+			"normalized": {
+				"x": 0.577350259,
+				"y": 0.577350259,
+				"z": 0.577350259,
+				"magnitude": 1.0,
+				"sqrMagnitude": 0.99999994
+			},
+			"magnitude": 1.73205078,
+			"sqrMagnitude": 3.0
+		},
+		"extraLinesOnShiftInfo": 0
+	}
+}

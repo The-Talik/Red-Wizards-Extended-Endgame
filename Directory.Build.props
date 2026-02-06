@@ -1,6 +1,7 @@
 <Project>
   <PropertyGroup>
-    <Version>1.1.5</Version>
+		<RWEEVersion>1.1.6</RWEEVersion>
+		<RWMMVersion>0.0.4</RWMMVersion>
     <Company>RWEE</Company>
     <Authors>RWEE</Authors>
     <LangVersion>7.3</LangVersion>
@@ -11,4 +12,20 @@
 		<RWMMPatcher></RWMMPatcher>
 		<RWMMPluginDir>RedWizardsModManager.Plugin</RWMMPluginDir>
   </PropertyGroup>
+
+	<Target Name="GenerateVersionsCode" BeforeTargets="BeforeCompile">
+		<WriteLinesToFile
+			File="$(MSBuildThisFileDirectory)Shared\Versions.cs"
+			Overwrite="true"
+			Encoding="UTF-8"
+			Lines="
+namespace RW
+{
+	static public class Versions
+	{
+		public const string RWEE = &quot;$(RWEEVersion)&quot; %3B
+		public const string RWMM = &quot;$(RWMMVersion)&quot; %3B
+	}
+}" />
+	</Target>
 </Project>

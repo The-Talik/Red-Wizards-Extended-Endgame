@@ -1,17 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using BepInEx;
 using BepInEx.Logging;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
+using BepInEx.Configuration;
 
 public static class RWEEPatcher
 {
 	public const int NEW_PCHAR_MAXLEVEL = 100;
 	public const int NEW_SECT_CAP = 200;
 	private static ManualLogSource _log;
+
 	// Your loader likes the PROPERTY form.
 	public static IEnumerable<string> TargetDLLs { get; } = new[] { "Assembly-CSharp.dll" };
 	static RWEEPatcher()
@@ -29,6 +32,9 @@ public static class RWEEPatcher
 
 	public static void Patch(AssemblyDefinition asm)
 	{
+
+
+
 		string modVersion = RW.Versions.RWEE;
 		Log("Patch() entered");
 
@@ -39,6 +45,7 @@ public static class RWEEPatcher
 
 		total += ReplaceFieldReadsWithConst(mod, "PChar", "EarnXP", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_PCHAR_MAXLEVEL));
 		total += ReplaceFieldReadsWithConst(mod, "PChar", "LevelUp", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_PCHAR_MAXLEVEL));
+
 		total += ReplaceFieldReadsWithConst(mod, "PChar", "GetRelevantLevelRank", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_SECT_CAP));
 		total += ReplaceFieldReadsWithConst(mod, "PChar", "UpdateChar", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_SECT_CAP));
 		total += ReplaceFieldReadsWithConst(mod, "BaseCharacter", "GetKnowledgeProgress", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_SECT_CAP));
@@ -300,5 +307,22 @@ public static class RWEEPatcher
 			}
 		}
 		return edits;
+	}
+	static bool TryGetSetting(string section,string key,bool defaultValue)
+		{
+		var cfg = new BepInEx.Configuration.ConfigFile(
+			Path.Combine(Paths.ConfigPath, "com.redwizard.rwee.cfg"),
+			false
+			);
+
+		ConfigEntry<bool> entry;
+
+		if (cfg.TryGetEntry<bool>(
+			new ConfigDefinition(section, key),
+			out entry))
+		{
+			return(entry.Value);
+		}
+		return (defaultValue);
 	}
 }

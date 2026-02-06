@@ -1,12 +1,13 @@
 ﻿using HarmonyLib;
 using RW.Logging;
-using System; 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using static RWEE.Logging;
+using UnityEngine.UI;
 namespace RWEE
 {
 	internal static class Player
@@ -17,11 +18,11 @@ namespace RWEE
 		[HarmonyPatch(typeof(PChar), "EarnXP")]
 		static class PChar_EarnXP
 		{
-			static void Prefix(float amount, int type, ref int ___maxLevel, int baseLevel)
+			static void Prefix(float amount, int type, ref int ___maxLevel, int baseLevel, ref int[] __state)
 			{
 				//PChar.Char.techLevel = 101;
 				//logr.Log($"EarnXP {amount}");
-
+				__state = new int[PChar.Char.passive.Length];
 				if (PChar.Char.level >= 50)
 				{
 					float mult = (Main.NEW_PCHAR_MAXLEVEL - PChar.Char.level) / (Main.NEW_PCHAR_MAXLEVEL - 50f);
@@ -29,12 +30,14 @@ namespace RWEE
 
 					for (int i = 0; i < PChar.Char.passive.Length; i++)
 					{
+						__state[i] = PChar.Char.passive[i];
 						PChar.Char.passive[i] = (int)Mathf.Min(PChar.Char.passive[i], mult);  //xp multiplier formula = 1 + passive*0.03
 					}
 				}
 			}
-			static void Postfix(ref int ___maxLevel)
+			static void Postfix(ref int ___maxLevel, ref int[] __state)
 			{
+				PChar.Char.passive = __state;
 				//___maxLevel = Main.Old_PChar_MaxLevel;
 			}
 		}
@@ -44,7 +47,7 @@ namespace RWEE
 			static bool Prefix()
 			{
 				//logr.Error("TechLevelUp");
-				//if (PChar.Char.techLevel < 101)
+				//if (PChar.Char.techLevel < 101)	
 				//	PChar.Char.techLevel = 101;
 
 				if (PChar.Char.techLevel >= Main.NEW_SECT_CAP)
@@ -129,12 +132,13 @@ namespace RWEE
 				{
 					PChar.Char.explorer = Main.OLD_PCHAR_MAXLEVEL;
 				}
+				
 			}
 		}
 		public static class SpacePilotBonusOverride
 		{
 			public static bool fleet_override = false;
-			
+
 			[HarmonyPatch]
 			static class PChar_ApplySoloFlyingBonuses
 			{
@@ -158,16 +162,16 @@ namespace RWEE
 			[HarmonyPatch(typeof(PlayerCharacter), "get_GetFleetSize")]
 			static class PlayerCharacter_get_GetFleetSize
 			{
-				
-				static bool Prefix(List<AIMercenaryCharacter> ___mercenaries,ref int __result)
+
+				static bool Prefix(List<AIMercenaryCharacter> ___mercenaries, ref int __result)
 				{
 					logr.Log("GetFleetSize Prefix");
 					if (!fleet_override)
-						return true ;
-						
+						return true;
+
 					logr.Log($"GetFleetSize original: {___mercenaries.Count}");
 					__result = 0;
-					for(int i = 0; i < ___mercenaries.Count; i++)
+					for (int i = 0; i < ___mercenaries.Count; i++)
 					{
 						if (___mercenaries[i].IsActive())
 						{
@@ -186,7 +190,7 @@ namespace RWEE
 				[HarmonyPatch(typeof(AIMercenary), nameof(AIMercenary.DockAtCarrier))]
 				[HarmonyPatch(typeof(AIMercenary), nameof(AIMercenary.EmergencyWarp))]
 				[HarmonyPatch(typeof(AIMercenary), nameof(AIMercenary.Vanish))]
-//				[HarmonyPatch(typeof(AIMercenary), nameof(AIMercenary.StationDockingReached))]
+				//				[HarmonyPatch(typeof(AIMercenary), nameof(AIMercenary.StationDockingReached))]
 				[HarmonyPatch(typeof(AIMercenary), nameof(AIMercenary.DockAtStation))]
 				[HarmonyPatch(typeof(GameManager), nameof(GameManager.LaunchPlayerFleetMember))]
 				static void Postfix(System.Reflection.MethodBase __originalMethod)
@@ -194,8 +198,8 @@ namespace RWEE
 					logr.Warn($"{__originalMethod} Recalculating ship ASAP due to mercenary change.");
 					if (PlayerControl.inst != null)
 					{
-logr.Log($"Is Player.");
-						
+						logr.Log($"Is Player.");
+
 						PlayerControl.inst.CalculateShip(false);
 						PlayerControl.inst.GetSpaceShip.VerifyShipCargoAndEquipment();
 
@@ -219,5 +223,6 @@ logr.Log($"Is Player.");
 				logr.Close($"CalculateShip");
 			}
 		}
+
 	}
 }

@@ -31,6 +31,8 @@ namespace RWMM
 				[HarmonyPriority(Priority.Last)]
 				static void Postfix()
 				{
+				
+
 					logr.Open("IDRefMap Fixing game data");
 					int i;
 					LoadFromGameData();

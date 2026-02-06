@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using RW;
@@ -26,10 +27,6 @@ namespace RWEE
 		public const string pluginName = "RWEE";//"Red Wizard's Extended Endgame";
 		public const string pluginVersion = Versions.RWEE;
 
-		//public System.Reflection.Assembly asm = typeof(Main).Assembly;
-		//public const string pluginVersion = asm.GetName().Version?.ToString()
-		//?? "0.0.0";
-
 		public const int OLD_PCHAR_MAXLEVEL = 50;
 		public const int NEW_PCHAR_MAXLEVEL = 100;
 		public const int NEW_SECT_CAP = 205;
@@ -38,45 +35,19 @@ namespace RWEE
 
 		private Harmony _harmony;
 
-		/*public static ManualLogSource Log;
-		public static int verbosity = 0;
-		public static void InitLog(ManualLogSource log, int verbosity = 0)
-		{
-			Main.Log = log;
-			Main.verbosity = verbosity;
-		}
-		public static void log(string msg, int level = 1)
-		{
-			if (Main.verbosity >= level)
-				Main.Log?.LogInfo(msg);
-		}
-		public static void log_obj(object obj, int level = 1)
-		{
-			logr.Log(JsonUtils.ToPrettyJson(obj), level);
-		}
-		public static void warn(string msg, int level = 0)
-		{
-			if (Main.verbosity >= level)
-				Main.Log?.LogWarning(msg);
-		}
-
-		public static void error(string msg, bool showPopup = false, int level = -1)
-		{
-			if (Main.verbosity >= level)
-			{
-				Main.Log?.LogError(msg);
-				if (showPopup)
-					SimplePopup.Show(msg);
-			}
-		}*/
+		private ConfigEntry<bool> enemy_scaling_enabled;
+		private ConfigEntry<bool> sector_leveling_enabled;
+		private ConfigEntry<bool> loot_tuning_enabled;
 
 		private void Awake()
 		{
+			RweeConfig.Init(Config);
+
 			_harmony = new Harmony(pluginGuid);
 			_harmony.PatchAll(Assembly.GetExecutingAssembly());
 			Logging.Init(Logger, 1);
 
-			logr.Log("Harder Endgame Loaded");
+			logr.Log("Red Wizard's Extended Endgame Loaded");
 			const string VERSION_URL = "https://mezr.com/star_valor.json.php";
 			var fi = typeof(GameData).GetField("rweePatcherVersion", BindingFlags.Public | BindingFlags.Static);
 			//logr.Log("GameDataInfo fields: " + string.Join(", ", fi.Select(f => f.Name + (f.IsStatic ? "[static]" : "[inst]"))));

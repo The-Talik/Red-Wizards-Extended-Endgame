@@ -1,0 +1,9 @@
+{
+	"_comment": "Top level 'refName' uses and overwrites 'obj.refName'.",
+	"type": "Perk",
+	"refName": "The Perfect Predator",
+	"cloneFrom": null,
+	"obj": {
+		"showLockState": true
+	}
+}
