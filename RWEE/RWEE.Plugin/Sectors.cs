@@ -18,7 +18,7 @@ namespace RWEE
 		{
 			static bool Prefix(GameDataInfo __instance, int cX, int cY, int desiredFactionControl, ref int __result)
 			{
-				if(!RweeConfig.increase_sector_cap.Value)
+				if(!RweeConfig.increaseSectorCap.Value)
 					return true;
 				int num = -1;
 				foreach (TSector tsector in __instance.sectors)
@@ -68,7 +68,7 @@ namespace RWEE
 		{
 			static bool Prefix(float distanceFromCenter, int bonus, ref TSector ___currSector, ref int __result)
 			{
-				if (!RweeConfig.increase_sector_cap.Value)
+				if (!RweeConfig.increaseSectorCap.Value)
 					return true;
 				int num = (int)(distanceFromCenter / 1000f);
 				int min = ___currSector.level - 1 + num / 2 + bonus;
@@ -91,7 +91,7 @@ namespace RWEE
 		{
 			static void Postfix(TSector __instance, bool ___generated, int ___level)
 			{
-				if (!RweeConfig.sectors_level_up.Value)
+				if (!RweeConfig.sectorsLevelUp.Value)
 					return ;
 				logr.Log($"UpdateSectorLevels Postfix New Level: {___level}");
 				if (___generated)
@@ -165,7 +165,7 @@ namespace RWEE
 		{
 			static bool Prefix(int newLevel, bool ___generated, ref int ___level)
 			{
-				if (!RweeConfig.sectors_level_up.Value)
+				if (!RweeConfig.sectorsLevelUp.Value)
 					return true;
 				if (!___generated)
 				{

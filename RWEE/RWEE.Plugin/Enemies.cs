@@ -46,8 +46,8 @@ namespace RWEE
 					___baseShield *= (1 + mod);
 					___baseEnergy *= (1 + mod);
 					___hpRegen += 0.0001f;
-					___hpRegen *= (1 + mod);
-					___shieldRecharge *= (1 + mod);
+					___hpRegen *= (1 + mod/2);
+					___shieldRecharge *= (1 + mod/2);
 					___maxSpeed *= (1 + mod / 10);
 					___acceleration *= (1 + mod / 10);
 
@@ -95,7 +95,7 @@ namespace RWEE
 		[HarmonyPatch(typeof(AIControl), "SetNewTarget")]
 		static class AIControl_SetNewTarget
 		{
-			static void Postfix(ref AIControl __instance, SpaceShip ___ss)
+			static void Postfix(ref AIControl __instance, ref bool ___avoidPlayer, SpaceShip ___ss)
 			{
 				//logr.Log($"AIControl_SetNewTarget: {__instance.Char.name}");
 				if (__instance.Char.level > 50)
@@ -103,24 +103,24 @@ namespace RWEE
 					float newReaction = 2f / (__instance.Char.level / 25);
 					__instance.reactionTime = Mathf.Min(__instance.reactionTime, Mathf.Clamp(newReaction, .25f, 2f));
 				}
-				SetTactic(ref __instance, ___ss);
+				SetTactic(ref __instance, ref ___avoidPlayer,	___ss);
 			}
 		}
 
 		[HarmonyPatch(typeof(AIControl), "VerifyChangeTactic")]
 		static class AIControl_VerifyChangeTactic
 		{
-			static void Postfix(ref AIControl __instance, SpaceShip ___ss)
+			static void Postfix(ref AIControl __instance, ref bool ___avoidPlayer, SpaceShip ___ss)
 			{
-				SetTactic(ref __instance, ___ss);
+				SetTactic(ref __instance, ref ___avoidPlayer, ___ss);
 			}
 		}
 		[HarmonyPatch(typeof(AIControl), "SetActions")]
 		static class AIControl_SetActions
 		{
-			static void Postfix(ref AIControl __instance, SpaceShip ___ss)
+			static void Postfix(ref AIControl __instance, ref bool ___avoidPlayer, SpaceShip ___ss)
 			{
-				SetTactic(ref __instance, ___ss);
+				SetTactic(ref __instance, ref ___avoidPlayer, ___ss);
 			}
 		}
 		[HarmonyPatch(typeof(AIMarauder), "SetActions")]
@@ -141,21 +141,27 @@ namespace RWEE
 				}
 			}
 		}
-		static void SetTactic(ref AIControl __instance, SpaceShip ___ss)// ref AICharacter ___Char, Entity ___targetEntity, SpaceShip ___ss)
+		static void SetTactic(ref AIControl __instance, ref bool ___avoidPlayer, SpaceShip ___ss)// ref AICharacter ___Char, Entity ___targetEntity, SpaceShip ___ss)
 		{
 			if (__instance.Char.level < 50)
 				return;
 			float hpPerc = 1f * ___ss.currHP / ___ss.stats.baseHP;
 			//logr.Log($"hp: {hpPerc}");
-			if (hpPerc < .2)
+			if (hpPerc < .2 && __instance.Char.currTactic !=0)
 			{
 				__instance.Char.currTactic = 0; //flee
 				__instance.target = null;
 				__instance.targetEntity = null;
+				___avoidPlayer = true;
 				//logr.Log("Fleeing");
 				return;
 			}
-			if (__instance.targetEntity == null)
+			if (hpPerc > .9 && __instance.Char.currTactic == 0)
+			{
+				__instance.Char.ChangeTactic(100);
+				___avoidPlayer = false;
+			}
+				if (__instance.targetEntity == null)
 				return;
 			if (__instance.Char.behavior.role == 0)
 			{
@@ -509,6 +515,19 @@ namespace RWEE
 			{
 				//logr.Log($"Found {__result.name}");
 			}
+			/**
+		 * Enhance enemy stations
+		 */
+			/*[HarmonyPatch(typeof(BuildingPlan), "BaseHP")]
+			static class BuildingPlan_BaseHP
+			{
+				static void Postfix(ref int level, ref float __result)
+				{
+					float orig = __result;
+					__result *= levelToMod(level);
+					logr.Log($"Boosting Station HP {(1 + levelToMod(level))}x. lev: {level} hp: {orig}->{__result}");
+				}
+			}*/
 		}
 	}
 }

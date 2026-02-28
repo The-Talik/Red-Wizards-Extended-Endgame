@@ -77,41 +77,6 @@ namespace RWEE
 
 				/*
 				 * Moved to RWMM
-				var template = ___equipments.FirstOrDefault(i => i != null && i.id == 151);
-				if (template == null) { logr.Warn("Template id 151 not found"); return; }
-
-
-
-				int nextId = ___equipments.Max(i => i?.id ?? -1) + 1;
-				//int nextId = 12000;
-				// Runtime-safe deep-ish clone for ScriptableObjects
-				
-				
-				var clone = UnityEngine.Object.Instantiate(template);
-
-				// (Optional) ensure no shared mutable lists
-				if (template.effects != null)
-				{
-					clone.effects = new List<Effect>(template.effects.Count);
-					for (int i = 0; i < template.effects.Count; i++)
-					{
-						var e = template.effects[i];
-						clone.effects.Add(new Effect { type = e.type, value = e.value, mod = e.mod });
-					}
-				}
-
-				clone.id = nextId;
-				clone.equipName = "Pirate Capital Booster";
-				clone.refName = "rwee_Pirate Capital Booster";  // keep refName unique/stable
-				clone.minShipClass = ShipClassLevel.Dreadnought;
-				clone.techLevel = 58;
-				clone.space = 6f;
-				clone.rarityMod = 1f;
-				clone.energyCost = 32f;
-				if (clone.effects != null && clone.effects.Count > 0)
-					clone.effects[0].value = 92f;
-
-				___equipments.Add(clone);
 				*/
 			}
 		}
@@ -158,7 +123,7 @@ namespace RWEE
 							$"Mythic {label} Relic",
 							"rwee_arcane_orb_" + label.ToLowerInvariant(),
 							"mythic_relic",
-							$"The Relic does not shine so much as it refuses darkness. Touching it is like reading a memory written in thunder — names you’ve never learned settle on your tongue as if they were yours.  This object appears to be missing something.  Maybe you can figure out what to combine it with to activate it."
+							$"The Relic does not shine so much as it refuses darkness. Touching it is like reading a memory written in thunder — names you’ve never learned settle on your tongue as if they were yours."
 							);
 					}
 
@@ -248,6 +213,7 @@ namespace RWEE
 				it.craftingMaterials = new List<CraftMaterial>();
 				it.sprite = RW.IconUtils.MakeSprite(Path.Combine(Paths.PluginPath, "RedWizardsExtendedEndgame.plugin", "assets", imageName + ".png"));
 
+				it.craftingYield = 1;
 				it.craftingMaterials.Add(new CraftMaterial(core_id, 1));
 				it.craftingMaterials.Add(new CraftMaterial(template.id, above_ancient * above_ancient));  //ancient relic  1,4, 9, 16
 				if (tier >5)
@@ -319,18 +285,18 @@ namespace RWEE
 
 							int rand = RweeRand.Range(0, 100, label.ToLowerInvariant() + "_mystic_relic_attempts");
 							logr.Log("random number:" + rand);
-							if (rand < 10 || Items.debugUpgrades)
+							if (rand < 15 || Items.debugUpgrades)
 							{
 
 								Item item = null;
 								switch (rarity)
 								{
 									case 5:
-										item = GetItemByRefName("rwee_mystic_relic_" + label.ToLowerInvariant());
+										item = GetItemByRefName("rwee_mystic_relic_" + label.ToLowerInvariant()+"_core");
 										break;
 									case 6:
 									case 7:
-										item = GetItemByRefName("rwee_arcane_orb_" + label.ToLowerInvariant());
+										item = GetItemByRefName("rwee_arcane_orb_" + label.ToLowerInvariant() + "_core");
 										break;
 								}
 								if (item != null)
@@ -537,11 +503,14 @@ namespace RWEE
 			{
 				switch (rarity)
 				{
+					case 5:
+						__result = 1f + 2f * rarityMod * effectMod;
+						return false;
 					case 6:
-						__result = 1f + 2.3f * rarityMod * effectMod;
+						__result = 1f + 3.5f * rarityMod * effectMod;
 						return false;
 					case 7:
-						__result = 1f + 3.1f * rarityMod * effectMod;
+						__result = 1f + 6.75f * rarityMod * effectMod;
 						return false;
 				}
 				return true;
@@ -550,9 +519,10 @@ namespace RWEE
 		[HarmonyPatch(typeof(TWeapon), "Dmg")]
 		static class TWeapon_Dmg
 		{
-			static void Postfix(int rarity, ref float __result)
+			static void Postfix(int rarity, int ___index, ref float __result)
 			{
-				if (rarity >= 5)
+				//only for vanilla weapons.
+				if (___index <= 60 && rarity >= 5)
 					__result *= 1.5f;
 			}
 		}
@@ -725,6 +695,43 @@ namespace RWEE
 				}
 			}
 			return needed;
+		}
+
+		[HarmonyPatch(typeof(EquipmentDB), "GetEquipmentString")]
+		static class EquipmentDB_GetEquipmentString
+		{
+			static void Postfix(int rarity, ref string __result)
+			{
+				switch (rarity)
+				{
+					case 5:
+						__result += "\nThis is a Legendary item.  This item might drop a Legendary Catalyst when scrapped.";
+						break;
+					case 6:
+						__result += "\nThis is a Mythic item.  This item might drop a Mythic Relic when scrapped.";
+						break;
+					case 7:
+						__result += "\nThis is an Ascended item.  This item can only drop a Mythic Relic when scrapped, however.";
+						break;
+				}
+			}
+		}
+		[HarmonyPatch(typeof(BaseBuildingControl), "GetStationStartingLevel")]
+		static class BaseBuildingControl_GetStationStartingLevel
+		{
+			static bool Prefix(int builderModuleTier, bool addOtherBonuses, ref int __result)
+			{
+				if (builderModuleTier <= 5)
+					return true;
+				int num = (int)Math.Round(10 * Math.Pow(1.5, builderModuleTier - 5));
+				
+				if (addOtherBonuses && PChar.Construction(true) >= 30)
+				{
+					num += 2;
+				}
+				__result = num;
+				return false;
+			}
 		}
 	}
 }

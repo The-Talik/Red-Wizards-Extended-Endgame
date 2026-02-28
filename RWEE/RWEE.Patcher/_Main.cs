@@ -53,6 +53,8 @@ public static class RWEEPatcher
 		total += ReplaceFieldReadsWithConst(mod, "BaseCharacter", "KnowledgeUp", "PChar", "maxLevel", Instruction.Create(OpCodes.Ldc_I4, NEW_SECT_CAP));
 		total += EnsureOptionalField(mod, "GameDataInfo", "rweeJson", mod.TypeSystem.String);
 		total += EnsureOptionalField(mod, "InstalledEquipment", "disabled", mod.TypeSystem.Int32, false);
+		total += EnsureOptionalField(mod, "EquipedWeapon", "disabled", mod.TypeSystem.Int32, false);
+
 		total += ReplaceConstFloatInMethod(mod, "AIMarauder", "SetActions", 500f, 2000f);
 		total += ReplaceConstFloatInMethod(mod, "AIMercenary", "SetActions", 250f, 500f);
 

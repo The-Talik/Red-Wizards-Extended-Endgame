@@ -1,7 +1,10 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using RW;
 using RWMM.Dto;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -186,9 +189,37 @@ namespace RWMM
 			list.Add(newObj);
 			return true;
 		}
+
+		sealed class ReplaceCollectionsResolver : DefaultContractResolver
+		{
+			protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+			{
+				var p = base.CreateProperty(member, memberSerialization);
+
+				var t = p.PropertyType;
+
+				if (t != typeof(string) && (t.IsArray || typeof(IList).IsAssignableFrom(t)))
+				{
+					p.ObjectCreationHandling = ObjectCreationHandling.Replace;
+				}
+
+				return p;
+			}
+		}
+
+		static readonly JsonSerializerSettings populate_settings = new JsonSerializerSettings
+		{
+			ContractResolver = new ReplaceCollectionsResolver(),
+			Converters =
+	{
+		// keep this if your JSON uses enum strings
+		new StringEnumConverter { AllowIntegerValues = true }
+	}
+		};
 		private static void PopulateObject<T, TData>(string json, Wrap<T> obj, Wrap<TData> wrap)
 		{
-			JsonConvert.PopulateObject(json, obj);
+			
+			JsonConvert.PopulateObject(json, obj, populate_settings);
 			switch (wrap.type)
 			{
 				case "Perk":

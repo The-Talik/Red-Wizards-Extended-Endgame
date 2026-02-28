@@ -46,7 +46,11 @@ namespace RWEE
 				}
 			}
 			RweeData.SetString("RWEESaveVersion", Main.pluginVersion);
-			if(Items.debugUpgrades)
+			//GameData.data.AddCargoItemForced(4, 86, -1, 1, -1);
+			//GameData.data.AddCargoItemForced(4, 66, -1, 1, -1);
+			//GameData.data.AddCargoItemForced(4, 85, -1, 1, -1);
+			//GameData.data.AddCargoItemForced(3, 42, -1, 1000, -1);
+			if (Items.debugUpgrades)
 			{
 				var items = ItemDB.GetItems(false);
 				//CargoSystem cs = PlayerControl.inst.GetCargoSystem;

@@ -369,5 +369,32 @@ namespace RWUI
 			img.color = new Color(r, g, b, a);
 			img.raycastTarget = false;
 		}
+		/**
+		 * show perk unlock even if already unlocked
+		 */
+		[HarmonyPatch(typeof(Perk), "GetString")]
+		public static class Perk_GetString
+		{
+			static void Postfix(bool justUnlocked, ref bool ___locked, ref bool ___showLockState, Perk __instance, int ___showLevel, ref string __result)
+			{
+				if ((___showLockState && ___locked) || justUnlocked)
+					return;
+				if (__instance.UnlockText == "")
+					return;
+				__result += "\n";
+
+				if(__instance.type == PerkType.Background)
+					__result += "\n";
+				
+				if (!justUnlocked)
+				{
+					__result += "<size=12>To Unlock:</size>\n";
+				}
+				__result += ColorSys.infoText2 + __instance.UnlockText + "</color>";
+
+				if (__instance.type != PerkType.Background)
+					__result += "\n";
+			}
+		}
 	}
 }

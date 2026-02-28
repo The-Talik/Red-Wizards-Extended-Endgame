@@ -165,11 +165,11 @@ namespace RWEE
 
 				static bool Prefix(List<AIMercenaryCharacter> ___mercenaries, ref int __result)
 				{
-					logr.Log("GetFleetSize Prefix");
+					//logr.Log("GetFleetSize Prefix");
 					if (!fleet_override)
 						return true;
 
-					logr.Log($"GetFleetSize original: {___mercenaries.Count}");
+					//logr.Log($"GetFleetSize original: {___mercenaries.Count}");
 					__result = 0;
 					for (int i = 0; i < ___mercenaries.Count; i++)
 					{
@@ -178,7 +178,7 @@ namespace RWEE
 							__result++;
 						}
 					}
-					logr.Log($"GetFleetSize active: {__result}");
+					//logr.Log($"GetFleetSize active: {__result}");
 					return false;
 				}
 			}

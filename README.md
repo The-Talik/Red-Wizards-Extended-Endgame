@@ -72,18 +72,18 @@ RWEE can also be **removed safely**, with these expected behaviors:
 - Tech + Construction caps increased to **200** (to match sector limits)
   - Other knowledges remain capped at **50** for balance.
 - Space Pilot bonuses are applied when no fleet members are present (even if you control a fleet)
-  - Warping in your fleet will disable the bonus, and your equipment will be disabled. 
+  - Warping in your fleet will disable the bonus, and your equipment and weapons will be disabled. 
 
 ### Items / Loot
 - Added endgame tiers:
   - **Mythic (Tier 6)** and **Ascended (Tier 7)**
   - Droppable only by very high-level enemies (starting at **L50** and **L100**, respectively)
 - Scrapping mechanics:
-  - Scrapping **Legendary or Mythic equipment** (not weapons, not Ascended) can drop **cores** (~10%)
-  - Cores combine into the familiar upgrade item for that equipment type
+  - Scrapping **Legendary or Mythic equipment** (not weapons, not Ascended) can drop **cores** (~15%)
+  - Cores combine into upgrade item for that equipment type
   - Results are seeded (sorry savescummers ;-)
 - Added: **Pirate Capital Booster**
-- Legendary+ weapons buffed roughly **1.5×** making them competitive with player made weapons.
+- Legendary+ weapons buffed making them competitive with player made weapons.
 
 ### Crew
 - Escape Pod crew always start at **level 1**
@@ -111,11 +111,12 @@ RWEE can also be **removed safely**, with these expected behaviors:
 - Crew list shows level and skills.
 - Number of large asteroids in a sector shown on sector map.
 - Perks list now shows all perks, including ones you have not yet acquired.
+- Added weapon space to weapon name.
 
 ### Bugfixes / Core Tweaks / QOL
 - Fleet ships properly use scanner power when looking for asteroids to mine.
 - Ancient artifacts are purple (instead of blue).
-- Too many installed equipments will disable them instead of removing them (useful for fleets).
+- Too many installed equipments/weapons will disable them instead of removing them (useful for fleets).
 - Inventory shows quantity needed for quests (ie. "(1/3) Iron").
 - Hephaestus set to Epic.
 
@@ -128,6 +129,24 @@ RWEE can also be **removed safely**, with these expected behaviors:
 ---
 
 ## Changelog
+### 1.1.8
+- Scrapping legendary/mythic items now drops a core, which must be crafted into the upgrade item.
+- Cut extra multiplier for high level enemy hp and shield regen in half.
+- Minor tweak to enemy ai engage/disengage logic.
+- Tweak to crew leveling.
+  - Crew can level up to tier 7
+  - Found crew can start at a higher tier
+- RWUI: Added weapon space to weapon name.
+- Slightly increased rate scrapped legendary+ items drop cores (from 10% to 15%).
+- Increased power of Tiers 5+ equipment and weapons.
+- builder module fix for Tiers 6+
+- RWMM: fix for lists being appended to, rather than replaced.
+
+### 1.1.7
+- Added descriptions for equipment with scrappable drops.
+- Boosted vanilla weapons damage more for tiers 5+ to make them competative with player made weapons.
+- RWUI: Added unlock text to all perks on perks grid.
+
 ### 1.1.6
 - Perks list now shows all perks, including ones you have not yet acquired.
 - Moved UI elements to their own dll (RWUI) so they could be used without RWEE.
@@ -216,7 +235,7 @@ RWEE can also be **removed safely**, with these expected behaviors:
 - Higher MK levels of QoL items (scanners/warp/collector beams/etc.)
   - More advanced sensors (detect stations in sector before visiting)
   - Higher-level Battle Computer (more opponent info)
-- Background perk changes (no lockouts; faction diplomacy rework)
+  - Something that increases turret rotation speed
 - Turret stat scaling in high-level sectors
 
 ### Long-term ideas (This section is basically my scratchpad for long-term ideas.  Expect duplicates and half-formed ideas.)
@@ -237,14 +256,13 @@ RWEE can also be **removed safely**, with these expected behaviors:
   - Maybe big ships are vulnerable from behind?  Causing extra damage, and debufs?
 - Way to make ramming builds more viable late-game
 - Maybe a separate higher-level version of Space Pilot and Fleet Commander that only starts when the base skills are maxed out.  This would allow the game to keep the standard L55-60 skills as hard to get, but introduce a new set of skill upgrades.
-- Allow higher versions of items (mk, etc.) to be intentionally turned down to mimic their weaker versions.
+- Allow higher versions of items (mk, etc.) to be intentionally turned down to mimic their weaker versions (lower stats, lower power usage).
 - When enemies run from you due to low health, they should flee to their own bases, turret clusteres if possible.
 - Add Bounty to end-game ships.
 - Balance for ultra-late-game sectors L150+
   - Tiers 8 (Celestial) and 9(Transcendent)
   - allow very high level enemies to drop ship blueprints, possibly including unique faction ships
 - group aggro for maurader hideouts.
-- Ship movement should always effect projectile movement because... physics.
 - Auto-rotate save log (to ensure more backups in case someone needs to restore).
 - Show hidden debris fields if your level is high enough (or maybe if you have a good enough scanner)
 - MK2 versions of unique ships (Geraki, Lacewing, etc) that require the original ship as an ingredient.
@@ -252,6 +270,7 @@ RWEE can also be **removed safely**, with these expected behaviors:
 - scrapping items returns some resources
 - Pirate Signature Transponder.  - An installed device that is tied a new identity.  Resets your background to Outis, and any reputation changes are tied to this identity.	Can be removed, returning you to your original identity and reputation.
 - Crew gain experience
+- bullet speed increasing equipment.
 - Stations
   - stations give back some resources when dismantled.
   - Some sort of limit to the number of stations that can be built in a sector to force you to optimize.  Maybe one miner per resource type per asteroid?
@@ -274,6 +293,3 @@ SHORT TERM TODO / reported bugs:
 test cloning a ship (language error.  use Aurora test) (conversation was in Discord Mods channel)
 
 effects being added, not edited (https://www.nexusmods.com/starvalor/mods/56?tab=posts)
-
-Cloning ships does not work.
-

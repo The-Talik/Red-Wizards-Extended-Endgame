@@ -9,23 +9,31 @@ namespace RWEE
 {
 	internal class RweeConfig
 	{
-		public static ConfigEntry<bool> increase_sector_cap;
-		public static ConfigEntry<bool> sectors_level_up;
+		public static ConfigEntry<bool> increaseSectorCap;
+		public static ConfigEntry<bool> sectorsLevelUp;
+		public static ConfigEntry<bool> disableEquipment;
 
 		public static void Init(ConfigFile config)
 		{
-			increase_sector_cap = config.Bind(
+			increaseSectorCap = config.Bind(
 				"Sectors",
 				"Increase Sector Cap",
 				true,
 				"Increase Sector Cap to 200."
 			);
-			sectors_level_up = config.Bind(
+			sectorsLevelUp = config.Bind(
 				"Sectors",
 				"Sectors Level Up",
 				true,
 				"Sectors level up when stations level up, and when nearby sectors level up."
 			);
+						disableEquipment = config.Bind(
+				"Ships",
+				"Disable Equipment",
+				true,
+				"Disables instead of unloads equipment when over limit from having a fleet."
+			);
+
 		}
 	}
 }

@@ -30,14 +30,28 @@ namespace RWEE
 				logr.Log($"Crew Orig: Level: {level} minRarity: {minRarity} maxRarity: {maxRarity} academy: {academy}");
 				if (academy != null)
 				{
-					if (level > 50)
-						level = 50;
+					//if (level > 50)
+					//	level = 50;
+					level = 1;
 					return true;
 				}
+
 				if (level > 30)
 					minRarity++;
 				if (level > 60)
 					maxRarity++;
+				if (level > 90)
+					minRarity++;
+				if (level > 120)
+					maxRarity++;
+				if (level > 150)
+					minRarity++;
+				if (level > 190)
+					maxRarity++;
+				if (minRarity > Main.MAX_RARITY-2)
+					minRarity = Main.MAX_RARITY-2;
+				if (maxRarity > Main.MAX_RARITY-1)
+					maxRarity = Main.MAX_RARITY-1;
 				level = 1;
 				logr.Log($"Crew Orig: Level: {level} minRarity: {minRarity} maxRarity: {maxRarity} academy: {academy}");
 				if (!allowSpecial)
@@ -146,12 +160,17 @@ namespace RWEE
 		{
 			static void Postfix(ref CrewMember __instance, ref int ___rarity, ref int ___nextRarityCount)
 			{
-				//logr.Log($"Crew GainXP Rarity: {___rarity} NextRarityCount: {___nextRarityCount}");
-				int mult = ___rarity - 3;
-				if (___nextRarityCount >= 1000 * Math.Pow(mult, 1.5f) && ___rarity >= 5 && ___rarity < Main.MAX_RARITY)
+				if (___rarity >= Main.MAX_RARITY)
+					return;
+				if (__instance.everEvolving || __instance.aiChar.level < PChar.maxLevel)
 				{
-					__instance.LevelUpRarity();
-					___nextRarityCount = 0;
+					int mult = ___rarity - 4;
+					logr.Log($"Crew GainXP Rarity: {___rarity}/{Main.MAX_RARITY} Level: {__instance.aiChar.level}/{PChar.maxLevel} Progress: {___nextRarityCount}/{1000 * Math.Pow(1.5f, mult)} {__instance.aiChar.name}");
+					if (___nextRarityCount >= 1000 * Math.Pow(1.5f, mult) && ___rarity >= 5 && ___rarity < Main.MAX_RARITY)
+					{
+						__instance.LevelUpRarity();
+						___nextRarityCount = 0;
+					}
 				}
 			}
 		}

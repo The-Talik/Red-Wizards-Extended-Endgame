@@ -36,11 +36,11 @@ namespace RWEE
 					//int currStationID = -1;
 					if (___inventory.inStation)
 					{
-						AttemptToLevelStation(___inventory.currStation);
+						AttemptToLevelStation(___inventory.currStation, ___quest.level);
 
 						int hostileFaction = FactionDB.GetHostileFactionForQuest(___inventory.currStation.factionIndex);
 						Station hostileStation = GameData.GetRandomStation(hostileFaction, ___inventory.currStation.level, 0, 10, 0, ___inventory.currStation.Sector, false, 1, false);
-						AttemptToLevelStation(hostileStation, true);
+						AttemptToLevelStation(hostileStation, ___quest.level, true);
 					}
 					else
 					{
@@ -53,7 +53,7 @@ namespace RWEE
 					logr.Log("Quest Incomplete");
 				}
 			}
-			static void AttemptToLevelStation(Station station, bool hostile = false)
+			static void AttemptToLevelStation(Station station, int level, bool hostile = false)
 			{
 				if (hostile)
 					logr.Log($"also considering leveling up a random hostile station {station.stationName(true)} and sector {station.Sector.level}. Shhh...  Nothing to see here.");
@@ -61,9 +61,11 @@ namespace RWEE
 					logr.Log($"considering leveling up station {station.stationName(true)} and sector {station.Sector.level}.");
 				//currStationID = this.inventory.currStation.id;
 				//logr.Log($"Char Level: {PChar.Char.level} Station Level:{station.level} Sector Level: {station.Sector.level}");
-				if (PChar.Char.level > station.level)
+				if (PChar.Char.level * 2 > level) //minimum of quest level or char level * 2
+					level = PChar.Char.level * 2;
+				if (level > station.level)
 				{
-					float amtOverStation = PChar.Char.level * 2 - station.level;
+					float amtOverStation = level - station.level;
 					if (amtOverStation < 1)
 						amtOverStation = 1;
 					if (UnityEngine.Random.Range(0, 20) < amtOverStation || (Main.DEBUG && 20 < amtOverStation))
