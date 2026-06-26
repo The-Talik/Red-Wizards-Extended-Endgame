@@ -58,6 +58,9 @@
     <Compile Include="..\..\Shared\Versions.cs">
       <Link>Versions.cs</Link>
     </Compile>
+    <Compile Include="..\..\Shared\StartupErrorLog.cs">
+      <Link>StartupErrorLog.cs</Link>
+    </Compile>
     <Compile Include="DataMemberOrder.cs" />
     <Compile Include="IgnoreDataMember.cs" />
     <Compile Include="_Main.cs" />

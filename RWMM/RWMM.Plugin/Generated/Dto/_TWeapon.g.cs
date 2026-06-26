@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using static RWMM.Dto._Equipment;
-using static RWMM.Dto._Item;
 
 namespace RWMM.Dto
 {
@@ -103,7 +101,7 @@ namespace RWMM.Dto
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float shortCooldown;
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
-		public _ReputationRequisite repReq;
+		public _Equipment._ReputationRequisite repReq;
 	[DataContract]
 	public class _TAmmo
 	{
@@ -116,11 +114,11 @@ namespace RWMM.Dto
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public _TAmmo ammo;
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
-		public List<_CraftMaterial> materials;
+		public List<_Item._CraftMaterial> materials;
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string description;
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
-		public List<_CraftMaterial> craftingMaterials;
+		public List<_Item._CraftMaterial> craftingMaterials;
 	}
 
 }

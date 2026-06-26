@@ -11,6 +11,7 @@ namespace RWMM.DTOGen
 	{
 		// Global set so nested DTO types (_ShipBonus, etc.) are only emitted once
 		private static readonly HashSet<string> emittedTypes = new HashSet<string>(StringComparer.Ordinal);
+		private static readonly Dictionary<string, string> emittedTypeOwners = new Dictionary<string, string>(StringComparer.Ordinal);
 
 		public static string EmitDto(TypeDefinition source_type, string dto_namespace, string dto_name)
 		{
@@ -28,14 +29,14 @@ namespace RWMM.DTOGen
 			sb.AppendLine("namespace " + dto_namespace);
 			sb.AppendLine("{");
 
-			EmitType(source_type, dto_name, sb);
+			EmitType(source_type, dto_name, sb, null);
 
 			sb.AppendLine("}");
 
 			return sb.ToString();
 		}
 
-		private static void EmitType(TypeDefinition type, string dto_name, StringBuilder sb)
+		private static void EmitType(TypeDefinition type, string dto_name, StringBuilder sb, string owner_dto_name)
 		{
 			if (type == null)
 				return;
@@ -43,6 +44,8 @@ namespace RWMM.DTOGen
 			// Only generate the class body once per source type
 			if (!emittedTypes.Add(type.FullName))
 				return;
+
+			emittedTypeOwners[type.FullName] = owner_dto_name;
 
 			if (ShouldSkipType(type))
 				return;
@@ -85,7 +88,7 @@ namespace RWMM.DTOGen
 					continue;
 
 				string cs_type;
-				if (!TryMapFieldType(f.FieldType, sb, out cs_type))
+				if (!TryMapFieldType(f.FieldType, sb, owner_dto_name ?? dto_name, out cs_type))
 					continue;
 
 				used_names.Add(member_name);
@@ -111,7 +114,7 @@ namespace RWMM.DTOGen
 			sb.AppendLine();
 		}
 
-		private static bool TryMapFieldType(TypeReference type, StringBuilder sb, out string cs_type)
+		private static bool TryMapFieldType(TypeReference type, StringBuilder sb, string current_owner_dto_name, out string cs_type)
 		{
 			cs_type = null;
 			if (type == null) return false;
@@ -127,7 +130,7 @@ namespace RWMM.DTOGen
 			{
 				var array_type = (ArrayType)type;
 				string elem_type;
-				if (!TryMapFieldType(array_type.ElementType, sb, out elem_type))
+				if (!TryMapFieldType(array_type.ElementType, sb, current_owner_dto_name, out elem_type))
 					return false;
 
 				cs_type = elem_type + "[]";
@@ -148,7 +151,7 @@ namespace RWMM.DTOGen
 						return false;
 
 					string elem_type;
-					if (!TryMapFieldType(gi.GenericArguments[0], sb, out elem_type))
+					if (!TryMapFieldType(gi.GenericArguments[0], sb, current_owner_dto_name, out elem_type))
 						return false;
 
 					cs_type = "List<" + elem_type + ">";
@@ -177,7 +180,7 @@ namespace RWMM.DTOGen
 			if (def != null && def.IsEnum)
 			{
 				
-				cs_type = def.Name;
+				cs_type = def.Namespace == "UnityEngine" ? "global::" + def.FullName : def.Name;
 				return true;
 			}
 
@@ -201,8 +204,18 @@ namespace RWMM.DTOGen
 			}
 
 			// Complex nested game/data type – emit DTO recursively
-			EmitType(def, GetDtoName(def), sb);
-			cs_type = GetDtoName(def);
+			var dto_type_name = GetDtoName(def);
+			string emitted_owner;
+			if (emittedTypeOwners.TryGetValue(def.FullName, out emitted_owner))
+			{
+				cs_type = string.IsNullOrEmpty(emitted_owner) || emitted_owner == current_owner_dto_name
+					? dto_type_name
+					: emitted_owner + "." + dto_type_name;
+				return true;
+			}
+
+			EmitType(def, dto_type_name, sb, current_owner_dto_name);
+			cs_type = dto_type_name;
 			return true;
 		}
 

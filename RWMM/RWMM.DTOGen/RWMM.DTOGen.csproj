@@ -32,6 +32,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <RepoRoot Condition=" '$(SolutionDir)' != '' And '$(SolutionDir)' != '*Undefined*' ">$(SolutionDir)</RepoRoot>
+    <RepoRoot Condition=" '$(RepoRoot)' == '' ">$(MSBuildProjectDirectory)\..\..\</RepoRoot>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Cecil">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Star Valor\BepInEx\core\Mono.Cecil.dll</HintPath>
@@ -55,9 +59,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"$(SolutionDir)RWMM\RWMM.DTOGen\bin\Debug\RWMM.DTOGen.exe" ^
+    <PostBuildEvent>"$(TargetPath)" ^
   --assembly "$(GamePath)\Star Valor_Data\Managed\Assembly-CSharp.dll" ^
-  --output   "$(SolutionDir)RWMM\RWMM.Plugin\Generated\Dto" ^
+  --output   "$(RepoRoot)RWMM\RWMM.Plugin\Generated\Dto" ^
   --types    "Item,Equipment,ShipModelData,Quest,TWeapon,CrewMember,Perk" ^
   --namespace "RWMM.Dto"</PostBuildEvent>
   </PropertyGroup>

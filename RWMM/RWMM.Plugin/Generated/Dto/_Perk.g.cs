@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using static RWMM.Dto._ShipModelData;
 
 namespace RWMM.Dto
 {
@@ -26,7 +25,7 @@ namespace RWMM.Dto
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public float duration;
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
-		public _ShipBonus[] shipBonus;
+		public _ShipModelData._ShipBonus[] shipBonus;
 	[DataContract]
 	public class _ReputationChange
 	{

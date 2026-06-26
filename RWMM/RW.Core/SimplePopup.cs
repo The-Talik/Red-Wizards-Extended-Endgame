@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RW
@@ -15,6 +16,8 @@ namespace RW
 		private GUIStyle _label, _btn, _title;
 		private bool _stylesBuilt;
 		private string _title_text;
+		private Vector2 _scroll;
+		private Queue<PopupMessage> _pending = new Queue<PopupMessage>();
 
 		public static void Show(string title, string message, string url = null)//1 = warn, 2=error
 		{
@@ -24,14 +27,13 @@ namespace RW
 				UnityEngine.Object.DontDestroyOnLoad(go);
 				_inst = go.AddComponent<SimplePopup>();
 			}
-			_inst._message = string.IsNullOrEmpty(message) ? "Message" : message;
-			_inst._url = string.IsNullOrEmpty(url) ? null : url;
-			_inst._visible = true;
-			_inst.enabled = true;
-			_inst._title_text = title;
-			_inst.CenterWindow();
-			if (GameManager.instance != null)
-				GameManager.instance.PauseGame(true);
+			if (_inst._visible)
+			{
+				_inst._pending.Enqueue(new PopupMessage(title, message, url));
+				return;
+			}
+
+			_inst.ShowNow(title, message, url);
 
 		}
 
@@ -39,11 +41,31 @@ namespace RW
 		{
 			if (_inst != null)
 			{
+				if (_inst._pending.Count > 0)
+				{
+					var next = _inst._pending.Dequeue();
+					_inst.ShowNow(next.Title, next.Message, next.Url);
+					return;
+				}
+
 				_inst._visible = false;
 				_inst.enabled = false;
 			}
 			if (GameManager.instance != null)
 				GameManager.instance.ResumeGame();
+		}
+
+		private void ShowNow(string title, string message, string url)
+		{
+			_message = string.IsNullOrEmpty(message) ? "Message" : message;
+			_url = string.IsNullOrEmpty(url) ? null : url;
+			_visible = true;
+			enabled = true;
+			_title_text = title;
+			_scroll = Vector2.zero;
+			CenterWindow();
+			if (GameManager.instance != null)
+				GameManager.instance.PauseGame(true);
 		}
 
 		private void Awake()
@@ -54,8 +76,12 @@ namespace RW
 
 		private void CenterWindow()
 		{
-			_win.x = (Screen.width - _win.width) * 0.5f;
-			_win.y = (Screen.height - _win.height) * 0.5f;
+			var screenWidth = Screen.width > 0 ? Screen.width : 1280;
+			var screenHeight = Screen.height > 0 ? Screen.height : 720;
+			_win.width = Mathf.Min(screenWidth - 40, Mathf.Max(500, screenWidth * 0.55f));
+			_win.height = Mathf.Min(screenHeight - 40, Mathf.Max(260, screenHeight * 0.55f));
+			_win.x = (screenWidth - _win.width) * 0.5f;
+			_win.y = (screenHeight - _win.height) * 0.5f;
 		}
 
 		private void OnGUI()
@@ -82,7 +108,9 @@ namespace RW
 		private void DoWindow(int id)
 		{
 			GUILayout.Space(6);
-			GUILayout.Label(_message, _label, GUILayout.ExpandHeight(true));
+			_scroll = GUILayout.BeginScrollView(_scroll, GUILayout.ExpandHeight(true));
+			GUILayout.Label(_message, _label);
+			GUILayout.EndScrollView();
 
 			GUILayout.FlexibleSpace();
 			GUILayout.BeginHorizontal();
@@ -126,6 +154,20 @@ namespace RW
 			{
 				fontSize = baseSize + 2  // <- bigger window title
 			};
+		}
+
+		private struct PopupMessage
+		{
+			public readonly string Title;
+			public readonly string Message;
+			public readonly string Url;
+
+			public PopupMessage(string title, string message, string url)
+			{
+				Title = title;
+				Message = message;
+				Url = url;
+			}
 		}
 	}
 }

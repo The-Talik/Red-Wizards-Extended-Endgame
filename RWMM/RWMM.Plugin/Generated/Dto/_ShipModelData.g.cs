@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using static RWMM.Dto._Equipment;
-using static RWMM.Dto._Item;
 
 namespace RWMM.Dto
 {
@@ -95,13 +93,13 @@ namespace RWMM.Dto
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public int rarity;
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
-		public _ReputationRequisite repReq;
+		public _Equipment._ReputationRequisite repReq;
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string _factions = "-1:Any, 0:Independent, 1:Miners, 2:Traders, 3:Pirates, 4:Venghi, 5:Rebels, 6:Tecnomancers";
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public TFaction[] factions;
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
-		public List<_CraftMaterial> craftingMaterials;
+		public List<_Item._CraftMaterial> craftingMaterials;
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public global::UnityEngine.Vector3 extraSurFXScale;
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]

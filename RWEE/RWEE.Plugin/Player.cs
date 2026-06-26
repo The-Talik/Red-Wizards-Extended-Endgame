@@ -3,6 +3,7 @@ using RW.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -18,27 +19,64 @@ namespace RWEE
 		[HarmonyPatch(typeof(PChar), "EarnXP")]
 		static class PChar_EarnXP
 		{
-			static void Prefix(float amount, int type, ref int ___maxLevel, int baseLevel, ref int[] __state)
+			static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 			{
-				//PChar.Char.techLevel = 101;
-				//logr.Log($"EarnXP {amount}");
-				__state = new int[PChar.Char.passive.Length];
-				if (PChar.Char.level >= 50)
-				{
-					float mult = (Main.NEW_PCHAR_MAXLEVEL - PChar.Char.level) / (Main.NEW_PCHAR_MAXLEVEL - 50f);
-					mult = -(1f - mult) * (100f / 3f);
+				var code = new List<CodeInstruction>(instructions);
+				var charField = AccessTools.Field(typeof(PChar), "Char");
+				var currXpField = AccessTools.Field(typeof(PlayerCharacter), "currXP");
+				var throttleMethod = AccessTools.Method(typeof(PChar_EarnXP), nameof(ThrottleCharacterLevelXp));
+				int patched = 0;
 
-					for (int i = 0; i < PChar.Char.passive.Length; i++)
+				for (int i = 0; i <= code.Count - 6; i++)
+				{
+					if (code[i].opcode == OpCodes.Ldsfld && Equals(code[i].operand, charField) &&
+						code[i + 1].opcode == OpCodes.Dup &&
+						code[i + 2].opcode == OpCodes.Ldfld && Equals(code[i + 2].operand, currXpField) &&
+						LoadsAmountArgument(code[i + 3]) &&
+						code[i + 4].opcode == OpCodes.Add &&
+						code[i + 5].opcode == OpCodes.Stfld && Equals(code[i + 5].operand, currXpField))
 					{
-						__state[i] = PChar.Char.passive[i];
-						PChar.Char.passive[i] = (int)Mathf.Min(PChar.Char.passive[i], mult);  //xp multiplier formula = 1 + passive*0.03
+						code.Insert(i + 4, new CodeInstruction(OpCodes.Call, throttleMethod));
+						patched++;
+						i += 5;
 					}
 				}
+
+				if (patched != 1)
+					logr.Warn($"RWEE PChar.EarnXP transpiler expected 1 currXP patch, found {patched}. Character XP throttling may be inactive.");
+
+				return code;
 			}
-			static void Postfix(ref int ___maxLevel, ref int[] __state)
+
+			static bool LoadsAmountArgument(CodeInstruction instruction)
 			{
-				PChar.Char.passive = __state;
-				//___maxLevel = Main.Old_PChar_MaxLevel;
+				return instruction.opcode == OpCodes.Ldarg_0 ||
+					(instruction.opcode == OpCodes.Ldarg_S && IsArgumentZero(instruction.operand)) ||
+					(instruction.opcode == OpCodes.Ldarg && IsArgumentZero(instruction.operand));
+			}
+
+			static bool IsArgumentZero(object operand)
+			{
+				if (operand is int index)
+					return index == 0;
+				if (operand is short shortIndex)
+					return shortIndex == 0;
+				if (operand is byte byteIndex)
+					return byteIndex == 0;
+				return false;
+			}
+
+			static float ThrottleCharacterLevelXp(float amount)
+			{
+				if (PChar.Char == null || PChar.Char.level <= Main.OLD_PCHAR_MAXLEVEL)
+					return amount;
+
+				float levelRange = Main.NEW_PCHAR_MAXLEVEL - Main.OLD_PCHAR_MAXLEVEL;
+				if (levelRange <= 0f)
+					return amount;
+
+				float multiplier = (Main.NEW_PCHAR_MAXLEVEL - PChar.Char.level) / levelRange;
+				return amount * Mathf.Clamp01(multiplier);
 			}
 		}
 		[HarmonyPatch(typeof(PChar), "TechLevelUp")]

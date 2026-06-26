@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
-		<RWEEVersion>1.1.6</RWEEVersion>
-		<RWMMVersion>0.0.4</RWMMVersion>
+		<RWEEVersion>1.1.9</RWEEVersion>
+		<RWMMVersion>0.0.6</RWMMVersion>
     <Company>RWEE</Company>
     <Authors>RWEE</Authors>
     <LangVersion>7.3</LangVersion>

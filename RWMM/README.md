@@ -277,6 +277,12 @@ RWMM includes a small utility library you can reference from your own BepInEx pl
 
 ## Changelog
 
+### 0.0.6
+- Updated generated DTOs for Star Valor 2.2.4 (tested against Steam build 23858659).
+- Fixed Unity enum references such as `KeyCode` in generated DTOs.
+- Fixed cross-file nested DTO references after regenerating against the current base game.
+- Added in-game reporting for startup, prepatcher, and runtime Unity errors.
+
 ### 0.0.2
 - Prototype injection set to run last, after other mods.
 - Added Perks to supported dump/import types.

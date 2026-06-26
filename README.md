@@ -1,5 +1,7 @@
 ﻿# RWEE — Red Wizards Extended Endgame (Star Valor)
 
+Note: I don't actively monitor the Nexus Posts.  Bugs are best reported through the Star Valor discord's RWEE channel.
+
 Red Wizard's Extended Endgame is an **end-game overhaul** mod for **Star Valor**.  It attempt at extending the gameplay in a number of ways intended to feel balanced with the core game.  Most features of this mod do not come into play until the player or sectors are L50+.  Increase player level cap to 100, sector level cap to 200, adds endgame upgrades, improves enemy AI, core gameplay improvements, and a bunch of other tweaks.
 
 - Player level cap → **100**  
@@ -129,6 +131,11 @@ RWEE can also be **removed safely**, with these expected behaviors:
 ---
 
 ## Changelog
+### 1.1.9
+- Updated for Star Valor 2.2.4.
+- RWMM: Added better in-game reporting for startup, prepatcher, and runtime Unity errors.
+- Fixed high-level character XP throttling so it no longer rewrites skill passive bonuses.
+
 ### 1.1.8
 - Scrapping legendary/mythic items now drops a core, which must be crafted into the upgrade item.
 - Cut extra multiplier for high level enemy hp and shield regen in half.

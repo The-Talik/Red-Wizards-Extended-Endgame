@@ -41,42 +41,53 @@ namespace RWEE
 
 		private void Awake()
 		{
-			RweeConfig.Init(Config);
-
-			_harmony = new Harmony(pluginGuid);
-			_harmony.PatchAll(Assembly.GetExecutingAssembly());
 			Logging.Init(Logger, 1);
-
-			logr.Log("Red Wizard's Extended Endgame Loaded");
-			const string VERSION_URL = "https://mezr.com/star_valor.json.php";
-			var fi = typeof(GameData).GetField("rweePatcherVersion", BindingFlags.Public | BindingFlags.Static);
-			//logr.Log("GameDataInfo fields: " + string.Join(", ", fi.Select(f => f.Name + (f.IsStatic ? "[static]" : "[inst]"))));
-			var patcherVersion = fi.GetValue(null) as string;
-			if(patcherVersion != pluginVersion)
+			ErrorPopupMonitor.Install(Logger, pluginName);
+			try
 			{
-				logr.Error($"Patcher version does not match plugin version.  Ensure both are up to date.  Patcher={patcherVersion} Plugin={pluginVersion}");
+				RweeConfig.Init(Config);
+
+				_harmony = new Harmony(pluginGuid);
+				_harmony.PatchAll(Assembly.GetExecutingAssembly());
+
+				logr.Log("Red Wizard's Extended Endgame Loaded");
+				const string VERSION_URL = "https://mezr.com/star_valor.json.php";
+				var fi = typeof(GameData).GetField("rweePatcherVersion", BindingFlags.Public | BindingFlags.Static);
+				//logr.Log("GameDataInfo fields: " + string.Join(", ", fi.Select(f => f.Name + (f.IsStatic ? "[static]" : "[inst]"))));
+				var patcherVersion = fi == null ? null : fi.GetValue(null) as string;
+				if(patcherVersion != pluginVersion)
+				{
+					logr.Error($"Patcher version does not match plugin version.  Ensure both are up to date.  Patcher={patcherVersion ?? "<missing>"} Plugin={pluginVersion}");
+				}
+
+				if (typeof(GameDataInfo).GetField("rweeJson", BindingFlags.Public | BindingFlags.Instance) == null)
+				{
+					logr.Error("Could not find rweeJson.  Did the prepatcher load?");
+				}
+				else
+				{
+					logr.Log("Found rweeJson.");
+				}
+
+				logr.Log("Has GameDataInfo.rweeJson? " + (typeof(GameDataInfo).GetField("rweeJson", BindingFlags.Public | BindingFlags.Instance) != null));
+				logr.PopupErrors("Red Wizard's Extended Endgame", "There were errors during startup:");
+				
+				VersionControl.Check(this, Logger, VERSION_URL, pluginVersion, (msg, link) =>
+				{
+
+					logr.Error(msg + (string.IsNullOrEmpty(link) ? "" : " -> " + link),false);
+
+					RW.SimplePopup.Show("Red Wizard's Extended Endgame", msg, link);
+					// Or open a page:
+					// if (!string.IsNullOrEmpty(link)) Application.OpenURL(link);
+				});
 			}
-
-			if (typeof(GameDataInfo).GetField("rweeJson", BindingFlags.Public | BindingFlags.Instance) == null)
+			catch (Exception ex)
 			{
-				logr.Error("Could not find rweeJson.  Did the prepatcher load?");
+				Logger.LogError("[RWEE] Load failed: " + ex);
+				ErrorPopupMonitor.Report("Red Wizard's Extended Endgame load error", ex);
+				throw;
 			}
-			else
-			{
-				logr.Log("Found rweeJson.");
-			}
-
-			logr.Log("Has GameDataInfo.rweeJson? " + (typeof(GameDataInfo).GetField("rweeJson", BindingFlags.Public | BindingFlags.Instance) != null));
-			
-			VersionControl.Check(this, Logger, VERSION_URL, pluginVersion, (msg, link) =>
-			{
-
-				logr.Error(msg + (string.IsNullOrEmpty(link) ? "" : " → " + link),false);
-
-				RW.SimplePopup.Show("Red Wizard's Extended Endgame", msg, link);
-				// Or open a page:
-				// if (!string.IsNullOrEmpty(link)) Application.OpenURL(link);
-			});
 		}
 		private void OnDestroy()
 		{

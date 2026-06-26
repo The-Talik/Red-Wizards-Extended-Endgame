@@ -31,11 +31,21 @@ namespace RWUI
 
 		private void Awake()
 		{
-			_harmony = new Harmony(pluginGuid);
-			_harmony.PatchAll(Assembly.GetExecutingAssembly());
 			Logging.Init(Logger, 1);
+			ErrorPopupMonitor.Install(Logger, pluginName);
+			try
+			{
+				_harmony = new Harmony(pluginGuid);
+				_harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-			logr.Log("Red Wizard's User Interface loaded");
+				logr.Log("Red Wizard's User Interface loaded");
+			}
+			catch (Exception ex)
+			{
+				Logger.LogError("[RWUI] Load failed: " + ex);
+				ErrorPopupMonitor.Report("Red Wizard's User Interface load error", ex);
+				throw;
+			}
 		}
 		private void OnDestroy()
 		{

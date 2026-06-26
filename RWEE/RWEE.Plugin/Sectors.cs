@@ -16,7 +16,7 @@ namespace RWEE
 		[HarmonyPatch(typeof(GameDataInfo), "GetSectorIndex")]
 		static class GameDataInfo_GetSectorIndex_Patch
 		{
-			static bool Prefix(GameDataInfo __instance, int cX, int cY, int desiredFactionControl, ref int __result)
+			static bool Prefix(GameDataInfo __instance, int cX, int cY, int desiredFactionControl, bool setAsMainSector, ref int __result)
 			{
 				if(!RweeConfig.increaseSectorCap.Value)
 					return true;
@@ -32,7 +32,7 @@ namespace RWEE
 				{
 					int newLevel = Sectors.calculateLevel(cX, cY);
 
-					TSector item = new TSector(2, cX, cY, newLevel, desiredFactionControl);
+					TSector item = new TSector(2, cX, cY, newLevel, desiredFactionControl, setAsMainSector);
 					__result = __instance.sectors.IndexOf(item);
 					return false;
 				}

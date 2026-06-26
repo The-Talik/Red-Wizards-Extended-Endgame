@@ -32,17 +32,27 @@ namespace RWMM
 
 		private void Awake()
 		{
-			_harmony = new Harmony(pluginGuid);
-			_harmony.PatchAll(Assembly.GetExecutingAssembly());
 			Logging.Init(Logger, 1);
-			RW.Core.Logging.Init(Logging.logr);
-//			RW.Core.Logging.Init(Logger, 1);
-			//Logger.ForegroundColor = ConsoleColor.Cyan;
-			//	Logger.WriteLine("This is cyan text");
+			ErrorPopupMonitor.Install(Logger, pluginName);
+			try
+			{
+				RW.Core.Logging.Init(Logging.logr);
+				_harmony = new Harmony(pluginGuid);
+				_harmony.PatchAll(Assembly.GetExecutingAssembly());
+//				RW.Core.Logging.Init(Logger, 1);
+				//Logger.ForegroundColor = ConsoleColor.Cyan;
+				//	Logger.WriteLine("This is cyan text");
 
 
 
-			logr.Log("[RWMM] Loaded");
+				logr.Log("[RWMM] Loaded");
+			}
+			catch (Exception ex)
+			{
+				Logger.LogError("[RWMM] Load failed: " + ex);
+				ErrorPopupMonitor.Report("Red Wizard's Mod Manager load error", ex);
+				throw;
+			}
 
 		}
 		private void OnDestroy()

@@ -28,34 +28,49 @@ namespace RWMM.Patcher
 			else { try {  } catch { } }
 		}
 
+		static void Warn(string s)
+		{
+			Log("[WARN] " + s);
+			RW.StartupErrorLog.Append("RWMM prepatcher warning", s);
+		}
+
 		public static void Patch(AssemblyDefinition asm)
 		{
-			string modVersion = RW.Versions.RWMM;
-			Log("Patch() entered");
+			try
+			{
+				string modVersion = RW.Versions.RWMM;
+				Log("Patch() entered");
 
-			var mod = asm.MainModule;
-			int total = 0;
+				var mod = asm.MainModule;
+				int total = 0;
 
-			total += EnsureOptionalField(mod, "GameDataInfo", "rweeItemMapJson", mod.TypeSystem.String);
-			total += EnsureOptionalField(mod, "ShipModelData", "refName", mod.TypeSystem.String, false);
-			total += EnsureOptionalField(mod, "TWeapon", "refName", mod.TypeSystem.String, false);
-			total += EnsureOptionalField(mod, "CrewMember", "refName", mod.TypeSystem.String, false);
+				total += EnsureOptionalField(mod, "GameDataInfo", "rweeItemMapJson", mod.TypeSystem.String);
+				total += EnsureOptionalField(mod, "ShipModelData", "refName", mod.TypeSystem.String, false);
+				total += EnsureOptionalField(mod, "TWeapon", "refName", mod.TypeSystem.String, false);
+				total += EnsureOptionalField(mod, "CrewMember", "refName", mod.TypeSystem.String, false);
 
-			//			total += AddDataContract.Add(mod,"Item");
-			total += IgnoreDataMember.AddIgnoreDataMemberToNonserialized(mod, "Item");
+				//			total += AddDataContract.Add(mod,"Item");
+				total += IgnoreDataMember.AddIgnoreDataMemberToNonserialized(mod, "Item");
 
-//			total += DataMemberOrder.AddDataMemberOrder(mod, "Item", "id", 0);
-			Log("Patch() done. Replacements/Appends: " + total);
+//				total += DataMemberOrder.AddDataMemberOrder(mod, "Item", "id", 0);
+				Log("Patch() done. Replacements/Appends: " + total);
+			}
+			catch (Exception ex)
+			{
+				Log("[ERROR] Patch() failed: " + ex);
+				RW.StartupErrorLog.Append("RWMM prepatcher", ex);
+				throw;
+			}
 		}
 
 		// Rewrites all stores to declaringTypeName.fieldName and appends a final set at end of its .cctor
 		static int ForceField(ModuleDefinition mod, string declaringTypeName, string fieldName, Instruction pushNewVal)
 		{
 			var declType = mod.Types.FirstOrDefault(t => t.Name == declaringTypeName);
-			if (declType == null) { Log("[WARN] Declaring type not found: " + declaringTypeName); return 0; }
+			if (declType == null) { Warn("Declaring type not found: " + declaringTypeName); return 0; }
 
 			var field = declType.Fields.FirstOrDefault(f => f.Name == fieldName);
-			if (field == null) { Log("[WARN] Field not found: " + declaringTypeName + "." + fieldName); return 0; }
+			if (field == null) { Warn("Field not found: " + declaringTypeName + "." + fieldName); return 0; }
 
 			int edits = 0;
 
@@ -145,12 +160,12 @@ namespace RWMM.Patcher
 				}
 				else
 				{
-					Log("[WARN] " + declType.FullName + "..cctor has no Ret");
+					Warn(declType.FullName + "..cctor has no Ret");
 				}
 			}
 			else
 			{
-				Log("[WARN] " + declType.FullName + " has no .cctor");
+				Warn(declType.FullName + " has no .cctor");
 			}
 
 			return edits;
@@ -178,14 +193,14 @@ namespace RWMM.Patcher
 				string[] paramTypeFullNames /* optional: null = all overloads */ = null)
 		{
 			var targetType = mod.Types.FirstOrDefault(t => t.Name == targetTypeName);
-			if (targetType == null) { Log("[WARN] Type not found: " + targetTypeName); return 0; }
+			if (targetType == null) { Warn("Type not found: " + targetTypeName); return 0; }
 
 			var ownerType = mod.Types.FirstOrDefault(t => t.Name == fieldOwnerTypeName);
-			if (ownerType == null) { Log("[WARN] Field owner type not found: " + fieldOwnerTypeName); return 0; }
+			if (ownerType == null) { Warn("Field owner type not found: " + fieldOwnerTypeName); return 0; }
 			var ownerFull = ownerType.FullName;
 
 			var methods = targetType.Methods.Where(m => m.Name == targetMethodName && m.HasBody).ToList();
-			if (methods.Count == 0) { Log("[WARN] Method not found: " + targetTypeName + "." + targetMethodName); return 0; }
+			if (methods.Count == 0) { Warn("Method not found: " + targetTypeName + "." + targetMethodName); return 0; }
 
 			// Optional: narrow to a specific overload by parameter type full names
 			if (paramTypeFullNames != null)
@@ -200,7 +215,7 @@ namespace RWMM.Patcher
 
 				if (methods.Count == 0)
 				{
-					Log("[WARN] Overload not found: " + targetTypeName + "." + targetMethodName + "(" + string.Join(", ", paramTypeFullNames) + ")");
+					Warn("Overload not found: " + targetTypeName + "." + targetMethodName + "(" + string.Join(", ", paramTypeFullNames) + ")");
 					return 0;
 				}
 			}
@@ -240,7 +255,7 @@ namespace RWMM.Patcher
 			var t = mod.Types.FirstOrDefault(x => x.Name == typeName);
 			if (t == null)
 			{
-				Log("[WARN] Type not found: " + typeName);
+				Warn("Type not found: " + typeName);
 				return 0;
 			}
 
